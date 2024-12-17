@@ -23,34 +23,42 @@
                     <div class="card shadow-2-strong" style="border-radius: 1rem;">
                         <div class="card-body p-5 text-center">
                             <h3 class="mb-5">Registro</h3>
-                            <form action="{{ route('login') }}" method="POST">
+                            <form action="{{ route('register') }}" method="POST">
                                 @csrf
+                                <!-- Name input -->
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="typeNameX-2">Nombre:</label>
+                                    <input name="name" type="text" id="name" class="form-control form-control-lg" required />
+                                </div>
                                 <!-- Email input -->
                                 <div class="form-outline mb-4">
-                                    <input name="email" type="email" id="typeEmailX-2" class="form-control form-control-lg" required />
                                     <label class="form-label" for="typeEmailX-2">Correo electrónico</label>
+                                    <input name="email" type="email" id="email" class="form-control form-control-lg" required />
                                 </div>
                                 <!-- Password input -->
                                 <div class="form-outline mb-4">
-                                    <input type="password" id="typePasswordX-2" class="form-control form-control-lg" required />
                                     <label class="form-label" for="typePasswordX-2">Contraseña</label>
+                                    <input name="password" type="password" id="password" class="form-control form-control-lg" required />
                                 </div>
-                                <!-- Checkbox -->
-                                <div class="form-check d-flex justify-content-start mb-4">
-                                    <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
-                                    <label class="form-check-label" for="form1Example3"> Recordar contraseña </label>
+                                <!-- Password input -->
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="typePasswordX-2">Confirmar contraseña</label>
+                                    <input name="password_confirmation" type="password" id="password_confirmation" class="form-control form-control-lg" required />
                                 </div>
                                 <!-- Login button -->
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">Acceder</button>
-                                <hr class="my-4">
-                                <!-- Social login buttons -->
-                                <button class="btn btn-lg btn-block btn-danger" style="background-color: #dd4b39;" type="button">
-                                    <i class="fab fa-google me-2"></i> Acceder con Google
-                                </button>
-                                <br><br>
-                                <button class="btn btn-lg btn-block btn-primary mb-2" style="background-color: #3b5998;" type="button">
-                                    <i class="fab fa-facebook-f me-2"></i> Acceder con Facebook
-                                </button>
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">Registrarse</button>
+                                <a href="{{route('login')}}" class="btn btn-secondary btn-lg btn-block"> Regresar
+                                </a>
+                                @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
+
                             </form>
                         </div>
                     </div>

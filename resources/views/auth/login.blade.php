@@ -27,13 +27,14 @@
                                 @csrf
                                 <!-- Email input -->
                                 <div class="form-outline mb-4">
+                                <label class="form-label" for="typeEmailX-2">Correo electrónico</label>
                                     <input name="email" type="email" id="typeEmailX-2" class="form-control form-control-lg" required />
-                                    <label class="form-label" for="typeEmailX-2">Correo electrónico</label>
                                 </div>
                                 <!-- Password input -->
                                 <div class="form-outline mb-4">
-                                    <input type="password" id="typePasswordX-2" class="form-control form-control-lg" required />
                                     <label class="form-label" for="typePasswordX-2">Contraseña</label>
+                                    <input name="password" id="typePasswordX-2" class="form-control form-control-lg" required />
+
                                 </div>
                                 <!-- Checkbox -->
                                 <div class="form-check d-flex justify-content-start mb-4">
@@ -43,18 +44,19 @@
                                 <!-- Login button -->
                                 <button class="btn btn-primary btn-lg btn-block" type="submit">Acceder</button>
                                 <hr class="my-4">
-                                
+                                @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
                                 <p>
                                     No tienes una cuenta? <a href="{{ route('register') }}">Regístrate</a>
                                 </p>
-                                <!-- Social login buttons -->
-                                <button class="btn btn-lg btn-block btn-danger" style="background-color: #dd4b39;" type="button">
-                                    <i class="fab fa-google me-2"></i> Acceder con Google
-                                </button>
-                                <br><br>
-                                <button class="btn btn-lg btn-block btn-primary mb-2" style="background-color: #3b5998;" type="button">
-                                    <i class="fab fa-facebook-f me-2"></i> Acceder con Facebook
-                                </button>
+   
                             </form>
                         </div>
                     </div>
