@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Sign In</title>
+    <title>Iniciar sesión</title>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -22,41 +22,40 @@
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                     <div class="card shadow-2-strong" style="border-radius: 1rem;">
                         <div class="card-body p-5 text-center">
-
-                            <h3 class="mb-5">Sign in</h3>
-
-                            <!-- Email input -->
-                            <div class="form-outline mb-4">
-                                <input type="email" id="typeEmailX-2" class="form-control form-control-lg" required />
-                                <label class="form-label" for="typeEmailX-2">Email</label>
-                            </div>
-
-                            <!-- Password input -->
-                            <div class="form-outline mb-4">
-                                <input type="password" id="typePasswordX-2" class="form-control form-control-lg" required />
-                                <label class="form-label" for="typePasswordX-2">Password</label>
-                            </div>
-
-                            <!-- Checkbox -->
-                            <div class="form-check d-flex justify-content-start mb-4">
-                                <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
-                                <label class="form-check-label" for="form1Example3"> Remember password </label>
-                            </div>
-
-                            <!-- Login button -->
-                            <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
-
-                            <hr class="my-4">
-
-                            <!-- Social login buttons -->
-                            <button class="btn btn-lg btn-block btn-danger" style="background-color: #dd4b39;" type="button">
-                                <i class="fab fa-google me-2"></i> Sign in with Google
-                            </button>
-                            <br><br>
-                            <button class="btn btn-lg btn-block btn-primary mb-2" style="background-color: #3b5998;" type="button">
-                                <i class="fab fa-facebook-f me-2"></i> Sign in with Facebook
-                            </button>
-
+                            <h3 class="mb-5">Iniciar sesión</h3>
+                            <form action="{{ route('login') }}" method="POST">
+                                @csrf
+                                <!-- Email input -->
+                                <div class="form-outline mb-4">
+                                    <input name="email" type="email" id="typeEmailX-2" class="form-control form-control-lg" required />
+                                    <label class="form-label" for="typeEmailX-2">Correo electrónico</label>
+                                </div>
+                                <!-- Password input -->
+                                <div class="form-outline mb-4">
+                                    <input type="password" id="typePasswordX-2" class="form-control form-control-lg" required />
+                                    <label class="form-label" for="typePasswordX-2">Contraseña</label>
+                                </div>
+                                <!-- Checkbox -->
+                                <div class="form-check d-flex justify-content-start mb-4">
+                                    <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
+                                    <label class="form-check-label" for="form1Example3"> Recordar contraseña </label>
+                                </div>
+                                <!-- Login button -->
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">Acceder</button>
+                                <hr class="my-4">
+                                
+                                <p>
+                                    No tienes una cuenta? <a href="{{ route('register') }}">Regístrate</a>
+                                </p>
+                                <!-- Social login buttons -->
+                                <button class="btn btn-lg btn-block btn-danger" style="background-color: #dd4b39;" type="button">
+                                    <i class="fab fa-google me-2"></i> Acceder con Google
+                                </button>
+                                <br><br>
+                                <button class="btn btn-lg btn-block btn-primary mb-2" style="background-color: #3b5998;" type="button">
+                                    <i class="fab fa-facebook-f me-2"></i> Acceder con Facebook
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
