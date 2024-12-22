@@ -2,17 +2,12 @@
 <html lang="en" class="h-100" data-bs-theme="auto">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
-    <!-- <title>@yield('titulo') - ITTG</title> -->
-
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sticky-footer-navbar/">
-
-
+    <title>@yield('titulo')Inicio - ITTG</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 
@@ -23,8 +18,8 @@
     <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
     <link rel="icon" href="favicon.ico" sizes="32x32" type="x-icon">
     <link rel="icon" href="favicon.ico" sizes="16x16" type="x-icon">
-    <link rel="manifest" href="manifest.json">
-    <link rel="mask-icon" href="tec_logo.svg" color="#712cf9">
+    <link rel="composer" href="composer.json">
+    <link rel="mask-icon" href="public\tec_logo.svg" color="#712cf9">
     <link rel="icon" href="favicon.ico">
     <meta name="theme-color" content="#712cf9">
 
@@ -157,7 +152,6 @@
         .navbar-brand {
             margin-bottom: 2px;
         }
-        
     </style>
 
 
@@ -223,7 +217,7 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
+                            <a class="nav-link active" aria-current="page" href="/">Inicio</a>
                         </li>
                         <li class="nav-item dropdown">
                             <!--DROPDOWN-->
@@ -241,20 +235,19 @@
                                     <a href="/c_proyectos">Proyectos</a>
                                     <a href="/c_servicios">Servicios</a>
                                     <a href="/c_tipos">Tipos</a>
-                                    <a href="/c_habilidadesAM">Habilidades AM</a>
                                 </div>
                             </div>
                             <!--DROPDOWN-->
                         </li>
 
                     </ul>
-
                     <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="btn btn-danger" type="submit" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Cerrar sesión
                         </button>
                     </form>
+
                 </div>
             </div>
         </nav>
@@ -262,4 +255,26 @@
 
     <!-- Begin page content -->
     <main class="flex-shrink-0">
-        <div class="container"></div>
+
+        <div class="container">
+            <div>
+                @yield('content')
+            </div>
+    </main>
+
+    <footer class="footer mt-auto py-3 bg-body-tertiary">
+        <div class="container">
+            <span class="text-body-secondary" style="font-size: 13px;">
+                Tecnológico Nacional de México, Campus Tuxtla Gutiérrez <br>
+                Incubadora <br>
+                Todos los derechos reservados &copy; 2024
+            </span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
+
+</body>
+
+</html>

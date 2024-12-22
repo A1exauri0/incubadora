@@ -26,24 +26,24 @@
                             <form action="{{ route('register') }}" method="POST">
                                 @csrf
                                 <!-- Name input -->
-                                <div class="form-outline mb-4">
-                                    <label class="form-label" for="typeNameX-2">Nombre:</label>
-                                    <input name="name" type="text" id="name" class="form-control form-control-lg" required />
+                                <div class="d-flex flex-row align-items-center mb-4">
+                                    <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                    <input name="name" type="text" id="name" class="form-control form-control-lg" placeholder="Nombre" required />
                                 </div>
                                 <!-- Email input -->
-                                <div class="form-outline mb-4">
-                                    <label class="form-label" for="typeEmailX-2">Correo electrónico</label>
-                                    <input name="email" type="email" id="email" class="form-control form-control-lg" required />
+                                <div class="d-flex flex-row align-items-center mb-4">
+                                    <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                    <input name="email" type="email" id="email" class="form-control form-control-lg" placeholder="Correo electrónico" required />
                                 </div>
                                 <!-- Password input -->
-                                <div class="form-outline mb-4">
-                                    <label class="form-label" for="typePasswordX-2">Contraseña</label>
-                                    <input name="password" type="password" id="password" class="form-control form-control-lg" required />
+                                <div class="d-flex flex-row align-items-center mb-4">
+                                    <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                                    <input name="password" type="password" id="password" class="form-control form-control-lg" placeholder="Contraseña" required />
                                 </div>
-                                <!-- Password input -->
-                                <div class="form-outline mb-4">
-                                    <label class="form-label" for="typePasswordX-2">Confirmar contraseña</label>
-                                    <input name="password_confirmation" type="password" id="password_confirmation" class="form-control form-control-lg" required />
+                                <!-- Password confirmation input -->
+                                <div class="d-flex flex-row align-items-center mb-4">
+                                    <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                                    <input name="password_confirmation" type="password" id="password_confirmation" class="form-control form-control-lg" placeholder="Confirmar contraseña" required />
                                 </div>
                                 <!-- Login button -->
                                 <button class="btn btn-primary btn-lg btn-block" type="submit">Registrarse</button>

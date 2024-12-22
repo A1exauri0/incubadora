@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    <section class="vh-100" style="background-color: #508bfc;">
+    <section class="vh-100" style="background-color: #2596be;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -26,15 +26,15 @@
                             <form action="{{ route('login') }}" method="POST">
                                 @csrf
                                 <!-- Email input -->
-                                <div class="form-outline mb-4">
-                                <label class="form-label" for="typeEmailX-2">Correo electrónico</label>
-                                    <input name="email" type="email" id="typeEmailX-2" class="form-control form-control-lg" required />
+                                <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                    <input name="email" type="email" class="form-control form-control-lg" placeholder="Correo electrónico" required />
                                 </div>
-                                <!-- Password input -->
-                                <div class="form-outline mb-4">
-                                    <label class="form-label" for="typePasswordX-2">Contraseña</label>
-                                    <input name="password" id="typePasswordX-2" class="form-control form-control-lg" required />
 
+                                <!-- Password input -->
+                                <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                    <input name="password" type="password" class="form-control form-control-lg" placeholder="Contraseña" required />
                                 </div>
                                 <!-- Checkbox -->
                                 <div class="form-check d-flex justify-content-start mb-4">
@@ -56,7 +56,7 @@
                                 <p>
                                     No tienes una cuenta? <a href="{{ route('register') }}">Regístrate</a>
                                 </p>
-   
+
                             </form>
                         </div>
                     </div>
