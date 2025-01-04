@@ -174,11 +174,14 @@
                 <td class="nombre">{{ $alumno->nombre }}</td>
                 <td class="carrera">{{ $alumno->carrera }}</td>
                 <td class="correo_institucional">{{ $alumno->correo_institucional }}</td>
+                <td style="text-align: center" class="semestre"> {{ $alumno->semestre}}</td>
+                <td style="text-align: center" class="telefono"> {{ $alumno->telefono}}</td>
                 <td>{{ $alumno->fecha_agregado }}</td>
                 <td>
                     <a href="#editEmployeeModal" class="edit" data-toggle="modal"
                         data-no-control="{{ $alumno->no_control }}" data-nombre="{{ $alumno->nombre }}"
-                        data-carrera="{{ $alumno->carrera }}" data-correo-institucional={{ $alumno->correo_institucional }}>
+                        data-carrera="{{ $alumno->carrera }}" data-correo-institucional={{ $alumno->correo_institucional }} 
+                        data-telefono="{{$alumno->telefono}}" data-semestre="{{$alumno->semestre}}">
                         <i class="material-icons" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
                         data-no-control="{{ $alumno->no_control }}"><i class="material-icons" data-toggle="tooltip"
@@ -251,6 +254,14 @@
                 <label>Correo institucional</label>
                 <input id="correo_institucional_agregar" name="correo_agregar" type="email" class="form-control correo_institucional" maxlength="50" required>
             </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input id="telefono_agregar" name="telefono_agregar" type="text" class="form-control telefono" pattern="[0-9]{10}" required>
+            </div>
+            <div class="form-group">
+                <label>Semestre</label>
+                <input id="semestre_agregar" name="semestre_agregar" type="number" class="form-control semestre" min="1" max="12" required>
+            </div>
         </div>
 
         <div class="modal-footer">
@@ -288,6 +299,8 @@
             <input type="hidden" name="nombre_mod" id="nombre_mod">
             <input type="hidden" name="carrera_mod" id="carrera_mod">
             <input type="hidden" name="correo_institucional_mod" id="correo_institucional_mod">
+            <input type="hidden" name="telefono_mod" id="telefono_mod">
+            <input type="hidden" name="semestre_mod" id="semestre_mod">
 
             <div class="modal-header">
                 <h4 class="modal-title">Editar @yield('administrar_s')</h4>
@@ -317,6 +330,14 @@
                     <label>Correo institucional</label>
                     <input id="correo_institucional_campo" type="email" class="form-control correo_institucional ceditar" value=""  required>
                 </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input id="telefono_campo" type="text" class="form-control telefono ceditar" value="" pattern="[0-9]{10}" required>
+                </div>
+                <div class="form-group">
+                    <label>Semestre</label>
+                    <input id="semestre_campo" type="number" class="form-control semestre ceditar" value="" min="1" max="12" required>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -335,6 +356,8 @@
                     var nombre = $(this).data('nombre');
                     var carrera = $(this).data('carrera');
                     var correo_institucional = $(this).data('correo-institucional');
+                    var telefono = $(this).data('telefono');
+                    var semestre = $(this).data('semestre');
 
                     $('#no_control_eliminar').val(noControlEditar);
 
@@ -344,6 +367,8 @@
                     $('.form-control option').removeAttr('selected');
                     $('.form-control option[value="' + carrera + '"]').attr('selected', 'selected');
                     $('.correo_institucional').val(correo_institucional);
+                    $('.telefono').val(telefono);
+                    $('.semestre').val(semestre);
 
                     // Se llenan los campos ocultos con los datos del registro a editar
                     $('#no_control_editar').val(noControlEditar);
@@ -351,6 +376,8 @@
                     $('#nombre_mod').val(nombre);
                     $('#carrera_mod').val(carrera);
                     $('#correo_institucional_mod').val(correo_institucional);
+                    $('#telefono_mod').val(telefono);
+                    $('#semestre_mod').val(semestre);
 
                     //Listeners para cuando cambien los campos
                     document.getElementById('no_control_campo').addEventListener('change', function() {
@@ -369,6 +396,14 @@
                         $('#correo_institucional_mod').val(this.value);
                     });
 
+                    document.getElementById('telefono_campo').addEventListener('change', function() {
+                        $('#telefono_mod').val(this.value);
+                    });
+
+                    document.getElementById('semestre_campo').addEventListener('change', function() {
+                        $('#semestre_mod').val(this.value);
+                    });
+
                 });
 
             });
@@ -379,6 +414,8 @@
                 $('.nombre').val('');
                 $('.carrera').prop('selectedIndex', -1);
                 $('.correo_institucional').val('');
+                $('.telefono').val('');
+                $('.semestre').val('');
             });
 
             // Vaciar los campos al hacer submit del formulario
@@ -387,6 +424,8 @@
                 $('.nombre.ceditar').val('');
                 $('.carrera.ceditar').prop('selectedIndex', -1);
                 $('.correo_institucional.ceditar').val('');
+                $('.telefono.ceditar').val('');
+                $('.semestre.ceditar').val('');
             });
         </script>
 
