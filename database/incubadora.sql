@@ -226,6 +226,203 @@ INSERT INTO `alumno` (`no_control`, `nombre`, `carrera`, `correo_institucional`,
 	('78270406', 'José Ángel Zepeda Hernández', 'Doctorado en Ciencias de la Ingeniería', 'D78270406@tuxtla.tecnm.mx', '9611234567', 3, '2024-08-28 11:01:27'),
 	('97270383', 'Martha Luz Paniagua Chávez', 'Doctorado en Ciencias de la Ingeniería', 'D97270383@tuxtla.tecnm.mx', '9611234567', 3, '2024-08-28 10:51:58');
 
+-- Volcando estructura para tabla incubadora.alumno_proyecto
+CREATE TABLE IF NOT EXISTS `alumno_proyecto` (
+  `clave_proyecto` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `no_control` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `fecha_agregado` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `FK_participante_alumno` (`no_control`),
+  KEY `FK_participante_proyecto` (`clave_proyecto`),
+  CONSTRAINT `FK_participante_alumno` FOREIGN KEY (`no_control`) REFERENCES `alumno` (`no_control`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_participante_proyecto` FOREIGN KEY (`clave_proyecto`) REFERENCES `proyecto` (`clave_proyecto`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla incubadora.alumno_proyecto: ~183 rows (aproximadamente)
+INSERT INTO `alumno_proyecto` (`clave_proyecto`, `no_control`, `fecha_agregado`) VALUES
+	('0000000000045', '20270236', '2024-08-27 11:11:43'),
+	('0000000000045', '20270242', '2024-08-27 11:11:53'),
+	('0000000000006', '20270278', '2024-08-28 09:49:01'),
+	('0000000000006', '21270389', '2024-08-28 09:49:11'),
+	('0000000000006', '20270284', '2024-08-28 09:49:21'),
+	('0000000000006', '20270670', '2024-08-28 09:49:29'),
+	('0000000000003', '23270980', '2024-08-28 09:51:12'),
+	('0000000000003', '21270467', '2024-08-28 09:51:19'),
+	('0000000000003', '20270852', '2024-08-28 09:51:25'),
+	('0000000000003', '21270229', '2024-08-28 09:51:32'),
+	('0000000000002', '20270812', '2024-08-28 09:52:06'),
+	('0000000000002', '20270750', '2024-08-28 09:52:12'),
+	('0000000000002', '20270517', '2024-08-28 09:53:18'),
+	('0000000000002', '21270339', '2024-08-28 09:53:25'),
+	('0000000000002', '21270468', '2024-08-28 09:53:32'),
+	('0000000000008', '21270381', '2024-08-28 09:54:08'),
+	('0000000000008', '21270706', '2024-08-28 09:54:14'),
+	('0000000000008', '21270703', '2024-08-28 09:54:21'),
+	('0000000000008', '20270470', '2024-08-28 09:55:24'),
+	('0000000000008', '20270947', '2024-08-28 09:55:39'),
+	('0000000000007', '21270723', '2024-08-28 09:57:10'),
+	('0000000000009', '15270455', '2024-08-28 09:57:53'),
+	('0000000000009', '23271371', '2024-08-28 09:59:11'),
+	('0000000000009', '15270885', '2024-08-28 09:59:20'),
+	('0000000000009', '17270901', '2024-08-28 09:59:27'),
+	('0000000000009', '17270537', '2024-08-28 09:59:38'),
+	('0000000000001', '21270434', '2024-08-28 10:00:14'),
+	('0000000000001', '21270433', '2024-08-28 10:00:20'),
+	('0000000000001', '21270452', '2024-08-28 10:00:26'),
+	('0000000000001', '21270404', '2024-08-28 10:00:32'),
+	('0000000000001', '22270200', '2024-08-28 10:00:37'),
+	('0000000000005', '22270382', '2024-08-28 10:01:19'),
+	('0000000000005', '21270667', '2024-08-28 10:01:24'),
+	('0000000000005', '22270371', '2024-08-28 10:01:30'),
+	('0000000000005', '22270354', '2024-08-28 10:01:38'),
+	('0000000000005', '22270355', '2024-08-28 10:01:45'),
+	('0000000000004', '21270787', '2024-08-28 10:07:15'),
+	('0000000000004', '21270506', '2024-08-28 10:07:20'),
+	('0000000000004', '19270529', '2024-08-28 10:07:25'),
+	('0000000000004', '20270034', '2024-08-28 10:07:33'),
+	('0000000000010', '00000001', '2024-08-28 11:02:07'),
+	('0000000000010', '23270361', '2024-08-28 11:02:13'),
+	('0000000000010', '21270461', '2024-08-28 11:02:20'),
+	('0000000000010', '21270135', '2024-08-28 11:02:28'),
+	('0000000000046', '20270241', '2024-08-29 10:26:16'),
+	('0000000000046', '20270246', '2024-08-29 10:26:29'),
+	('0000000000047', '20270243', '2024-08-29 10:27:42'),
+	('0000000000048', '19270126', '2024-08-29 10:28:08'),
+	('0000000000014', '16270697', '2024-08-29 10:57:18'),
+	('0000000000014', '14270621', '2024-08-29 10:57:33'),
+	('0000000000014', '09270506', '2024-08-29 10:57:39'),
+	('0000000000014', '23270369', '2024-08-29 10:57:47'),
+	('0000000000049', '22270373', '2024-08-29 11:04:51'),
+	('0000000000049', '21270123', '2024-08-29 11:05:00'),
+	('0000000000049', '22270357', '2024-08-29 11:05:09'),
+	('0000000000049', '22270367', '2024-08-29 11:05:15'),
+	('0000000000049', '21270115', '2024-08-29 11:05:25'),
+	('0000000000015', '17270901', '2024-08-29 11:05:53'),
+	('0000000000015', '23271371', '2024-08-29 11:06:12'),
+	('0000000000015', '15270455', '2024-08-29 11:12:02'),
+	('0000000000015', '15270885', '2024-08-29 11:12:34'),
+	('0000000000015', '97270383', '2024-08-29 11:12:47'),
+	('0000000000012', '21270410', '2024-08-29 11:13:50'),
+	('0000000000012', '20270760', '2024-08-29 11:14:09'),
+	('0000000000012', '21270151', '2024-08-29 11:14:16'),
+	('0000000000012', '21270455', '2024-08-29 11:14:48'),
+	('0000000000042', '20270617', '2024-08-29 11:15:10'),
+	('0000000000042', '21270375', '2024-08-29 11:15:16'),
+	('0000000000042', '23270705', '2024-08-29 11:15:24'),
+	('0000000000042', '21270401', '2024-08-29 11:15:31'),
+	('0000000000043', '18270404', '2024-08-29 11:16:24'),
+	('0000000000043', '78270406', '2024-08-29 11:16:31'),
+	('0000000000029', '20270435', '2024-08-30 07:32:13'),
+	('0000000000029', '20270449', '2024-08-30 07:32:25'),
+	('0000000000029', '21270417', '2024-08-30 07:32:32'),
+	('0000000000029', '20270341', '2024-08-30 07:32:42'),
+	('0000000000029', '21270761', '2024-08-30 07:32:50'),
+	('0000000000031', '22270349', '2024-08-30 07:50:26'),
+	('0000000000031', '21270466', '2024-08-30 07:50:34'),
+	('0000000000031', '21270505', '2024-08-30 07:50:41'),
+	('0000000000031', '21271248', '2024-08-30 07:50:47'),
+	('0000000000033', '21270244', '2024-08-30 07:53:28'),
+	('0000000000033', '21270929', '2024-08-30 07:53:34'),
+	('0000000000033', '21270442', '2024-08-30 07:53:42'),
+	('0000000000033', '21270280', '2024-08-30 07:53:52'),
+	('0000000000033', '21270279', '2024-08-30 07:53:58'),
+	('0000000000032', '18270140', '2024-08-30 07:54:40'),
+	('0000000000032', '11270019', '2024-08-30 07:54:45'),
+	('0000000000032', '13270738', '2024-08-30 07:57:48'),
+	('0000000000030', '21271156', '2024-08-30 07:58:44'),
+	('0000000000030', '21271151', '2024-08-30 07:58:52'),
+	('0000000000030', '21271160', '2024-08-30 08:04:03'),
+	('0000000000030', '21271166', '2024-08-30 08:04:10'),
+	('0000000000030', '21271150', '2024-08-30 08:04:16'),
+	('0000000000034', '21270077', '2024-08-30 11:11:20'),
+	('0000000000034', '20270656', '2024-08-30 11:11:26'),
+	('0000000000034', '21270928', '2024-08-30 11:11:33'),
+	('0000000000034', '22270190', '2024-08-30 11:11:45'),
+	('0000000000034', '22270194', '2024-08-30 11:11:50'),
+	('0000000000026', '21270425', '2024-08-31 13:09:48'),
+	('0000000000026', '21270387', '2024-08-31 13:09:59'),
+	('0000000000026', '22270435', '2024-08-31 13:10:09'),
+	('0000000000026', '22270512', '2024-08-31 13:10:17'),
+	('0000000000025', '21270540', '2024-08-31 13:12:08'),
+	('0000000000025', '21270530', '2024-08-31 13:12:20'),
+	('0000000000025', '22270674', '2024-08-31 13:12:28'),
+	('0000000000025', '21270527', '2024-08-31 13:12:49'),
+	('0000000000025', '21270383', '2024-08-31 13:13:05'),
+	('0000000000024', '20270794', '2024-08-31 13:14:51'),
+	('0000000000024', '21270141', '2024-08-31 13:15:02'),
+	('0000000000024', '21270178', '2024-08-31 13:15:13'),
+	('0000000000024', '21270166', '2024-08-31 13:15:20'),
+	('0000000000024', '20270760', '2024-08-31 13:15:45'),
+	('0000000000023', '21270428', '2024-08-31 13:16:17'),
+	('0000000000023', '21270458', '2024-08-31 13:16:25'),
+	('0000000000023', '21270396', '2024-08-31 13:16:32'),
+	('0000000000023', '21270440', '2024-08-31 13:16:40'),
+	('0000000000023', '21270963', '2024-08-31 13:16:51'),
+	('0000000000027', '21270120', '2024-08-31 13:17:43'),
+	('0000000000027', '21270128', '2024-08-31 13:17:51'),
+	('0000000000027', '22270446', '2024-08-31 13:18:01'),
+	('0000000000027', '22270856', '2024-08-31 13:18:09'),
+	('0000000000027', '21270175', '2024-08-31 13:18:15'),
+	('0000000000028', '21270985', '2024-08-31 13:19:03'),
+	('0000000000028', '21270414', '2024-08-31 13:19:09'),
+	('0000000000028', '21270422', '2024-08-31 13:19:19'),
+	('0000000000028', '21270922', '2024-08-31 13:19:26'),
+	('0000000000021', '14270826', '2024-09-01 12:05:09'),
+	('0000000000021', '16270670', '2024-09-01 12:05:20'),
+	('0000000000021', '16270882', '2024-09-01 12:05:27'),
+	('0000000000018', '20270683', '2024-09-01 12:10:38'),
+	('0000000000018', '21270045', '2024-09-01 12:10:46'),
+	('0000000000018', '20270672', '2024-09-01 12:11:30'),
+	('0000000000018', '21270094', '2024-09-01 12:11:37'),
+	('0000000000018', '21270472', '2024-09-01 12:11:44'),
+	('0000000000017', '22270092', '2024-09-01 12:24:55'),
+	('0000000000017', '22270089', '2024-09-01 12:25:01'),
+	('0000000000017', '21270378', '2024-09-01 12:25:15'),
+	('0000000000017', '22270106', '2024-09-01 12:25:24'),
+	('0000000000017', '21270241', '2024-09-01 12:25:35'),
+	('0000000000019', '22270600', '2024-09-01 12:26:07'),
+	('0000000000019', '22270176', '2024-09-01 12:26:13'),
+	('0000000000019', '22270597', '2024-09-01 12:26:24'),
+	('0000000000019', '21270193', '2024-09-01 12:26:31'),
+	('0000000000022', '21271144', '2024-09-01 12:27:07'),
+	('0000000000022', '23271370', '2024-09-01 12:27:15'),
+	('0000000000022', '22271094', '2024-09-01 12:27:26'),
+	('0000000000020', '20270769', '2024-09-01 12:28:06'),
+	('0000000000020', '21270188', '2024-09-01 12:28:14'),
+	('0000000000020', '20270915', '2024-09-01 12:28:21'),
+	('0000000000020', '20270807', '2024-09-01 12:28:28'),
+	('0000000000039', '17270661', '2024-09-01 22:53:30'),
+	('0000000000039', '23271374', '2024-09-01 22:54:09'),
+	('0000000000039', '01270526', '2024-09-01 22:54:16'),
+	('0000000000039', '01270777', '2024-09-01 22:54:23'),
+	('0000000000038', '21270462', '2024-09-01 22:55:34'),
+	('0000000000038', '21270394', '2024-09-01 22:56:08'),
+	('0000000000038', '21270469', '2024-09-01 22:56:27'),
+	('0000000000038', '21270400', '2024-09-01 22:56:50'),
+	('0000000000038', '21270902', '2024-09-01 22:57:00'),
+	('0000000000036', '21270930', '2024-09-01 22:58:16'),
+	('0000000000036', '21270937', '2024-09-01 22:58:26'),
+	('0000000000036', '22270738', '2024-09-01 22:58:33'),
+	('0000000000036', '21270951', '2024-09-01 22:58:58'),
+	('0000000000036', '21270934', '2024-09-01 22:59:05'),
+	('0000000000041', '21270938', '2024-09-01 22:59:42'),
+	('0000000000041', '22270244', '2024-09-01 22:59:50'),
+	('0000000000041', '21270954', '2024-09-01 22:59:57'),
+	('0000000000041', '21270382', '2024-09-01 23:00:08'),
+	('0000000000041', '21270474', '2024-09-01 23:00:14'),
+	('0000000000035', '20270621', '2024-09-01 23:01:22'),
+	('0000000000035', '22270684', '2024-09-01 23:01:28'),
+	('0000000000035', '21270416', '2024-09-01 23:01:37'),
+	('0000000000035', '21270090', '2024-09-01 23:01:45'),
+	('0000000000035', '21270089', '2024-09-01 23:01:52'),
+	('0000000000037', '21270450', '2024-09-01 23:02:25'),
+	('0000000000037', '21270821', '2024-09-01 23:02:31'),
+	('0000000000037', '21270470', '2024-09-01 23:02:37'),
+	('0000000000037', '20270485', '2024-09-01 23:02:44'),
+	('0000000000040', '18270127', '2024-09-01 23:03:21'),
+	('0000000000040', '15270437', '2024-09-01 23:03:30'),
+	('0000000000040', '10270792', '2024-09-01 23:03:37'),
+	('0000000000040', '23270367', '2024-09-01 23:03:44');
+
 -- Volcando estructura para tabla incubadora.alumno_semestre
 CREATE TABLE IF NOT EXISTS `alumno_semestre` (
   `idSemestre` int NOT NULL AUTO_INCREMENT,
@@ -254,7 +451,7 @@ CREATE TABLE IF NOT EXISTS `asesor` (
   `correo_electronico` varchar(50) NOT NULL,
   `fecha_agregado` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idAsesor`)
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.asesor: ~53 rows (aproximadamente)
 INSERT INTO `asesor` (`idAsesor`, `nombre`, `telefono`, `correo_electronico`, `fecha_agregado`) VALUES
@@ -312,6 +509,93 @@ INSERT INTO `asesor` (`idAsesor`, `nombre`, `telefono`, `correo_electronico`, `f
 	(57, 'Rony Obed Suchiapa Díaz', '9619876543', 'ejemplo@gmail.com', '2024-09-01 22:52:48'),
 	(58, 'Samuel Gómez Peñate', '9611111111', 'ejemplos@gmail.com', '2024-09-01 22:52:58');
 
+-- Volcando estructura para tabla incubadora.asesor_proyecto
+CREATE TABLE IF NOT EXISTS `asesor_proyecto` (
+  `idAsesor` int NOT NULL,
+  `clave_proyecto` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `fecha_agregado` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `FK_asesor_proyecto_asesor` (`idAsesor`),
+  KEY `FK_asesor_proyecto_proyecto` (`clave_proyecto`),
+  CONSTRAINT `FK_asesor_proyecto_asesor` FOREIGN KEY (`idAsesor`) REFERENCES `asesor` (`idAsesor`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_asesor_proyecto_proyecto` FOREIGN KEY (`clave_proyecto`) REFERENCES `proyecto` (`clave_proyecto`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla incubadora.asesor_proyecto: ~73 rows (aproximadamente)
+INSERT INTO `asesor_proyecto` (`idAsesor`, `clave_proyecto`, `fecha_agregado`) VALUES
+	(2, '0000000000045', '2024-08-27 11:12:05'),
+	(15, '0000000000006', '2024-08-28 09:49:42'),
+	(16, '0000000000006', '2024-08-28 09:49:47'),
+	(17, '0000000000003', '2024-08-28 09:51:41'),
+	(18, '0000000000003', '2024-08-28 09:51:49'),
+	(15, '0000000000002', '2024-08-28 09:53:39'),
+	(19, '0000000000002', '2024-08-28 09:53:48'),
+	(21, '0000000000008', '2024-08-28 09:55:50'),
+	(20, '0000000000008', '2024-08-28 09:56:23'),
+	(22, '0000000000007', '2024-08-28 09:57:16'),
+	(23, '0000000000007', '2024-08-28 09:57:24'),
+	(24, '0000000000009', '2024-08-28 09:59:45'),
+	(25, '0000000000001', '2024-08-28 10:00:46'),
+	(26, '0000000000001', '2024-08-28 10:00:56'),
+	(27, '0000000000005', '2024-08-28 10:07:00'),
+	(28, '0000000000004', '2024-08-28 10:07:44'),
+	(29, '0000000000004', '2024-08-28 10:08:04'),
+	(24, '0000000000010', '2024-08-28 11:02:36'),
+	(30, '0000000000010', '2024-08-28 11:03:07'),
+	(3, '0000000000046', '2024-08-29 10:26:36'),
+	(4, '0000000000047', '2024-08-29 10:27:52'),
+	(15, '0000000000048', '2024-08-29 10:28:40'),
+	(31, '0000000000014', '2024-08-29 11:02:35'),
+	(32, '0000000000014', '2024-08-29 11:02:44'),
+	(27, '0000000000049', '2024-08-29 11:05:33'),
+	(24, '0000000000015', '2024-08-29 11:12:55'),
+	(15, '0000000000012', '2024-08-29 11:14:54'),
+	(17, '0000000000042', '2024-08-29 11:15:40'),
+	(18, '0000000000042', '2024-08-29 11:15:47'),
+	(34, '0000000000043', '2024-08-29 11:17:10'),
+	(35, '0000000000029', '2024-08-30 07:49:54'),
+	(16, '0000000000029', '2024-08-30 07:50:04'),
+	(28, '0000000000031', '2024-08-30 07:50:56'),
+	(36, '0000000000031', '2024-08-30 07:51:02'),
+	(37, '0000000000033', '2024-08-30 07:54:09'),
+	(38, '0000000000033', '2024-08-30 07:54:22'),
+	(39, '0000000000032', '2024-08-30 07:57:56'),
+	(40, '0000000000032', '2024-08-30 07:58:05'),
+	(41, '0000000000030', '2024-08-30 11:10:30'),
+	(42, '0000000000030', '2024-08-30 11:10:54'),
+	(43, '0000000000034', '2024-08-30 11:12:08'),
+	(44, '0000000000034', '2024-08-30 11:12:16'),
+	(45, '0000000000026', '2024-08-31 13:10:28'),
+	(47, '0000000000025', '2024-08-31 13:13:16'),
+	(38, '0000000000025', '2024-08-31 13:13:26'),
+	(15, '0000000000024', '2024-08-31 13:15:53'),
+	(25, '0000000000023', '2024-08-31 13:17:06'),
+	(26, '0000000000023', '2024-08-31 13:17:15'),
+	(12, '0000000000027', '2024-08-31 13:18:28'),
+	(20, '0000000000027', '2024-08-31 13:18:40'),
+	(22, '0000000000028', '2024-08-31 13:19:34'),
+	(23, '0000000000028', '2024-08-31 13:19:44'),
+	(34, '0000000000021', '2024-09-01 12:05:40'),
+	(53, '0000000000021', '2024-09-01 12:05:50'),
+	(50, '0000000000018', '2024-09-01 12:12:15'),
+	(21, '0000000000018', '2024-09-01 12:12:34'),
+	(51, '0000000000017', '2024-09-01 12:25:43'),
+	(29, '0000000000019', '2024-09-01 12:26:36'),
+	(52, '0000000000019', '2024-09-01 12:26:46'),
+	(15, '0000000000020', '2024-09-01 12:28:35'),
+	(7, '0000000000020', '2024-09-01 12:28:43'),
+	(23, '0000000000039', '2024-09-01 22:54:33'),
+	(22, '0000000000039', '2024-09-01 22:54:42'),
+	(22, '0000000000038', '2024-09-01 22:57:50'),
+	(23, '0000000000038', '2024-09-01 22:58:01'),
+	(55, '0000000000036', '2024-09-01 22:59:16'),
+	(18, '0000000000041', '2024-09-01 23:00:25'),
+	(44, '0000000000041', '2024-09-01 23:00:33'),
+	(18, '0000000000035', '2024-09-01 23:02:01'),
+	(17, '0000000000035', '2024-09-01 23:02:09'),
+	(56, '0000000000037', '2024-09-01 23:02:53'),
+	(57, '0000000000037', '2024-09-01 23:03:01'),
+	(58, '0000000000040', '2024-09-01 23:03:54');
+
 -- Volcando estructura para tabla incubadora.carrera
 CREATE TABLE IF NOT EXISTS `carrera` (
   `clave` char(13) NOT NULL,
@@ -344,7 +628,7 @@ CREATE TABLE IF NOT EXISTS `categoria` (
   `idCategoria` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`idCategoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.categoria: ~8 rows (aproximadamente)
 INSERT INTO `categoria` (`idCategoria`, `nombre`) VALUES
@@ -394,7 +678,7 @@ CREATE TABLE IF NOT EXISTS `etapas` (
   `descripcion` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `color` varchar(50) NOT NULL,
   PRIMARY KEY (`idEtapa`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.etapas: ~4 rows (aproximadamente)
 INSERT INTO `etapas` (`idEtapa`, `nombre`, `descripcion`, `color`) VALUES
@@ -424,7 +708,7 @@ CREATE TABLE IF NOT EXISTS `habilidad` (
   `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `descripcion` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`idHabilidad`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.habilidad: ~0 rows (aproximadamente)
 
@@ -446,9 +730,22 @@ CREATE TABLE IF NOT EXISTS `mentor` (
   `nombre` varchar(50) DEFAULT NULL,
   `fecha_agregado` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idMentor`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.mentor: ~0 rows (aproximadamente)
+
+-- Volcando estructura para tabla incubadora.mentor_proyecto
+CREATE TABLE IF NOT EXISTS `mentor_proyecto` (
+  `idMentor` int DEFAULT NULL,
+  `clave_proyecto` char(50) DEFAULT NULL,
+  `fecha_agregado` datetime DEFAULT CURRENT_TIMESTAMP,
+  KEY `FK_mentor_proyecto_mentor` (`idMentor`),
+  KEY `FK_mentor_proyecto_proyecto` (`clave_proyecto`),
+  CONSTRAINT `FK_mentor_proyecto_mentor` FOREIGN KEY (`idMentor`) REFERENCES `mentor` (`idMentor`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_mentor_proyecto_proyecto` FOREIGN KEY (`clave_proyecto`) REFERENCES `proyecto` (`clave_proyecto`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla incubadora.mentor_proyecto: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla incubadora.migrations
 CREATE TABLE IF NOT EXISTS `migrations` (
@@ -625,6 +922,40 @@ INSERT INTO `proyecto` (`clave_proyecto`, `nombre`, `nombre_descriptivo`, `descr
 	('0000000000048', 'Implementación de tecnologías Didactic Electronic', 'Sin asignar', 'Implementación de tecnologías para el desarrollo de mesa didáctica Didactic Electronic', 18, 13, 4, NULL, 'Sin asignar', 'Sin asignar', 'Sin asignar', '2024-06-07 13:37:00'),
 	('0000000000049', 'Phytobot', 'Sin asignar', 'Phytobot', 13, 12, 4, NULL, 'Sin asignar', 'Sin asignar', 'Sin asignar', '2024-08-29 11:04:16');
 
+-- Volcando estructura para tabla incubadora.proyecto_requerimientos
+CREATE TABLE IF NOT EXISTS `proyecto_requerimientos` (
+  `idRequerimiento` int NOT NULL AUTO_INCREMENT,
+  `clave_proyecto` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `descripcion` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `cantidad` varchar(50) NOT NULL,
+  PRIMARY KEY (`idRequerimiento`),
+  KEY `FK_proyecto_requerimientos_proyecto` (`clave_proyecto`),
+  CONSTRAINT `FK_proyecto_requerimientos_proyecto` FOREIGN KEY (`clave_proyecto`) REFERENCES `proyecto` (`clave_proyecto`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla incubadora.proyecto_requerimientos: ~3 rows (aproximadamente)
+INSERT INTO `proyecto_requerimientos` (`idRequerimiento`, `clave_proyecto`, `descripcion`, `cantidad`) VALUES
+	(1, '0000000000029', 'requerimiento 1', 'uno'),
+	(2, '0000000000029', 'requerimiento 2', 'dos'),
+	(3, '0000000000029', 'requerimiento 3', 'tres');
+
+-- Volcando estructura para tabla incubadora.proyecto_resultados
+CREATE TABLE IF NOT EXISTS `proyecto_resultados` (
+  `idResultado` int NOT NULL AUTO_INCREMENT,
+  `clave_proyecto` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `descripcion` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `fecha_agregado` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idResultado`),
+  KEY `FK_proyecto_resultados_proyecto` (`clave_proyecto`),
+  CONSTRAINT `FK_proyecto_resultados_proyecto` FOREIGN KEY (`clave_proyecto`) REFERENCES `proyecto` (`clave_proyecto`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla incubadora.proyecto_resultados: ~3 rows (aproximadamente)
+INSERT INTO `proyecto_resultados` (`idResultado`, `clave_proyecto`, `descripcion`, `fecha_agregado`) VALUES
+	(4, '0000000000029', 'resultado 1', '2024-11-10 12:37:14'),
+	(5, '0000000000029', 'resultado 2', '2024-11-10 12:37:24'),
+	(6, '0000000000029', 'resultado 3', '2024-11-10 12:37:36');
+
 -- Volcando estructura para tabla incubadora.roles
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -676,7 +1007,7 @@ CREATE TABLE IF NOT EXISTS `servicio` (
   `nombre` varchar(50) DEFAULT NULL,
   `descripcion` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`idServicio`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.servicio: ~0 rows (aproximadamente)
 
@@ -685,7 +1016,7 @@ CREATE TABLE IF NOT EXISTS `tipo` (
   `idTipo` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`idTipo`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.tipo: ~4 rows (aproximadamente)
 INSERT INTO `tipo` (`idTipo`, `nombre`) VALUES
