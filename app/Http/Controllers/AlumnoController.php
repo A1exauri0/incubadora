@@ -9,9 +9,9 @@ class AlumnoController extends Controller
 {
     public function index()
     {
-        $alumnos = DB::table('alumno')->orderBy('no_control')->get();
+        $alumnos = DB::table('alumno')->orderBy('fecha_agregado','desc')->get();
         $carreras = DB::table('carrera')->get();
-        $columnas = ['No. Control', 'Nombre', 'Carrera', 'Correo institucional','Fecha Agregado'];
+        $columnas = ['No. Control', 'Nombre', 'Carrera', 'Correo institucional','Semestre','Teléfono','Fecha Agregado'];
         $total_registros = $alumnos->count();
 
         //dd($alumnos);
@@ -38,12 +38,14 @@ class AlumnoController extends Controller
         $nombre = $request->input('nombre_agregar');
         $carrera = $request->input('carrera_agregar');
         $correo = $request->input('correo_agregar');
+        $semestre = $request->input('semestre_agregar');
+        $telefono = $request->input('telefono_agregar');
 
         if ($this->registro_existe($no_control)) {
             return back()->with('error', 'El numero de control que intentó agregar ya existe en otro registro.');
         } else {
 
-            DB::table('alumno')->insert(['no_control' => $no_control, 'nombre' => $nombre, 'carrera' => $carrera, 'correo_institucional' => $correo]);
+            DB::table('alumno')->insert(['no_control' => $no_control, 'nombre' => $nombre, 'carrera' => $carrera, 'correo_institucional' => $correo, 'semestre' => $semestre, 'telefono' => $telefono]);
         }
         return back();
     }
@@ -55,13 +57,15 @@ class AlumnoController extends Controller
         $nombre = $request->input('nombre_mod');
         $carrera = $request->input('carrera_mod');
         $correo_institucional = $request->input('correo_institucional_mod');
+        $semestre = $request->input('semestre_mod');
+        $telefono = $request->input('telefono_mod');
 
         if (($this->registro_existe($no_control_mod)) && ($no_control != $no_control_mod)) {
             if ($this->registro_existe($no_control)) {
                 return back()->with('error', 'El numero de control que intentó modificar ya existe en otro registro.');
             }
         } else {
-            DB::table('alumno')->where('no_control', '=', $no_control)->update(['no_control' => $no_control_mod, 'nombre' => $nombre, 'carrera' => $carrera, 'correo_institucional' => $correo_institucional]);
+            DB::table('alumno')->where('no_control', '=', $no_control)->update(['no_control' => $no_control_mod, 'nombre' => $nombre, 'carrera' => $carrera, 'correo_institucional' => $correo_institucional, 'semestre' => $semestre, 'telefono' => $telefono]);
             return back();
         }
     }
