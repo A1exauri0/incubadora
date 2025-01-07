@@ -820,15 +820,16 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `permissions_name_guard_name_unique` (`name`,`guard_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla incubadora.permissions: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla incubadora.permissions: ~6 rows (aproximadamente)
 INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
-	(1, 'ver proyectos', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56'),
-	(2, 'crear proyectos', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56'),
-	(3, 'editar proyectos', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56'),
-	(4, 'eliminar proyectos', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56'),
-	(5, 'gestionar usuarios', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56');
+	(6, 'mostrar admin', 'web', '2025-01-05 00:09:56', '2025-01-05 00:09:56'),
+	(7, 'mostrar alumno', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57'),
+	(8, 'mostrar asesor', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57'),
+	(9, 'mostrar mentor', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57'),
+	(10, 'mostrar emprendedor', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57'),
+	(11, 'mostrar inversionista', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57');
 
 -- Volcando estructura para tabla incubadora.personal_access_tokens
 CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
@@ -986,20 +987,14 @@ CREATE TABLE IF NOT EXISTS `role_has_permissions` (
   CONSTRAINT `role_has_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla incubadora.role_has_permissions: ~12 rows (aproximadamente)
+-- Volcando datos para la tabla incubadora.role_has_permissions: ~6 rows (aproximadamente)
 INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
-	(1, 1),
-	(2, 1),
-	(3, 1),
-	(4, 1),
-	(5, 1),
-	(1, 2),
-	(2, 2),
-	(1, 3),
-	(3, 3),
-	(1, 4),
-	(1, 5),
-	(1, 6);
+	(6, 1),
+	(7, 2),
+	(8, 3),
+	(9, 4),
+	(10, 5),
+	(11, 6);
 
 -- Volcando estructura para tabla incubadora.servicio
 CREATE TABLE IF NOT EXISTS `servicio` (
