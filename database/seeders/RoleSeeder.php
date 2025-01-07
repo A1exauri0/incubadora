@@ -13,61 +13,62 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear roles
-        $adminRole = Role::updateOrCreate(['name' => 'admin']);
-        $alumnoRole = Role::updateOrCreate(['name' => 'alumno']);
-        $asesorRole = Role::updateOrCreate(['name' => 'asesor']);
-        $mentorRole = Role::updateOrCreate(['name' => 'mentor']);
-        $emprendedorRole = Role::updateOrCreate(['name' => 'emprendedor']);
-        $inversionistaRole = Role::updateOrCreate(['name' => 'inversionista']);
-
-        // Crear permisos
-        $permissions = [
-            'ver proyectos',
-            'crear proyectos',
-            'editar proyectos',
-            'eliminar proyectos',
-            'gestionar usuarios'
+        // Crear roles o actualizar si ya existen
+        $roles = [
+            'admin',
+            'alumno',
+            'asesor',
+            'mentor',
+            'emprendedor',
+            'inversionista',
         ];
 
-        foreach ($permissions as $permission) {
+        foreach ($roles as $role) {
+            Role::updateOrCreate(['name' => $role]);
+        }
+
+        // Crear permisos generales o actualizar si ya existen
+        $generalPermissions = [
+            'mostrar admin',
+            'mostrar alumno',
+            'mostrar asesor',
+            'mostrar mentor',
+            'mostrar emprendedor',
+            'mostrar inversionista',
+        ];
+
+        foreach ($generalPermissions as $permission) {
             Permission::updateOrCreate(['name' => $permission]);
         }
 
         // Asignar permisos a roles
-        $adminRole->syncPermissions([
-            'ver proyectos',
-            'crear proyectos',
-            'editar proyectos',
-            'eliminar proyectos',
-            'gestionar usuarios'
+        Role::findByName('admin')->syncPermissions([
+            'mostrar admin',
         ]);
 
-        $alumnoRole->syncPermissions([
-            'ver proyectos',
-            'crear proyectos'
+        Role::findByName('alumno')->syncPermissions([
+            'mostrar alumno',
         ]);
 
-        $asesorRole->syncPermissions([
-            'ver proyectos',
-            'editar proyectos'
+        Role::findByName('asesor')->syncPermissions([
+            'mostrar asesor',
         ]);
 
-        $mentorRole->syncPermissions([
-            'ver proyectos'
+        Role::findByName('mentor')->syncPermissions([
+            'mostrar mentor',
         ]);
 
-        $emprendedorRole->syncPermissions([
-            'ver proyectos'
+        Role::findByName('emprendedor')->syncPermissions([
+            'mostrar emprendedor',
         ]);
 
-        $inversionistaRole->syncPermissions([
-            'ver proyectos'
+        Role::findByName('inversionista')->syncPermissions([
+            'mostrar inversionista',
         ]);
 
         /*
-        Nota: Para aplicar los cambios ejecuta:
-        php artisan migrate:fresh --seed
+        Nota: Este seeder solo creará o actualizará roles y permisos
+        sin eliminar asociaciones existentes.
         */
     }
 }

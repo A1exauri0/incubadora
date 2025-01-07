@@ -138,7 +138,7 @@
         }
 
         .dropdown:hover .nav-link {
-            background-color: #084b92;
+            background-color: #036ee0;
         }
 
         .dropdown.position-fixed {
@@ -151,6 +151,38 @@
 
         .navbar-brand {
             margin-bottom: 2px;
+        }
+
+        /* Submenú estilos */
+        .dropdown.submenu {
+            position: relative;
+        }
+
+        .dropdown.submenu .content {
+            left: 100%;
+            /* Posiciona el submenú a la derecha */
+            top: 0;
+            display: none;
+            /* Oculta el submenú por defecto */
+            position: absolute;
+            background-color: #036ee0;
+            box-shadow: 2px 2px 2px #000000;
+        }
+
+        .dropdown.submenu:hover .content {
+            display: block;
+            /* Muestra el submenú al pasar el cursor */
+        }
+
+        .dropdown.submenu a {
+            padding: 8px 15px;
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .dropdown.submenu .content a:hover {
+            background-color: #084b92;
+            cursor: pointer;
         }
     </style>
 
@@ -175,30 +207,47 @@
                             <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <!--DROPDOWN-->
-                            <div class="dropdown">
-                                <a class="nav-link active" href="#">Catálogos</a>
-                                <div class="content">
-                                    <a href="/c_alumnos">Alumnos</a>
-                                    <a href="/c_asesores">Asesores</a>
-                                    <a href="/c_carreras">Carreras</a>
-                                    <a href="/c_categorias">Categorías</a>
-                                    <a href="/c_etapas">Etapas</a>
-                                    <a href="/c_habilidades">Habilidades</a>
-                                    <a href="/c_mentores">Mentores</a>
-                                    <a href="/c_participantes">Participantes</a>
-                                    <a href="/c_proyectos">Proyectos</a>
-                                    <a href="/c_servicios">Servicios</a>
-                                    <a href="/c_tipos">Tipos</a>
+                            <!--ADMIN-->
+                            @can('mostrar admin')
+                                <div class="dropdown">
+                                    <a class="nav-link active" href="#">Catálogos</a>
+                                    <div class="content">
+                                        <a href="/c_alumnos">Alumnos</a>
+                                        <a href="/c_asesores">Asesores</a>
+                                        <a href="/c_carreras">Carreras</a>
+                                        <a href="/c_categorias">Categorías</a>
+                                        <!-- Submenú -->
+                                        <div class="dropdown submenu">
+                                            <a class="nav-link" href="/c_proyectos">&nbsp;Proyectos</a>
+                                            <div class="content">
+                                                <a href="/c_etapas">Etapas</a>
+                                                <a href="/c_tipos">Tipos</a>
+                                                <a href="/c_participantes">Participantes</a>
+                                            </div>
+                                        </div>
+                                        <a href="/c_habilidades">Habilidades</a>
+                                        <a href="/c_mentores">Mentores</a>
+                                        <a href="/c_servicios">Servicios</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <!--DROPDOWN-->
+                            @endcan
+                            
+                            <!--ALUMNO-->
+                            @can('mostrar alumno')
+                                <div class="dropdown">
+                                    <a class="nav-link active" href="#">Catálogos</a>
+                                    <div class="content">
+                                        <a href="/c_proyectos">Proyectos</a>
+                                    </div>
+                                </div>
+                            @endcan
                         </li>
-                        </ul>
+                    </ul>
+
                     <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="btn btn-danger" type="submit"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Cerrar sesión
                         </button>
                     </form>
@@ -234,8 +283,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+        </script>
 </body>
 
 </html>
