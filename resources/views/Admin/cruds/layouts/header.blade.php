@@ -23,7 +23,6 @@
     <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
     <link rel="icon" href="favicon.ico" sizes="32x32" type="x-icon">
     <link rel="icon" href="favicon.ico" sizes="16x16" type="x-icon">
-    <link rel="manifest" href="manifest.json">
     <link rel="mask-icon" href="tec_logo.svg" color="#712cf9">
     <link rel="icon" href="favicon.ico">
     <meta name="theme-color" content="#712cf9">

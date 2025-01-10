@@ -276,69 +276,80 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 <script>
-    // Obtener las etiquetas y datos
-    var labels = @json($estadisticas->pluck('carrera'));
-    var data = @json($estadisticas->pluck('total_alumnos'));
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener etiquetas y datos
+        var labels = @json($estadisticas->pluck('carrera'));
+        var data = @json($estadisticas->pluck('total_alumnos'));
 
-    // Ordenar los datos de mayor a menor
-    var sortedData = labels.map((label, index) => {
-        return {
-            label: label,
-            value: data[index]
-        };
-    }).sort((a, b) => b.value - a.value);
+        // Ordenar los datos de mayor a menor
+        var sortedData = labels.map((label, index) => {
+            return {
+                label: label,
+                value: data[index]
+            };
+        }).sort((a, b) => b.value - a.value);
 
-    // Extraer etiquetas y valores ordenados
-    var sortedLabels = sortedData.map(item => item.label);
-    var sortedValues = sortedData.map(item => item.value);
+        // Extraer etiquetas y valores ordenados
+        var sortedLabels = sortedData.map(item => item.label);
+        var sortedValues = sortedData.map(item => item.value);
 
-    // Crear el gráfico de pastel
-    var ctx = document.getElementById('carrerasChart').getContext('2d');
-    var carrerasChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: sortedLabels, // Carreras ordenadas
-            datasets: [{
-                label: 'Número de Alumnos por Carrera',
-                data: sortedValues, // Total de alumnos por carrera
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 99, 132, 1)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: {
+        // Crear el gráfico de pastel
+        var ctx = document.getElementById('carrerasChart').getContext('2d');
+        var carrerasChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: sortedLabels,
+                datasets: [{
+                    label: 'Número de Alumnos por Carrera',
+                    data: sortedValues,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, context) => {
+                            let total = context.chart.data.datasets[0].data.reduce((acc, cur) => acc + cur, 0);
+                            let percentage = (value / total * 100).toFixed(2);
+                            return `${percentage}%`;
+                        },
+                        color: '#000',
                         font: {
+                            weight: 'bold',
                             size: 12
                         }
                     }
                 }
-            }
-        }
+            },
+            plugins: [ChartDataLabels]
+        });
     });
 </script>
 
