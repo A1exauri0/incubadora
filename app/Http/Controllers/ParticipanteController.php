@@ -30,15 +30,15 @@ class ParticipanteController extends Controller
         $mentores = DB::table('mentor')->get();
         $carreras = DB::table('carrera')->get();
         $estadisticas = DB::table('alumno')
-        ->select('carrera', DB::raw('COUNT(DISTINCT no_control) as total_alumnos'))
-        ->groupBy('carrera')
-        ->orderBy('total_alumnos', 'desc')
-        ->get();
+            ->select('carrera', DB::raw('COUNT(DISTINCT no_control) as total_alumnos'))
+            ->groupBy('carrera')
+            ->orderBy('total_alumnos', 'desc')
+            ->get();
 
 
         $titulo = "CRUD Participantes";
 
-        return view('Admin.cruds.participantes', compact('estadisticas','alumno_proyecto', 'asesor_proyecto', 'mentor_proyecto', 'titulo', 'proyectos', 'alumnos', 'asesores', 'mentores', 'carreras', 'clave_proyecto'));
+        return view('Admin.cruds.participantes', compact('estadisticas', 'alumno_proyecto', 'asesor_proyecto', 'mentor_proyecto', 'titulo', 'proyectos', 'alumnos', 'asesores', 'mentores', 'carreras', 'clave_proyecto'));
     }
 
     public function mostrarParticipantes(Request $request)
@@ -53,28 +53,54 @@ class ParticipanteController extends Controller
     {
         $tipo = $request->get('tipo');
         $query = $request->get('query');
-
+    
         $resultados = collect();
-
+    
         if ($tipo === 'alumno') {
             $resultados = DB::table('alumno')
-                ->where('nombre', 'LIKE', '%' . $query . '%')
-                ->orWhere('no_control', 'LIKE', '%' . $query . '%')
+                ->join('alumno_proyecto', 'alumno.no_control', '=', 'alumno_proyecto.no_control')
+                ->join('proyecto', 'alumno_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                ->where('alumno.nombre', 'LIKE', '%' . $query . '%')
+                ->orWhere('alumno.no_control', 'LIKE', '%' . $query . '%')
+                ->select(
+                    'alumno.no_control as id',
+                    'alumno.nombre',
+                    DB::raw('GROUP_CONCAT(proyecto.nombre) as proyectos')
+                )
+                ->groupBy('alumno.no_control', 'alumno.nombre')
                 ->get();
         } elseif ($tipo === 'asesor') {
             $resultados = DB::table('asesor')
-                ->where('nombre', 'LIKE', '%' . $query . '%')
-                ->orWhere('idAsesor', 'LIKE', '%' . $query . '%')
+                ->join('asesor_proyecto', 'asesor.idAsesor', '=', 'asesor_proyecto.idAsesor')
+                ->join('proyecto', 'asesor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                ->where('asesor.nombre', 'LIKE', '%' . $query . '%')
+                ->orWhere('asesor.idAsesor', 'LIKE', '%' . $query . '%')
+                ->select(
+                    'asesor.idAsesor as id',
+                    'asesor.nombre',
+                    DB::raw('GROUP_CONCAT(proyecto.nombre) as proyectos')
+                )
+                ->groupBy('asesor.idAsesor', 'asesor.nombre')
                 ->get();
         } elseif ($tipo === 'mentor') {
             $resultados = DB::table('mentor')
-                ->where('nombre', 'LIKE', '%' . $query . '%')
-                ->orWhere('idMentor', 'LIKE', '%' . $query . '%')
+                ->join('mentor_proyecto', 'mentor.idMentor', '=', 'mentor_proyecto.idMentor')
+                ->join('proyecto', 'mentor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                ->where('mentor.nombre', 'LIKE', '%' . $query . '%')
+                ->orWhere('mentor.idMentor', 'LIKE', '%' . $query . '%')
+                ->select(
+                    'mentor.idMentor as id',
+                    'mentor.nombre',
+                    DB::raw('GROUP_CONCAT(proyecto.nombre) as proyectos')
+                )
+                ->groupBy('mentor.idMentor', 'mentor.nombre')
                 ->get();
         }
-
+    
         return response()->json($resultados);
     }
+    
+    
 
     public function agregar(Request $request)
     {
@@ -156,49 +182,49 @@ class ParticipanteController extends Controller
     {
         // Obtener el clave_proyecto desde la URL
         $clave_proyecto = $request->input('clave_proyecto');
-    
+
         // Reutilizar las consultas filtradas que tienes en el método index
         $alumno_proyecto = DB::table('alumno_proyecto')
             ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
             ->where('alumno_proyecto.clave_proyecto', $clave_proyecto)
-            ->select('alumno_proyecto.*', 'alumno.nombre','alumno.correo_institucional','alumno.carrera','alumno.telefono','alumno.semestre')
-            ->orderBy('nombre') 
+            ->select('alumno_proyecto.*', 'alumno.nombre', 'alumno.correo_institucional', 'alumno.carrera', 'alumno.telefono', 'alumno.semestre')
+            ->orderBy('nombre')
             ->get();
-            
+
         $asesor_proyecto = DB::table('asesor_proyecto')
             ->join('asesor', 'asesor_proyecto.idAsesor', '=', 'asesor.idAsesor')
             ->where('asesor_proyecto.clave_proyecto', $clave_proyecto)
-            ->select('asesor_proyecto.*', 'asesor.nombre','asesor.telefono','asesor.correo_electronico')
+            ->select('asesor_proyecto.*', 'asesor.nombre', 'asesor.telefono', 'asesor.correo_electronico')
             ->get();
-    
+
         // Obtener el proyecto específico que se quiere exportar
         $proyecto = DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->first();
-    
+
         // Verificar si el proyecto fue encontrado
         if (!$proyecto) {
             return redirect()->back()->with('error', 'El proyecto no fue encontrado');
         }
-    
+
         $alumnos = DB::table('alumno')->orderBy('nombre')->get();
         $asesores = DB::table('asesor')->get();
         $carreras = DB::table('carrera')->get();
         $categorias = DB::table('categoria')->get();
         $resultados = DB::table('proyecto_resultados')
-        ->where('clave_proyecto', $clave_proyecto) 
-        ->orderBy('fecha_agregado') 
-        ->get();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->orderBy('fecha_agregado')
+            ->get();
         $requerimientos = DB::table('proyecto_requerimientos')
-        ->where('clave_proyecto', $clave_proyecto) 
-        ->get();
-        
+            ->where('clave_proyecto', $clave_proyecto)
+            ->get();
+
         // Generar el PDF con los mismos datos que tienes en la vista
         $pdf = PDF::loadView('Admin.cruds.layouts.pdf', compact(
-            'proyecto', 
-            'alumno_proyecto', 
-            'asesor_proyecto', 
-            'alumnos', 
-            'asesores', 
-            'carreras', 
+            'proyecto',
+            'alumno_proyecto',
+            'asesor_proyecto',
+            'alumnos',
+            'asesores',
+            'carreras',
             'categorias',
             'resultados',
             'requerimientos'
@@ -207,6 +233,6 @@ class ParticipanteController extends Controller
         // Mostrar el PDF
         return $pdf->stream('proyecto_' . $clave_proyecto . '.pdf');
     }
-    
-    
+
+
 }
