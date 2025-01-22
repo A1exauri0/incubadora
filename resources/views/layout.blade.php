@@ -216,9 +216,10 @@
                                         <a href="/c_asesores">Asesores</a>
                                         <a href="/c_carreras">Carreras</a>
                                         <a href="/c_categorias">Categorías</a>
+                                        <a href="/c_tokens">Tokens</a>
                                         <!-- Submenú -->
                                         <div class="dropdown submenu">
-                                            <a class="nav-link" href="/c_proyectos">&nbsp;Proyectos</a>
+                                            <a class="nav-link" href="/c_proyectos">&nbsp;Proyectos ></a>
                                             <div class="content">
                                                 <a href="/c_etapas">Etapas</a>
                                                 <a href="/c_tipos">Tipos</a>

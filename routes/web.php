@@ -17,7 +17,8 @@ use App\Http\Controllers\{
     MentorController,
     ServicioController,
     InicioController,
-    habilidadesAMController
+    habilidadesAMController,
+    TokenController
 };
 
 /*
@@ -71,6 +72,13 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/c_categorias/editar', [CategoriaController::class, 'editar'])->name('categorias.editar');
     Route::post('/c_categorias/eliminar', [CategoriaController::class, 'eliminar'])->name('categorias.eliminar');
     Route::post('c_categorias/eliminarMultiple', [CategoriaController::class, 'eliminarMultiple'])->name('categorias.eliminarMultiple');
+
+    //CRUD Códigos
+    Route::get('/c_tokens', [TokenController::class, 'index']);
+    Route::post('/c_tokens/agregar', [TokenController::class, 'agregar'])->name('tokens.agregar');
+    Route::post('/c_tokens/editar', [TokenController::class, 'editar'])->name('tokens.editar');
+    Route::post('/c_tokens/eliminar', [TokenController::class, 'eliminar'])->name('tokens.eliminar');
+    Route::post('c_tokens/eliminarMultiple', [TokenController::class, 'eliminarMultiple'])->name('tokens.eliminarMultiple');
 
     //CRUD Etapas
     Route::get('/c_etapas', [EtapaController::class, 'index']);
