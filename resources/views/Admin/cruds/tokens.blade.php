@@ -103,16 +103,6 @@
                 this.value = valorNumerico;
             });
         });
-
-        document.querySelectorAll('.nombre').forEach(function(element) {
-            element.addEventListener('input', function() {
-                var valor = this.value;
-
-                // Sólo acepta Letras Mayúsculas y Minúsculas
-                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ]+/g, '').replace(/\s{2,}/g, ' ');
-                this.value = valorLimpio;
-            });
-        });
     </script>
 @endsection
 
@@ -172,7 +162,7 @@
                 </td>
                 <td class="idToken">{{ $token->idToken }}</td>
                 <td class="token">{{ $token->token }}</td>
-                <td class="rol">{{  $token->rol }}</td>
+                <td class="rol">{{  $roles->firstWhere('id', $token->rol)->name ?? 'N/A'; }}</td>
                 <td class="correo">{{ $token->correo }}</td>
                 <td>
                     <a href="#editEmployeeModal" class="edit" data-toggle="modal"
@@ -231,7 +221,7 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Correo</label>
-                <input id="correo_agregar" name="correo_agregar" type="text" class="form-control correo" required>
+                <input id="correo_agregar" name="correo_agregar" type="email" class="form-control correo" value="" maxlength="50" required>
             </div>
 
             <div class="form-group">
@@ -273,7 +263,8 @@
 
             {{-- Aquí se debe guardar el numero de control a enviar al método del controlador para eliminar. --}}
             <input type="hidden" name="idToken_editar" id="idToken_editar">
-            <input type="hidden" name="nombre_mod" id="nombre_mod">
+            <input type="hidden" name="correo_mod" id="correo_mod">
+            <input type="hidden" name="rol_mod" id="rol_mod">
 
             <div class="modal-header">
                 <h4 class="modal-title">Editar @yield('administrar_s')</h4>
@@ -282,8 +273,19 @@
 
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nombre</label>
-                    <input id="nombre_campo" type="text" class="form-control nombre ceditar" value="" maxlength="50" required>
+                    <label>Correo</label>
+                    <input id="correo_campo" type="email" class="form-control correo ceditar" value="" maxlength="50" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="rol_campo" name="rol_campo" class="form-control rol ceditar" required>
+                        @foreach ($roles as $rol)
+                            <option value="{{ $rol->name }}" class="form-control"
+                                {{ isset($token) && $rol->id == $token->rol ? 'selected' : '' }}> {{ $rol->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -300,33 +302,47 @@
                 $('a.edit').click(function() {
                     // Se obtienen los datos del registro a editar
                     var idToken = $(this).data('idtoken');
-                    var nombre = $(this).data('nombre');
+                    var correo = $(this).data('correo');
+                    var rolId = $(this).data('rol');
+                    var roles = @json($roles);
+                    var rol = roles.find(role => role.id == rolId).name;
+                    
 
                     // Se llenan los campos del formulario con los datos del registro a editar
-                    $('.nombre').val(nombre);
+                    $('.correo').val(correo);
+                    $('.form-control option').removeAttr('selected');
+                    $('.form-control option[value="' + rol + '"]').attr('selected', 'selected');
 
                     // Se llenan los campos ocultos con los datos del registro a editar
                     $('#idToken_editar').val(idToken);
-                    $('#nombre_mod').val(nombre);
+                    $('#correo_mod').val(correo);
+                    $('#rol_mod').val(rol);
 
                     //Listeners para cuando cambien los campos
-                    document.getElementById('nombre_campo').addEventListener('change', function() {
-                        $('#nombre_mod').val(this.value);
+                    document.getElementById('correo_campo').addEventListener('change', function() {
+                        $('#correo_mod').val(this.value);
+                    });
+                    
+                    document.getElementById('rol_campo').addEventListener('change', function() {
+                        $('#rol_mod').val(this.value);
                     });
 
-                    //console.log("idToken:", idToken);
+                    console.log("rol:", rol);
                 });
 
             });
 
             // Vaciar los campos al dar clic en "Cancelar"
             $('input[type="button"]').click(function() {
-                $('.nombre').val('');
+                $('.correo').val('');
+                $('.rol').prop('selectedIndex', -1);
             });
+
 
             // Vaciar los campos al hacer submit del formulario
             $('form').submit(function() {
-                $('.nombre.ceditar').val('');
+                $('.correo.ceditar').val('');
+                $('.rol.ceditar').prop('selectedIndex', -1);
             });
         </script>
 

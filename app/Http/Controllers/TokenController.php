@@ -9,7 +9,7 @@ class TokenController extends Controller
 {
     public function index()
     {
-        $tokens = DB::table('token_rol')->get();
+        $tokens = DB::table('token_rol')->orderBy('idToken', 'desc')->get();
         $columnas = ['ID', 'Token', 'Rol','Correo'];
         $total_registros = $tokens->count();
         $roles = DB::table('roles')->get();
@@ -52,8 +52,10 @@ class TokenController extends Controller
     public function editar(Request $request)
     {
         $idtoken = $request->input('idToken_editar');
-        $nombre = $request->input('correo_mod');
+        $correo = $request->input('correo_mod');
         $rol = $request->input('rol_mod');
+        //convertir el rol a su id
+        $rol = DB::table('roles')->where('name', '=', $rol)->first()->id;
 
         DB::table('token_rol')->where('idToken', '=', $idtoken)->update(['correo' => $correo, 'rol' => $rol]);
         return back();
