@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Auth\VerificationController;
+use Illuminate\Http\Request;
 use App\Http\Controllers\{
     ParticipanteController,
     UserController,
@@ -36,13 +39,46 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+// Rutas de autenticación y verificación de correo electrónico
+Auth::routes(['verify' => true]);
 
 //Home
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
+->middleware(['auth', 'verified'])
+->name('home');
 
+//Verificacion
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Ruta para manejar la verificación del correo
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    // Redirigir a la página personalizada de confirmación
+    return redirect()->route('email.confirmed');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Ruta para la vista personalizada de correo verificado
+Route::get('/email-verified', function () {
+    return view('auth.email-verified');
+})->name('email.confirmed');
+
+Route::post('email/verification-notification', function () {
+    \Illuminate\Support\Facades\Notification::send(auth()->user(), new \Illuminate\Auth\Notifications\VerifyEmail);
+})->middleware('auth')->name('verification.send');
 
 Route::group(['middleware' => ['role:admin']], function () {
+    /*
+    Route::prefix('c_alumnos')->group(function () {
+    Route::get('/', [AlumnoController::class, 'index']);
+    Route::post('/agregar', [AlumnoController::class, 'agregar'])->name('alumnos.agregar');
+    Route::post('/editar', [AlumnoController::class, 'editar'])->name('alumnos.editar');
+    Route::post('/eliminar', [AlumnoController::class, 'eliminar'])->name('alumnos.eliminar');
+    Route::post('/eliminarMultiple', [AlumnoController::class, 'eliminarMultiple'])->name('alumnos.eliminarMultiple');
+});
+ */
 
     //CRUD Alumnos
     Route::get('/c_alumnos', [AlumnoController::class, 'index']);
@@ -132,3 +168,5 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('c_tipos/eliminarMultiple', [TipoController::class, 'eliminarMultiple'])->name('tipos.eliminarMultiple');
 
 });
+
+

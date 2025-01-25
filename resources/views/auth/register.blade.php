@@ -45,11 +45,11 @@
                                     <i class="fas fa-key fa-lg me-3 fa-fw"></i>
                                     <input name="password_confirmation" type="password" id="password_confirmation" class="form-control form-control-lg" placeholder="Confirmar contraseña" required />
                                 </div>
-                                <!-- Código de rol -->
+                                <!-- Código de rol 
                                 <div class="d-flex flex-row align-items-center mb-4">
                                     <i class="fas fa-key fa-lg me-3 fa-fw"></i>
                                     <input name="rol" type="text" id="rol" class="form-control form-control-lg" placeholder="Código (Sólo si no es estudiante)" required />
-                                </div>
+                                </div>-->
                                 <!-- Login button -->
                                 <button class="btn btn-primary btn-lg btn-block" type="submit">Registrarse</button>
                                 <a href="{{route('login')}}" class="btn btn-secondary btn-lg btn-block"> Regresar

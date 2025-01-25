@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versión del servidor:         8.0.30 - MySQL Community Server - GPL
+-- Versión del servidor:         8.0.40 - MySQL Community Server - GPL
 -- SO del servidor:              Win64
 -- HeidiSQL Versión:             12.1.0.6537
 -- --------------------------------------------------------
@@ -16,12 +16,10 @@
 
 
 -- Volcando estructura de base de datos para incubadora
-DROP DATABASE IF EXISTS `incubadora`;
 CREATE DATABASE IF NOT EXISTS `incubadora` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `incubadora`;
 
 -- Volcando estructura para tabla incubadora.alumno
-DROP TABLE IF EXISTS `alumno`;
 CREATE TABLE IF NOT EXISTS `alumno` (
   `no_control` char(8) NOT NULL,
   `nombre` varchar(50) NOT NULL,
@@ -34,7 +32,6 @@ CREATE TABLE IF NOT EXISTS `alumno` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.alumno: ~192 rows (aproximadamente)
-DELETE FROM `alumno`;
 INSERT INTO `alumno` (`no_control`, `nombre`, `carrera`, `correo_institucional`, `telefono`, `semestre`, `fecha_agregado`) VALUES
 	('00000001', 'Francisco Alberto Pérez Hernández', 'Ingeniería Electrónica', 'L000000002@tuxtla.tecnm.mx', '9611234567', 3, '2024-08-28 10:10:40'),
 	('01270526', 'Julio Cesar Martinez Morgan', 'Doctorado en Ciencias de la Ingeniería', 'D01270526@tuxtla.tecnm.mx', '9611234567', 3, '2024-09-01 12:56:56'),
@@ -230,7 +227,6 @@ INSERT INTO `alumno` (`no_control`, `nombre`, `carrera`, `correo_institucional`,
 	('97270383', 'Martha Luz Paniagua Chávez', 'Doctorado en Ciencias de la Ingeniería', 'D97270383@tuxtla.tecnm.mx', '9611234567', 3, '2024-08-28 10:51:58');
 
 -- Volcando estructura para tabla incubadora.alumno_proyecto
-DROP TABLE IF EXISTS `alumno_proyecto`;
 CREATE TABLE IF NOT EXISTS `alumno_proyecto` (
   `clave_proyecto` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `no_control` char(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -242,7 +238,6 @@ CREATE TABLE IF NOT EXISTS `alumno_proyecto` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.alumno_proyecto: ~183 rows (aproximadamente)
-DELETE FROM `alumno_proyecto`;
 INSERT INTO `alumno_proyecto` (`clave_proyecto`, `no_control`, `fecha_agregado`) VALUES
 	('0000000000045', '20270236', '2024-08-27 11:11:43'),
 	('0000000000045', '20270242', '2024-08-27 11:11:53'),
@@ -429,7 +424,6 @@ INSERT INTO `alumno_proyecto` (`clave_proyecto`, `no_control`, `fecha_agregado`)
 	('0000000000040', '23270367', '2024-09-01 23:03:44');
 
 -- Volcando estructura para tabla incubadora.alumno_semestre
-DROP TABLE IF EXISTS `alumno_semestre`;
 CREATE TABLE IF NOT EXISTS `alumno_semestre` (
   `idSemestre` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -437,7 +431,6 @@ CREATE TABLE IF NOT EXISTS `alumno_semestre` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.alumno_semestre: ~10 rows (aproximadamente)
-DELETE FROM `alumno_semestre`;
 INSERT INTO `alumno_semestre` (`idSemestre`, `nombre`) VALUES
 	(1, 'Primer semestre'),
 	(2, 'Segundo semestre'),
@@ -451,7 +444,6 @@ INSERT INTO `alumno_semestre` (`idSemestre`, `nombre`) VALUES
 	(10, 'Décimo semestre');
 
 -- Volcando estructura para tabla incubadora.asesor
-DROP TABLE IF EXISTS `asesor`;
 CREATE TABLE IF NOT EXISTS `asesor` (
   `idAsesor` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -462,7 +454,6 @@ CREATE TABLE IF NOT EXISTS `asesor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.asesor: ~53 rows (aproximadamente)
-DELETE FROM `asesor`;
 INSERT INTO `asesor` (`idAsesor`, `nombre`, `telefono`, `correo_electronico`, `fecha_agregado`) VALUES
 	(2, 'Jorge William Figueroa Corzo', '9619876543', 'ejemplo@gmail.com', '2024-06-01 14:16:07'),
 	(3, 'Jesús Carlos Sánchez Guzmán', '9619876543', 'ejemplo@gmail.com', '2024-06-01 14:16:28'),
@@ -519,7 +510,6 @@ INSERT INTO `asesor` (`idAsesor`, `nombre`, `telefono`, `correo_electronico`, `f
 	(58, 'Samuel Gómez Peñate', '9611111111', 'ejemplos@gmail.com', '2024-09-01 22:52:58');
 
 -- Volcando estructura para tabla incubadora.asesor_proyecto
-DROP TABLE IF EXISTS `asesor_proyecto`;
 CREATE TABLE IF NOT EXISTS `asesor_proyecto` (
   `idAsesor` int NOT NULL,
   `clave_proyecto` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -531,7 +521,6 @@ CREATE TABLE IF NOT EXISTS `asesor_proyecto` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.asesor_proyecto: ~73 rows (aproximadamente)
-DELETE FROM `asesor_proyecto`;
 INSERT INTO `asesor_proyecto` (`idAsesor`, `clave_proyecto`, `fecha_agregado`) VALUES
 	(2, '0000000000045', '2024-08-27 11:12:05'),
 	(15, '0000000000006', '2024-08-28 09:49:42'),
@@ -608,7 +597,6 @@ INSERT INTO `asesor_proyecto` (`idAsesor`, `clave_proyecto`, `fecha_agregado`) V
 	(58, '0000000000040', '2024-09-01 23:03:54');
 
 -- Volcando estructura para tabla incubadora.carrera
-DROP TABLE IF EXISTS `carrera`;
 CREATE TABLE IF NOT EXISTS `carrera` (
   `clave` char(13) NOT NULL,
   `nombre` varchar(75) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -617,7 +605,6 @@ CREATE TABLE IF NOT EXISTS `carrera` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.carrera: ~16 rows (aproximadamente)
-DELETE FROM `carrera`;
 INSERT INTO `carrera` (`clave`, `nombre`, `fecha_agregado`) VALUES
 	('0000000000000', 'PENDIENTE', '2024-06-01 18:42:16'),
 	('DALB-2010-12', 'Doctorado en Ciencias de los Alimentos y Biotecnología', '2024-08-28 10:42:27'),
@@ -637,7 +624,6 @@ INSERT INTO `carrera` (`clave`, `nombre`, `fecha_agregado`) VALUES
 	('MPADM-2011-26', 'Maestría en Administración', '2024-08-28 10:47:58');
 
 -- Volcando estructura para tabla incubadora.categoria
-DROP TABLE IF EXISTS `categoria`;
 CREATE TABLE IF NOT EXISTS `categoria` (
   `idCategoria` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -645,7 +631,6 @@ CREATE TABLE IF NOT EXISTS `categoria` (
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.categoria: ~8 rows (aproximadamente)
-DELETE FROM `categoria`;
 INSERT INTO `categoria` (`idCategoria`, `nombre`) VALUES
 	(12, 'Cambio climático'),
 	(13, 'Industria eléctrica y electrónica'),
@@ -657,7 +642,6 @@ INSERT INTO `categoria` (`idCategoria`, `nombre`) VALUES
 	(19, 'NODESS');
 
 -- Volcando estructura para tabla incubadora.color
-DROP TABLE IF EXISTS `color`;
 CREATE TABLE IF NOT EXISTS `color` (
   `idColor` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -666,7 +650,6 @@ CREATE TABLE IF NOT EXISTS `color` (
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.color: ~8 rows (aproximadamente)
-DELETE FROM `color`;
 INSERT INTO `color` (`idColor`, `nombre`, `clase`) VALUES
 	(1, 'Azul', 'primary'),
 	(2, 'Verde', 'success'),
@@ -678,7 +661,6 @@ INSERT INTO `color` (`idColor`, `nombre`, `clase`) VALUES
 	(8, 'Gris oscuro', 'dark');
 
 -- Volcando estructura para tabla incubadora.especialidades
-DROP TABLE IF EXISTS `especialidades`;
 CREATE TABLE IF NOT EXISTS `especialidades` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -688,10 +670,8 @@ CREATE TABLE IF NOT EXISTS `especialidades` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.especialidades: ~0 rows (aproximadamente)
-DELETE FROM `especialidades`;
 
 -- Volcando estructura para tabla incubadora.etapas
-DROP TABLE IF EXISTS `etapas`;
 CREATE TABLE IF NOT EXISTS `etapas` (
   `idEtapa` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -701,7 +681,6 @@ CREATE TABLE IF NOT EXISTS `etapas` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.etapas: ~4 rows (aproximadamente)
-DELETE FROM `etapas`;
 INSERT INTO `etapas` (`idEtapa`, `nombre`, `descripcion`, `color`) VALUES
 	(1, 'Inicio', 'Proyecto en fase de inicio.', 'Verde'),
 	(2, 'Desarrollo', 'Proyecto en fase de desarrollo.', 'Amarillo'),
@@ -709,7 +688,6 @@ INSERT INTO `etapas` (`idEtapa`, `nombre`, `descripcion`, `color`) VALUES
 	(4, 'PENDIENTE', 'Proyecto pendiente de revisión o acción.', 'Gris');
 
 -- Volcando estructura para tabla incubadora.failed_jobs
-DROP TABLE IF EXISTS `failed_jobs`;
 CREATE TABLE IF NOT EXISTS `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -723,10 +701,8 @@ CREATE TABLE IF NOT EXISTS `failed_jobs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.failed_jobs: ~0 rows (aproximadamente)
-DELETE FROM `failed_jobs`;
 
 -- Volcando estructura para tabla incubadora.habilidad
-DROP TABLE IF EXISTS `habilidad`;
 CREATE TABLE IF NOT EXISTS `habilidad` (
   `idHabilidad` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
@@ -735,10 +711,8 @@ CREATE TABLE IF NOT EXISTS `habilidad` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.habilidad: ~0 rows (aproximadamente)
-DELETE FROM `habilidad`;
 
 -- Volcando estructura para tabla incubadora.habilidad_asesor
-DROP TABLE IF EXISTS `habilidad_asesor`;
 CREATE TABLE IF NOT EXISTS `habilidad_asesor` (
   `idHabilidad` int unsigned NOT NULL,
   `idAsesor` int NOT NULL,
@@ -749,10 +723,8 @@ CREATE TABLE IF NOT EXISTS `habilidad_asesor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.habilidad_asesor: ~0 rows (aproximadamente)
-DELETE FROM `habilidad_asesor`;
 
 -- Volcando estructura para tabla incubadora.mentor
-DROP TABLE IF EXISTS `mentor`;
 CREATE TABLE IF NOT EXISTS `mentor` (
   `idMentor` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) DEFAULT NULL,
@@ -761,10 +733,8 @@ CREATE TABLE IF NOT EXISTS `mentor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.mentor: ~0 rows (aproximadamente)
-DELETE FROM `mentor`;
 
 -- Volcando estructura para tabla incubadora.mentor_proyecto
-DROP TABLE IF EXISTS `mentor_proyecto`;
 CREATE TABLE IF NOT EXISTS `mentor_proyecto` (
   `idMentor` int DEFAULT NULL,
   `clave_proyecto` char(50) DEFAULT NULL,
@@ -776,10 +746,8 @@ CREATE TABLE IF NOT EXISTS `mentor_proyecto` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.mentor_proyecto: ~0 rows (aproximadamente)
-DELETE FROM `mentor_proyecto`;
 
 -- Volcando estructura para tabla incubadora.migrations
-DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -788,7 +756,6 @@ CREATE TABLE IF NOT EXISTS `migrations` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.migrations: ~6 rows (aproximadamente)
-DELETE FROM `migrations`;
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(1, '2014_10_12_000000_create_users_table', 1),
 	(2, '2014_10_12_100000_create_password_reset_tokens_table', 1),
@@ -798,7 +765,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(6, '2024_12_17_174702_create_permission_tables', 1);
 
 -- Volcando estructura para tabla incubadora.model_has_permissions
-DROP TABLE IF EXISTS `model_has_permissions`;
 CREATE TABLE IF NOT EXISTS `model_has_permissions` (
   `permission_id` bigint unsigned NOT NULL,
   `model_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -809,10 +775,8 @@ CREATE TABLE IF NOT EXISTS `model_has_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.model_has_permissions: ~0 rows (aproximadamente)
-DELETE FROM `model_has_permissions`;
 
 -- Volcando estructura para tabla incubadora.model_has_roles
-DROP TABLE IF EXISTS `model_has_roles`;
 CREATE TABLE IF NOT EXISTS `model_has_roles` (
   `role_id` bigint unsigned NOT NULL,
   `model_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -822,15 +786,24 @@ CREATE TABLE IF NOT EXISTS `model_has_roles` (
   CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla incubadora.model_has_roles: ~2 rows (aproximadamente)
-DELETE FROM `model_has_roles`;
+-- Volcando datos para la tabla incubadora.model_has_roles: ~10 rows (aproximadamente)
 INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
 	(1, 'App\\Models\\User', 1),
 	(2, 'App\\Models\\User', 2),
-	(2, 'App\\Models\\User', 3);
+	(2, 'App\\Models\\User', 3),
+	(2, 'App\\Models\\User', 4),
+	(2, 'App\\Models\\User', 5),
+	(2, 'App\\Models\\User', 6),
+	(2, 'App\\Models\\User', 7),
+	(2, 'App\\Models\\User', 8),
+	(2, 'App\\Models\\User', 9),
+	(2, 'App\\Models\\User', 11),
+	(2, 'App\\Models\\User', 12),
+	(2, 'App\\Models\\User', 13),
+	(2, 'App\\Models\\User', 14),
+	(2, 'App\\Models\\User', 15);
 
 -- Volcando estructura para tabla incubadora.password_resets
-DROP TABLE IF EXISTS `password_resets`;
 CREATE TABLE IF NOT EXISTS `password_resets` (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -839,10 +812,8 @@ CREATE TABLE IF NOT EXISTS `password_resets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.password_resets: ~0 rows (aproximadamente)
-DELETE FROM `password_resets`;
 
 -- Volcando estructura para tabla incubadora.password_reset_tokens
-DROP TABLE IF EXISTS `password_reset_tokens`;
 CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -851,10 +822,8 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.password_reset_tokens: ~0 rows (aproximadamente)
-DELETE FROM `password_reset_tokens`;
 
 -- Volcando estructura para tabla incubadora.permissions
-DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE IF NOT EXISTS `permissions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -866,7 +835,6 @@ CREATE TABLE IF NOT EXISTS `permissions` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.permissions: ~6 rows (aproximadamente)
-DELETE FROM `permissions`;
 INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
 	(6, 'mostrar admin', 'web', '2025-01-05 00:09:56', '2025-01-05 00:09:56'),
 	(7, 'mostrar alumno', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57'),
@@ -876,7 +844,6 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 	(11, 'mostrar inversionista', 'web', '2025-01-05 00:09:57', '2025-01-05 00:09:57');
 
 -- Volcando estructura para tabla incubadora.personal_access_tokens
-DROP TABLE IF EXISTS `personal_access_tokens`;
 CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tokenable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -894,10 +861,8 @@ CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.personal_access_tokens: ~0 rows (aproximadamente)
-DELETE FROM `personal_access_tokens`;
 
 -- Volcando estructura para tabla incubadora.proyecto
-DROP TABLE IF EXISTS `proyecto`;
 CREATE TABLE IF NOT EXISTS `proyecto` (
   `clave_proyecto` char(15) NOT NULL,
   `nombre` varchar(50) NOT NULL,
@@ -919,7 +884,6 @@ CREATE TABLE IF NOT EXISTS `proyecto` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.proyecto: ~49 rows (aproximadamente)
-DELETE FROM `proyecto`;
 INSERT INTO `proyecto` (`clave_proyecto`, `nombre`, `nombre_descriptivo`, `descripcion`, `categoria`, `tipo`, `etapa`, `video`, `area_aplicacion`, `naturaleza_tecnica`, `objetivo`, `fecha_agregado`) VALUES
 	('0000000000001', 'NaturArma', 'Sin asignar', 'NaturArma', 12, 12, 2, 'https://www.youtube.com/watch?v=fOW8Y09GVek', 'Sin asignar', 'Sin asignar', 'Sin asignar', '2024-05-30 11:50:56'),
 	('0000000000002', 'BioGe', 'Sin asignar', 'BioGe', 12, 12, 1, NULL, 'Sin asignar', 'Sin asignar', 'Sin asignar', '2024-05-30 11:51:27'),
@@ -972,7 +936,6 @@ INSERT INTO `proyecto` (`clave_proyecto`, `nombre`, `nombre_descriptivo`, `descr
 	('0000000000049', 'Phytobot', 'Sin asignar', 'Phytobot', 13, 12, 4, NULL, 'Sin asignar', 'Sin asignar', 'Sin asignar', '2024-08-29 11:04:16');
 
 -- Volcando estructura para tabla incubadora.proyecto_requerimientos
-DROP TABLE IF EXISTS `proyecto_requerimientos`;
 CREATE TABLE IF NOT EXISTS `proyecto_requerimientos` (
   `idRequerimiento` int NOT NULL AUTO_INCREMENT,
   `clave_proyecto` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -984,14 +947,12 @@ CREATE TABLE IF NOT EXISTS `proyecto_requerimientos` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.proyecto_requerimientos: ~3 rows (aproximadamente)
-DELETE FROM `proyecto_requerimientos`;
 INSERT INTO `proyecto_requerimientos` (`idRequerimiento`, `clave_proyecto`, `descripcion`, `cantidad`) VALUES
 	(1, '0000000000029', 'requerimiento 1', 'uno'),
 	(2, '0000000000029', 'requerimiento 2', 'dos'),
 	(3, '0000000000029', 'requerimiento 3', 'tres');
 
 -- Volcando estructura para tabla incubadora.proyecto_resultados
-DROP TABLE IF EXISTS `proyecto_resultados`;
 CREATE TABLE IF NOT EXISTS `proyecto_resultados` (
   `idResultado` int NOT NULL AUTO_INCREMENT,
   `clave_proyecto` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -1003,14 +964,12 @@ CREATE TABLE IF NOT EXISTS `proyecto_resultados` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.proyecto_resultados: ~3 rows (aproximadamente)
-DELETE FROM `proyecto_resultados`;
 INSERT INTO `proyecto_resultados` (`idResultado`, `clave_proyecto`, `descripcion`, `fecha_agregado`) VALUES
 	(4, '0000000000029', 'resultado 1', '2024-11-10 12:37:14'),
 	(5, '0000000000029', 'resultado 2', '2024-11-10 12:37:24'),
 	(6, '0000000000029', 'resultado 3', '2024-11-10 12:37:36');
 
 -- Volcando estructura para tabla incubadora.roles
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1022,7 +981,6 @@ CREATE TABLE IF NOT EXISTS `roles` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.roles: ~6 rows (aproximadamente)
-DELETE FROM `roles`;
 INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
 	(1, 'admin', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56'),
 	(2, 'alumno', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56'),
@@ -1032,7 +990,6 @@ INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VAL
 	(6, 'inversionista', 'web', '2024-12-19 06:36:56', '2024-12-19 06:36:56');
 
 -- Volcando estructura para tabla incubadora.role_has_permissions
-DROP TABLE IF EXISTS `role_has_permissions`;
 CREATE TABLE IF NOT EXISTS `role_has_permissions` (
   `permission_id` bigint unsigned NOT NULL,
   `role_id` bigint unsigned NOT NULL,
@@ -1043,7 +1000,6 @@ CREATE TABLE IF NOT EXISTS `role_has_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla incubadora.role_has_permissions: ~6 rows (aproximadamente)
-DELETE FROM `role_has_permissions`;
 INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 	(6, 1),
 	(7, 2),
@@ -1053,7 +1009,6 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 	(11, 6);
 
 -- Volcando estructura para tabla incubadora.servicio
-DROP TABLE IF EXISTS `servicio`;
 CREATE TABLE IF NOT EXISTS `servicio` (
   `idServicio` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) DEFAULT NULL,
@@ -1062,10 +1017,8 @@ CREATE TABLE IF NOT EXISTS `servicio` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.servicio: ~0 rows (aproximadamente)
-DELETE FROM `servicio`;
 
 -- Volcando estructura para tabla incubadora.tipo
-DROP TABLE IF EXISTS `tipo`;
 CREATE TABLE IF NOT EXISTS `tipo` (
   `idTipo` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -1073,7 +1026,6 @@ CREATE TABLE IF NOT EXISTS `tipo` (
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla incubadora.tipo: ~4 rows (aproximadamente)
-DELETE FROM `tipo`;
 INSERT INTO `tipo` (`idTipo`, `nombre`) VALUES
 	(12, 'Innovación'),
 	(13, 'Residencia profesional'),
@@ -1081,23 +1033,21 @@ INSERT INTO `tipo` (`idTipo`, `nombre`) VALUES
 	(15, 'Gobierno');
 
 -- Volcando estructura para tabla incubadora.token_rol
-DROP TABLE IF EXISTS `token_rol`;
 CREATE TABLE IF NOT EXISTS `token_rol` (
   `idToken` int NOT NULL AUTO_INCREMENT,
   `token` char(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `rol` int DEFAULT NULL,
   `correo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`idToken`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla incubadora.token_rol: ~1 rows (aproximadamente)
-DELETE FROM `token_rol`;
+-- Volcando datos para la tabla incubadora.token_rol: ~3 rows (aproximadamente)
 INSERT INTO `token_rol` (`idToken`, `token`, `rol`, `correo`) VALUES
 	(1, NULL, 1, 'nadmin@g.com'),
-	(5, '6790a1703b03f', 1, 'asd@g.com');
+	(5, '6790a1703b03f', 1, 'asd@g.com'),
+	(6, '6792e370c7eac', 1, 'admin@g.com');
 
 -- Volcando estructura para tabla incubadora.users
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1109,14 +1059,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla incubadora.users: ~2 rows (aproximadamente)
-DELETE FROM `users`;
+-- Volcando datos para la tabla incubadora.users: ~4 rows (aproximadamente)
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 	(1, 'Admin User', 'admin@g.com', NULL, '$2y$12$Whop/ZfGM5e.yaFcyZP51.MOLMCO2uJd39JStLONfwH88wJVCXnv.', NULL, '2024-12-19 06:38:24', '2024-12-19 06:38:24'),
 	(2, 'alumno', 'alumno@g.com', NULL, '$2y$12$MBYMEQOzB5eijaR47NiMpOOwu33ehPttH2p095QF6K0..acB04R4e', NULL, '2024-12-19 06:38:24', '2024-12-19 06:38:24'),
-	(3, 'Prueba', 'prueba@gmail.com', NULL, '$2y$12$eqNdDrLtEa7S/oy7wIkwH.VKasE1iRsOY.3frfwe2KEVV8PvZy0sq', NULL, '2025-01-19 03:58:42', '2025-01-19 03:58:42');
+	(3, 'Prueba', 'prueba@gmail.com', NULL, '$2y$12$eqNdDrLtEa7S/oy7wIkwH.VKasE1iRsOY.3frfwe2KEVV8PvZy0sq', NULL, '2025-01-19 03:58:42', '2025-01-19 03:58:42'),
+	(15, 'Adrián Alejandro', 'l21270669@tuxtla.tecnm.mx', '2025-01-26 00:36:10', '$2y$12$LOasnq0giowa1RSlYYhh2O34Ch9pj1wHKitisspe9yU6oFp1lHnie', NULL, '2025-01-26 00:35:46', '2025-01-26 00:36:10');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

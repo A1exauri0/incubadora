@@ -162,7 +162,7 @@
                 </td>
                 <td class="idToken">{{ $token->idToken }}</td>
                 <td class="token">{{ $token->token }}</td>
-                <td class="rol">{{  $roles->firstWhere('id', $token->rol)->name ?? 'N/A'; }}</td>
+                <td class="rol">{{  $roles->firstWhere('id', $token->rol)->name ?? 'N/A' }}</td>
                 <td class="correo">{{ $token->correo }}</td>
                 <td>
                     <a href="#editEmployeeModal" class="edit" data-toggle="modal"
