@@ -167,6 +167,11 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/c_tipos/eliminar', [TipoController::class, 'eliminar'])->name('tipos.eliminar');
     Route::post('c_tipos/eliminarMultiple', [TipoController::class, 'eliminarMultiple'])->name('tipos.eliminarMultiple');
 
+    Route::get('/c_habilidadesAM', [habilidadesAMController::class, 'index']);
+    Route::post('/c_habilidadesAM/agregar', [habilidadesAMController::class, 'agregar'])->name('habilidadesAM.agregar');
+    Route::post('/c_habilidadesAM/editar', [habilidadesAMController::class,'editar'])->name('habilidadesAM.editar');
+    Route::post('/c_habilidadesAM/eliminar', [HabilidadesAMController::class,'eliminar'])->name('habilidadesAM.editar');
+    Route::post('/c_habilidadesAM/eliminarMultiple', [HabilidadesAMController::class,'eliminarMultiple'])->name('habilidadesAM.eliminarMultiple');
 });
 
 
