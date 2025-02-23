@@ -11,15 +11,12 @@ class RegistroDatosController extends Controller
 {
     public function index()
     {
-        return view('auth.registro-datos');
-    }
-    // Muestra el formulario de registro de datos después de la verificación del email
-    public function showForm()
-    {
         $correo = Auth::user()->email;
         $alumno = DB::table('alumno')->where('correo_institucional', $correo)->first();
+        $carreras = DB::table('carrera')->get();
+        $titulo = "Registro de datos";
         
-        return view('auth.registro-datos', compact('alumno'));
+        return view('auth.registro-datos', compact('alumno', 'carreras','titulo'));
     }
 
     // Guarda o actualiza los datos del alumno en la base de datos
