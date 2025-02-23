@@ -235,12 +235,7 @@
                             
                             <!--ALUMNO-->
                             @can('mostrar alumno')
-                                <div class="dropdown">
-                                    <a class="nav-link active" href="#">Catálogos</a>
-                                    <div class="content">
-                                        <a href="/c_proyectos">Proyectos</a>
-                                    </div>
-                                </div>
+
                             @endcan
                         </li>
                     </ul>

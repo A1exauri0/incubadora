@@ -10,7 +10,7 @@
     <div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6 mt-20">
         <h1 class="text-2xl font-bold text-green-600 mb-4">¡Correo verificado con éxito!</h1>
         <p class="text-gray-700 mb-6">Gracias por verificar tu correo. Ahora puedes acceder a todas las funcionalidades de la plataforma.</p>
-        <a href="{{ route('home') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <a href="{{ route('registro-datos') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
             Ir a Inicio
         </a>
     </div>

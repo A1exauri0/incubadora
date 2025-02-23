@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\Auth\RegistroDatosController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\{
     ParticipanteController,
@@ -170,3 +171,10 @@ Route::group(['middleware' => ['role:admin']], function () {
 });
 
 
+Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
+
+
+// Ruta para guardar o actualizar los datos
+Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
+    ->middleware(['auth', 'verified'])
+    ->name('registro.datos.guardar');
