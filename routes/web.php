@@ -176,10 +176,9 @@ Route::group(['middleware' => ['role:admin']], function () {
 });
 
 
-Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
-
-
-// Ruta para guardar o actualizar los datos
-Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
-    ->middleware(['auth', 'verified'])
-    ->name('registro.datos.guardar');
+Route::group(['middleware' => ['role:alumno']], function () {
+    Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
+    Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
+        ->middleware(['auth', 'verified'])
+        ->name('registro.datos.guardar');
+});
