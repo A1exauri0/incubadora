@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\{
     ParticipanteController,
     UserController,
-    MainController,
+    UsuarioController,
     AlumnoController,
     CarreraController,
     TipoController,
@@ -167,6 +167,13 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/c_tipos/editar', [TipoController::class, 'editar'])->name('tipos.editar');
     Route::post('/c_tipos/eliminar', [TipoController::class, 'eliminar'])->name('tipos.eliminar');
     Route::post('c_tipos/eliminarMultiple', [TipoController::class, 'eliminarMultiple'])->name('tipos.eliminarMultiple');
+
+    //CRUD Usuarios
+    Route::get('/c_usuarios', [UsuarioController::class, 'index']);
+    // Route::post('/c_usuarios/agregar', [UsuarioController::class, 'agregar'])->name('usuarios.agregar');
+    Route::post('/c_usuarios/editar', [UsuarioController::class, 'editar'])->name('usuarios.editar');
+    Route::post('/c_usuarios/eliminar', [UsuarioController::class, 'eliminar'])->name('usuarios.eliminar');
+    Route::post('c_usuarios/eliminarMultiple', [UsuarioController::class, 'eliminarMultiple'])->name('usuarios.eliminarMultiple');
 
     Route::get('/c_habilidadesAM', [habilidadesAMController::class, 'index']);
     Route::post('/c_habilidadesAM/agregar', [habilidadesAMController::class, 'agregar'])->name('habilidadesAM.agregar');
