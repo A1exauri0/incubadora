@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+// use Spatie\Permission\Models\Permission; // Ya no necesitamos Permission aquí
 use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
@@ -23,52 +23,9 @@ class RoleSeeder extends Seeder
             'inversionista',
         ];
 
-        foreach ($roles as $role) {
-            Role::updateOrCreate(['name' => $role]);
+        foreach ($roles as $roleName) { // Cambié $role a $roleName para mayor claridad
+            Role::updateOrCreate(['name' => $roleName, 'guard_name' => 'web']); // Aseguramos guard_name
         }
 
-        // Crear permisos generales o actualizar si ya existen
-        $generalPermissions = [
-            'mostrar admin',
-            'mostrar alumno',
-            'mostrar asesor',
-            'mostrar mentor',
-            'mostrar emprendedor',
-            'mostrar inversionista',
-        ];
-
-        foreach ($generalPermissions as $permission) {
-            Permission::updateOrCreate(['name' => $permission]);
-        }
-
-        // Asignar permisos a roles
-        Role::findByName('admin')->syncPermissions([
-            'mostrar admin',
-        ]);
-
-        Role::findByName('alumno')->syncPermissions([
-            'mostrar alumno',
-        ]);
-
-        Role::findByName('asesor')->syncPermissions([
-            'mostrar asesor',
-        ]);
-
-        Role::findByName('mentor')->syncPermissions([
-            'mostrar mentor',
-        ]);
-
-        Role::findByName('emprendedor')->syncPermissions([
-            'mostrar emprendedor',
-        ]);
-
-        Role::findByName('inversionista')->syncPermissions([
-            'mostrar inversionista',
-        ]);
-
-        /*
-        Nota: Este seeder solo creará o actualizará roles y permisos
-        sin eliminar asociaciones existentes.
-        */
     }
 }

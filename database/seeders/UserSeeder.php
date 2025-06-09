@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon; // Para manejar las fechas
+use Illuminate\Support\Facades\Hash; // Para hashing de contraseñas
 
 class UserSeeder extends Seeder
 {
@@ -14,21 +14,27 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => 'admin@g.com'],  // Busca por el correo electrónico
+        DB::table('users')->insert([
             [
-                'name' => 'Admin User',
-                'password' => Hash::make('admin'), // Hasheando la contraseña
-            ]
-        )->assignRole('admin');
-
-
-        User::updateOrCreate(
-            ['email' => 'alumno@g.com'],  // Busca por el correo electrónico
+                'id' => 23,
+                'name' => 'Adrián Alejandro',
+                'email' => 'l21270669@tuxtla.tecnm.mx',
+                'email_verified_at' => Carbon::parse('2025-02-15 09:08:47'),
+                'password' => '$2y$12$JUXltUxmM0NCzYCvoikdAO4ZuhUjAfEliEaKyi6UYHj/XrfYuqcfC', // Contraseña ya hasheada
+                'remember_token' => null,
+                'created_at' => Carbon::parse('2025-01-26 09:21:40'),
+                'updated_at' => Carbon::parse('2025-02-15 09:08:47'),
+            ],
             [
-                'name' => 'alumno',
-                'password' => Hash::make('alumno'), // Hasheando la contraseña
-            ]
-        )->assignRole('alumno');
+                'id' => 30,
+                'name' => 'Jose Estrada',
+                'email' => 'l21270650@tuxtla.tecnm.mx',
+                'email_verified_at' => Carbon::parse('2025-02-24 00:22:55'),
+                'password' => '$2y$12$8hMWYsbf38l2epEokFG0fu67wTiCmJqftbp1n9nLfsWBNWWAnebO', // Contraseña ya hasheada
+                'remember_token' => null,
+                'created_at' => Carbon::parse('2025-02-24 00:22:47'),
+                'updated_at' => Carbon::parse('2025-02-24 00:22:55'),
+            ],
+        ]);
     }
 }
