@@ -10,7 +10,7 @@ class ProyectoController extends Controller
     public function index()
     {
         $proyectos = DB::table('proyecto')->orderBy('fecha_agregado', 'desc')->orderBy('fecha_agregado','desc')->get();
-        $columnas = ['Clave', 'Nombre', 'Desc.','Categoria', 'Tipo','Etapa','Video','Registrado'];
+        $columnas = ['Clave', 'Nombre', 'Nombre descriptivo','Categoria', 'Tipo','Etapa','Video','Registrado'];
         $categorias = DB::table('categoria')->get();
         $alumnos = DB::table('alumno')->get();
         $tipos = DB::table('tipo')->get();
@@ -39,6 +39,7 @@ class ProyectoController extends Controller
     {
         $clave_proyecto = $request->input('clave_proyecto_agregar');
         $nombre = $request->input('nombre_agregar');
+        $nombre_descriptivo = $request->input('nombre_descriptivo_agregar');
         $descripcion = $request->input('descripcion_agregar');
         $categoria= $request->input('categoria_agregar');
         $tipo= $request->input('tipo_agregar');
@@ -52,7 +53,7 @@ class ProyectoController extends Controller
         if ($this->registro_existe($clave_proyecto)) {
             return back()->with('error', 'La clave del proyecto que intentó agregar ya existe en otro registro.');
         } else {
-            DB::table('proyecto')->insert(['clave_proyecto' => $clave_proyecto, 'nombre' => $nombre, 'descripcion' => $descripcion, 'categoria' => $categoria, 'tipo' => $tipo,'etapa' => $etapa, 'video' => $video]);
+            DB::table('proyecto')->insert(['clave_proyecto' => $clave_proyecto, 'nombre' => $nombre, 'nombre_descriptivo' => $nombre_descriptivo, 'descripcion' => $descripcion, 'categoria' => $categoria, 'tipo' => $tipo,'etapa' => $etapa, 'video' => $video]);
         }
         return back();
     }
@@ -62,6 +63,7 @@ class ProyectoController extends Controller
         $clave_proyecto = $request->input('clave_proyecto_editar');
         $clave_proyecto_mod = $request->input('clave_proyecto_mod');
         $nombre = $request->input('nombre_mod');
+        $nombre_descriptivo = $request->input('nombre_descriptivo_mod');
         $descripcion = $request->input('descripcion_mod');
         $categoria= $request->input('categoria_mod');
         $tipo= $request->input('tipo_mod');
@@ -73,7 +75,7 @@ class ProyectoController extends Controller
                 return back()->with('error', 'La clave del proyecto que intentó modificar ya existe en otro registro.');
             }
         } else {
-            DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->update(['clave_proyecto' => $clave_proyecto_mod, 'nombre' => $nombre,
+            DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->update(['clave_proyecto' => $clave_proyecto_mod, 'nombre' => $nombre, 'nombre_descriptivo' => $nombre_descriptivo,
             'descripcion' => $descripcion, 'categoria' => $categoria, 'tipo' => $tipo,'etapa' =>$etapa,'video' => $video]);
             return back();
         }

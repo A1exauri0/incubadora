@@ -111,7 +111,19 @@
                 var valor = this.value;
 
                 // Solo acepta Letras Mayúsculas y Minúsculas, Números, Espacios, ÁÉÍÓÚ, áéíóú, : - y "
-                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ:\-"]/g, '').replace(/\s{2,}/g, ' ');
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ:\-"]/g, '').replace(/\s{2,}/g,
+                ' ');
+                this.value = valorLimpio;
+            });
+        });
+
+                document.querySelectorAll('.nombre_descriptivo').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+
+                // Solo acepta Letras Mayúsculas y Minúsculas, Números, Espacios, ÁÉÍÓÚ, áéíóú, : - y "
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ:\-"]/g, '').replace(/\s{2,}/g,
+                ' ');
                 this.value = valorLimpio;
             });
         });
@@ -128,18 +140,19 @@
 
         document.querySelectorAll('.video').forEach(function(element) {
             element.addEventListener('input', function() {
-            var valor = this.value;
+                var valor = this.value;
 
-            // Solo acepta Letras Mayúsculas y Minúsculas, Números, "/", ".", ":", "_", "\"
-            var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ\/\.\:_\\]+/g, '').replace(/\s{2,}/g, ' ');
-            this.value = valorLimpio;
+                // Solo acepta Letras Mayúsculas y Minúsculas, Números, "/", ".", ":", "_", "\"
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ\/\.\:_\\]+/g, '').replace(
+                    /\s{2,}/g, ' ');
+                this.value = valorLimpio;
             });
         });
     </script>
 @endsection
 
 <!-- Se recibe la lista de columnas a mostrar (nombres) -->
-@section('columnas')    
+@section('columnas')
 
     @if (!$proyectos->isEmpty())
         @foreach ($columnas as $columna)
@@ -160,7 +173,7 @@
 
 <!-- Se carga el contenido de la tabla -->
 @section('datos')
-    
+
     {{-- Se manejan los mensajes de error --}}
     @if (session('error'))
         <div id="error-message" style="text-align: center; background-color: rgb(155, 38, 38); color: white; ">
@@ -174,7 +187,7 @@
     @endif
 
     @if ($proyectos->isEmpty())
-        <p style="text-align: center;">No hay registros</p>
+        <p style="text-align: cent  er;">No hay registros</p>
     @else
         @php
             $proyectos = $proyectos->toArray(); // Convert $proyectos to an array
@@ -194,23 +207,23 @@
                 </td>
                 <td class="clave_proyecto">{{ $proyecto->clave_proyecto }}</td>
                 <td class="nombre">{{ $proyecto->nombre }}</td>
-                <td class="descripcion">{{ $proyecto->descripcion }}</td>
-                @foreach($categorias as $categoria)
-                    @if($proyecto->categoria === $categoria->idCategoria)
+                <td class="nombre_descriptivo">{{ $proyecto->nombre_descriptivo }}</td>
+                @foreach ($categorias as $categoria)
+                    @if ($proyecto->categoria === $categoria->idCategoria)
                         <td class="categoria">{{ $categoria->nombre }}</td>
                     @endif
                 @endforeach
-                @foreach ( $tipos as $tipo)
-                    @if($proyecto->tipo === $tipo->idTipo)
+                @foreach ($tipos as $tipo)
+                    @if ($proyecto->tipo === $tipo->idTipo)
                         <td class="tipo">{{ $tipo->nombre }}</td>
                     @endif
                 @endforeach
-                @foreach($etapas as $etapa)
-                    @if($proyecto->etapa === $etapa->idEtapa)
+                @foreach ($etapas as $etapa)
+                    @if ($proyecto->etapa === $etapa->idEtapa)
                         <td class="etapa">{{ $etapa->nombre }}</td>
                     @endif
                 @endforeach
-                @if ($proyecto->video!==null && $proyecto->video!=="No" && $proyecto->video!=="no") 
+                @if ($proyecto->video !== null && $proyecto->video !== 'No' && $proyecto->video !== 'no')
                     <td class="video"><a href="{{ $proyecto->video }}" target="_blank">Video</a> </td>
                 @else
                     <td class="video">Sin Video</td>
@@ -218,11 +231,18 @@
                 <td>{{ $proyecto->fecha_agregado }}</td>
                 <td>
                     <a href="#editEmployeeModal" class="edit" data-toggle="modal"
-                        data-descripcion="{{ $proyecto->descripcion }}" data-clave-proyecto="{{ $proyecto->clave_proyecto }}" data-nombre="{{ $proyecto->nombre }}"
-                        data-categoria="{{ $proyecto->categoria }}" data-tipo="{{ $proyecto->tipo }}" data-etapa="{{ $proyecto->etapa }}" data-video="{{ $proyecto->video }}">
+                        data-descripcion="{{ $proyecto->descripcion }}"
+                        data-clave-proyecto="{{ $proyecto->clave_proyecto }}" 
+                        data-nombre="{{ $proyecto->nombre }}" 
+                        data-nombre_descriptivo="{{ $proyecto->nombre_descriptivo }}"
+                        data-categoria="{{ $proyecto->categoria }}" 
+                        data-tipo="{{ $proyecto->tipo }}"
+                        data-etapa="{{ $proyecto->etapa }}" 
+                        data-video="{{ $proyecto->video }}">
                         <i class="material-icons" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                        data-clave-proyecto="{{ $proyecto->clave_proyecto }}"><i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i></a>
+                        data-clave-proyecto="{{ $proyecto->clave_proyecto }}"><i class="material-icons"
+                            data-toggle="tooltip" title="Eliminar">&#xE872;</i></a>
                 </td>
             </tr>
         @endforeach
@@ -241,7 +261,7 @@
                 @endfor
             </ul>
         @endsection
-        
+
         {{-- Muestra y añade la funcionalidad de los botones siguiente y anterior --}}
         @section('paginacion')
             <ul class="pagination">
@@ -267,7 +287,8 @@
 
 
         <input type="hidden" name="clave_proyecto_agregar" id="clave_proyecto_agregar">
-        <input type="hidden" name="nombre_agregar" id="nombre_agregar">
+        <input type="" name="nombre_agregar" id="nombre_agregar">
+        <input type="" name="nombre_descriptivo_agregar" id="nombre_descriptivo_agregar">
         <input type="hidden" name="descripcion_agregar" id="descripcion_agregar">
         <input type="hidden" name="categoria_agregar" id="categoria_agregar">
         <input type="hidden" name="tipo_agregar" id="tipo_agregar">
@@ -281,21 +302,30 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Clave del Proyecto</label>
-                <input id="clave_proyecto_agregar_campo" name="clave_proyecto_agregar" type="text" class="form-control clave_proyecto" pattern="[A-Z0-9\-]{13}" required>
+                <input id="clave_proyecto_agregar_campo" name="clave_proyecto_agregar" type="text"
+                    class="form-control clave_proyecto" pattern="[A-Z0-9\-]{13}" required>
             </div>
             <div class="form-group">
                 <label>Nombre</label>
-                <input id="nombre_agregar_campo" name="nombre_agregar" type="text" class="form-control nombre" maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
+                <input id="nombre_agregar_campo" name="nombre_agregar" type="text" class="form-control nombre"
+                    maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
+            </div>
+            <div class="form-group">
+                <label>Nombre Descriptivo</label>
+                <input id="nombre_descriptivo_agregar_campo" name="nombre_descriptivo_agregar" type="text" class="form-control nombre_descriptivo"
+                    maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
             </div>
             <div class="form-group">
                 <label>Descripción</label>
-                <textarea id="descripcion_agregar_campo" name="descripcion_agregar" class="form-control descripcion" maxlength="800" rows="5" required></textarea>
+                <textarea id="descripcion_agregar_campo" name="descripcion_agregar" class="form-control descripcion" maxlength="800"
+                    rows="5" required></textarea>
             </div>
             <div class="form-group">
                 <label>Categoria</label>
                 <select name="categoria_agregar_nombre" class="form-control" required>
                     @foreach ($categorias as $categoria)
-                        <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }} </option>
+                        <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -317,7 +347,9 @@
             </div>
             <div>
                 <label>Video</label>
-                <input id="video_agregar_campo" type="text" name="video_agregar" class="form-control video" placeholder="URL del video (Youtube, Google Drive, etc.)" pattern="^(https:\/\/(www\.)?(youtube\.com\/|drive\.google\.com\/).*)$">
+                <input id="video_agregar_campo" type="text" name="video_agregar" class="form-control video"
+                    placeholder="URL del video (Youtube, Google Drive, etc.)"
+                    pattern="^(https:\/\/(www\.)?(youtube\.com\/|drive\.google\.com\/).*)$">
             </div>
         </div>
 
@@ -332,6 +364,7 @@
             $('#addEmployeeModal').on('show.bs.modal', function() {
                 $('#clave_proyecto_agregar_campo').val('');
                 $('#nombre_agregar_campo').val('');
+                $('#nombre_descriptivo_agregar_campo').val('');
                 $('#descripcion_agregar_campo').val('');
                 $('select[name="categoria_agregar_nombre"]').prop('selectedIndex', 1);
                 $('select[name="tipo_agregar_nombre"]').prop('selectedIndex', 1);
@@ -360,7 +393,8 @@
                 //Fin de bloque de depuración----
 
                 //Listeners para cuando cambien los valores de los campos
-                document.getElementById('clave_proyecto_agregar_campo').addEventListener('input', function() {
+                document.getElementById('clave_proyecto_agregar_campo').addEventListener('input',
+            function() {
                     $('#clave_proyecto_agregar').val(this.value);
                     //bloque de depuración----
                     // console.log("Clave del Proyecto: ", $('#clave_proyecto_agregar').val());
@@ -374,6 +408,13 @@
                     //fin de bloque de depuración----
                 });
 
+                document.getElementById('nombre_descriptivo_agregar_campo').addEventListener('input', function() {
+                    $('#nombre_descriptivo_agregar').val(this.value);
+                    //bloque de depuración----
+                    // console.log("Nombre Descriptivo: ", $('#nombre_descriptivo_agregar').val());
+                    //fin de bloque de depuración----
+                });
+
                 document.getElementById('descripcion_agregar_campo').addEventListener('input', function() {
                     $('#descripcion_agregar').val(this.value);
                     //bloque de depuración----
@@ -382,26 +423,29 @@
                 });
 
                 //Listeners para cuando cambien los valores de los select
-                document.querySelector('select[name="categoria_agregar_nombre"]').addEventListener('change', function() {
-                    $('#categoria_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Categoria: ", $('#categoria_agregar').val());
-                    //fin de bloque de depuración----
-                });
+                document.querySelector('select[name="categoria_agregar_nombre"]').addEventListener('change',
+                    function() {
+                        $('#categoria_agregar').val(this.value);
+                        //bloque de depuración----
+                        // console.log("Categoria: ", $('#categoria_agregar').val());
+                        //fin de bloque de depuración----
+                    });
 
-                document.querySelector('select[name="tipo_agregar_nombre"]').addEventListener('change', function() {
-                    $('#tipo_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Tipo: ", $('#tipo_agregar').val());
-                    //fin de bloque de depuración----
-                });
+                document.querySelector('select[name="tipo_agregar_nombre"]').addEventListener('change',
+                    function() {
+                        $('#tipo_agregar').val(this.value);
+                        //bloque de depuración----
+                        // console.log("Tipo: ", $('#tipo_agregar').val());
+                        //fin de bloque de depuración----
+                    });
 
-                document.querySelector('select[name="etapa_agregar_nombre"]').addEventListener('change', function() {
-                    $('#etapa_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Tipo: ", $('#tipo_agregar').val());
-                    //fin de bloque de depuración----
-                });
+                document.querySelector('select[name="etapa_agregar_nombre"]').addEventListener('change',
+                    function() {
+                        $('#etapa_agregar').val(this.value);
+                        //bloque de depuración----
+                        // console.log("Tipo: ", $('#tipo_agregar').val());
+                        //fin de bloque de depuración----
+                    });
 
                 document.querySelector('input[name="video_agregar"]').addEventListener('input', function() {
                     $('#video_agregar').val(this.value);
@@ -410,9 +454,12 @@
                     //fin de bloque de depuración----
                 });
 
-                $('select[name="categoria_agregar_nombre"]').val($('select[name="categoria_agregar_nombre"] option:first').val());
-                $('select[name="tipo_agregar_nombre"]').val($('select[name="tipo_agregar_nombre"] option:first').val());
-                $('select[name="etapa_agregar_nombre"]').val($('select[name="etapa_agregar_nombre"] option:first').val());
+                $('select[name="categoria_agregar_nombre"]').val($(
+                    'select[name="categoria_agregar_nombre"] option:first').val());
+                $('select[name="tipo_agregar_nombre"]').val($(
+                    'select[name="tipo_agregar_nombre"] option:first').val());
+                $('select[name="etapa_agregar_nombre"]').val($(
+                    'select[name="etapa_agregar_nombre"] option:first').val());
             });
         });
     </script>
@@ -434,6 +481,7 @@
 
             <input type="hidden" name="clave_proyecto_mod" id="clave_proyecto_mod">
             <input type="hidden" name="nombre_mod" id="nombre_mod">
+            <input type="hidden" name="nombre_descriptivo_mod" id="nombre_descriptivo_mod">
             <input type="hidden" name="descripcion_mod" id="descripcion_mod">
             <input type="hidden" name="categoria_mod" id="categoria_mod">
             <input type="hidden" name="tipo_mod" id="tipo_mod">
@@ -448,21 +496,30 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Clave del Proyecto</label>
-                    <input id="clave_proyecto_campo" type="text" class="form-control clave_proyecto ceditar" value=""  pattern="[0-9A-Z]{13}" required>
+                    <input id="clave_proyecto_campo" type="text" class="form-control clave_proyecto ceditar"
+                        value="" pattern="[0-9A-Z]{13}" required>
                 </div>
                 <div class="form-group">
                     <label>Nombre</label>
-                    <input id="nombre_campo" type="text" class="form-control nombre ceditar" value="" maxlength="50" required>
+                    <input id="nombre_campo" type="text" class="form-control nombre ceditar" value=""
+                        maxlength="50" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre Descriptivo</label>
+                    <input id="nombre_descriptivo_campo" type="text" class="form-control nombre_descriptivo ceditar"
+                        value="" maxlength="50" required>
                 </div>
                 <div class="form-group">
                     <label>Descripción</label>
-                    <textarea id="descripcion_campo" name="descripcion_agregar ceditar" class="form-control descripcion" maxlength="200" rows="5" required></textarea>
+                    <textarea id="descripcion_campo" name="descripcion_agregar ceditar" class="form-control descripcion" maxlength="200"
+                        rows="5" required></textarea>
                 </div>
                 <div class="form-group">
                     <label>Categoria</label>
                     <select name="categoria_campo_nombre" class="form-control" required>
                         @foreach ($categorias as $categoria)
-                            <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }} </option>
+                            <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -484,7 +541,8 @@
                 </div>
                 <div>
                     <label>Video</label>
-                    <input id="video_campo" name="video_agregar ceditar" type="url" class="form-control video" placeholder="URL del video (Youtube, Google Drive)">
+                    <input id="video_campo" name="video_agregar ceditar" type="url" class="form-control video"
+                        placeholder="URL del video (Youtube, Google Drive)">
                 </div>
             </div>
 
@@ -502,6 +560,7 @@
                     // Se obtienen los datos del registro a editar
                     var claveProyecto = $(this).data('clave-proyecto');
                     var nombre = $(this).data('nombre');
+                    var nombreDescriptivo = $(this).data('nombre_descriptivo');
                     var descripcion = $(this).data('descripcion');
                     var categoria = $(this).data('categoria');
                     var tipo = $(this).data('tipo');
@@ -511,6 +570,7 @@
                     // Se llenan los campos del formulario con los datos del registro a editar
                     $('.clave_proyecto').val(claveProyecto);
                     $('.nombre').val(nombre);
+                    $('.nombre_descriptivo').val(nombreDescriptivo);
                     $('.descripcion').val(descripcion);
                     $('.form-control option').removeAttr('selected');
                     $('.form-control option[value="' + categoria + '"]').attr('selected', 'selected');
@@ -522,6 +582,7 @@
                     $('#clave_proyecto_editar').val(claveProyecto);
                     $('#clave_proyecto_mod').val(claveProyecto);
                     $('#nombre_mod').val(nombre);
+                    $('#nombre_descriptivo_mod').val(nombre);
                     $('#descripcion_mod').val(descripcion);
                     $('#categoria_mod').val(categoria);
                     $('#tipo_mod').val(tipo);
@@ -539,26 +600,34 @@
                         // console.log('Cambio en nombre_campo: ' + this.value);
                     });
 
+                    document.getElementById('nombre_descriptivo_campo').addEventListener('input', function() {
+                        $('#nombre_descriptivo_mod').val(this.value);
+                        // console.log('Cambio en nombre_descriptivo_campo: ' + this.value);
+                    });
+
                     document.getElementById('descripcion_campo').addEventListener('input', function() {
                         $('#descripcion_mod').val(this.value);
                         // console.log('Cambio en descripcion_campo: ' + this.value);
                     });
 
-                    document.querySelector('select[name="categoria_campo_nombre"]').addEventListener('change', function() {
-                        $('#categoria_mod').val(this.value);
-                        // console.log('Cambio en categoria_campo_nombre: ' + this.value);
-                    });
+                    document.querySelector('select[name="categoria_campo_nombre"]').addEventListener('change',
+                        function() {
+                            $('#categoria_mod').val(this.value);
+                            // console.log('Cambio en categoria_campo_nombre: ' + this.value);
+                        });
 
-                    document.querySelector('select[name="tipo_campo_nombre"]').addEventListener('change', function() {
-                        $('#tipo_mod').val(this.value);
-                        // console.log('Cambio en tipo_campo_nombre: ' + this.value);
-                    });
+                    document.querySelector('select[name="tipo_campo_nombre"]').addEventListener('change',
+                        function() {
+                            $('#tipo_mod').val(this.value);
+                            // console.log('Cambio en tipo_campo_nombre: ' + this.value);
+                        });
 
-                    document.querySelector('select[name="etapa_campo_nombre"]').addEventListener('change', function() {
-                        $('#etapa_mod').val(this.value);
-                        // console.log('Cambio en etapa_campo_nombre: ' + this.value);
-                    });
-                    
+                    document.querySelector('select[name="etapa_campo_nombre"]').addEventListener('change',
+                        function() {
+                            $('#etapa_mod').val(this.value);
+                            // console.log('Cambio en etapa_campo_nombre: ' + this.value);
+                        });
+
                     document.getElementById('video_campo').addEventListener('input', function() {
                         $('#video_mod').val(this.value);
                         // console.log('Cambio en video_campo: ' + this.value);
@@ -571,6 +640,7 @@
             $('input[type="button"]').click(function() {
                 $('.clave_proyecto').val('');
                 $('.nombre').val('');
+                $('.nombre_descriptivo').val('');
                 $('.descripcion').val('');
                 $('.categoria').val($('.categoria option:first').val());
                 $('#categoria_campo').val('');
@@ -585,6 +655,7 @@
             $('form').submit(function() {
                 $('.clave_proyecto.ceditar').val('');
                 $('.nombre.ceditar').val('');
+                $('.nombre_descriptivo.ceditar').val('');
                 $('.descripcion.ceditar').val('');
                 $('.categoria').val($('.categoria option:first').val());
                 $('#categoria_campo').val('');
