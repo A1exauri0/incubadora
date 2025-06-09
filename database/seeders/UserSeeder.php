@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
                 'name' => 'Adrián Alejandro',
                 'email' => 'l21270669@tuxtla.tecnm.mx',
                 'email_verified_at' => Carbon::parse('2025-02-15 09:08:47'),
-                'password' => '$2y$12$JUXltUxmM0NCzYCvoikdAO4ZuhUjAfEliEaKyi6UYHj/XrfYuqcfC', // Contraseña ya hasheada
+                'password' => Hash::make('11111111'),
                 'remember_token' => null,
                 'created_at' => Carbon::parse('2025-01-26 09:21:40'),
                 'updated_at' => Carbon::parse('2025-02-15 09:08:47'),
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
                 'name' => 'Jose Estrada',
                 'email' => 'l21270650@tuxtla.tecnm.mx',
                 'email_verified_at' => Carbon::parse('2025-02-24 00:22:55'),
-                'password' => '$2y$12$8hMWYsbf38l2epEokFG0fu67wTiCmJqftbp1n9nLfsWBNWWAnebO', // Contraseña ya hasheada
+                'password' => Hash::make('11111111'),
                 'remember_token' => null,
                 'created_at' => Carbon::parse('2025-02-24 00:22:47'),
                 'updated_at' => Carbon::parse('2025-02-24 00:22:55'),
