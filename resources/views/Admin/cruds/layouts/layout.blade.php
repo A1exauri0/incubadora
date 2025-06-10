@@ -1,3 +1,4 @@
+{{-- INICIO DEL CÓDIGO PARA: layout.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -90,7 +91,7 @@
         }
 
         table.table tr th:last-child {
-            width: 100px;
+            width: 140px; /* Aumentado para dar espacio al nuevo botón */
         }
 
         table.table-striped tbody tr:nth-of-type(odd) {
@@ -123,6 +124,11 @@
 
         table.table td a:hover {
             color: #2196F3;
+        }
+        
+        /* --- NUEVO: Estilo para el botón de ver --- */
+        table.table td a.view {
+            color: #03A9F4;
         }
 
         table.table td a.edit {
@@ -250,7 +256,7 @@
 
         /* Modal styles */
         .modal .modal-dialog {
-            max-width: 400px;
+            max-width: 500px; /* Aumentado para mejor visualización */
         }
 
         .modal .modal-header,
@@ -313,9 +319,9 @@
                         </div>
                         <div class="col-sm-6">
                             <a id="btnAgregar" href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
-                                    class="material-icons">&#xE147;</i> <span>Agregar @yield('administrar_s')</span></a>
+                                    class="material-icons"></i> <span>Agregar @yield('administrar_s')</span></a>
                             <a id="btnEliminar" href="#deleteMultipleEmployeeModal" class="btn btn-danger" data-toggle="modal">
-                                <i class="material-icons">&#xE15C;</i> <span>Eliminar</span></a>
+                                <i class="material-icons"></i> <span>Eliminar</span></a>
 
                         </div>
                     </div>
@@ -337,14 +343,14 @@
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    {{-- <div class="hint-text ocultar">Mostrando <b>@yield('mostrando')</b> de <b>@yield('total_registros')</b> registros</div> --}}
                     <div class="hint-text">Mostrando un máximo <b>20</b> registros por página, hay un total de <b>@yield('total_registros')</b> registros encontrados.</div>
                     @yield('paginacion')
                 </div>
             </div>
         </div>
     </div>
-    <!-- Edit Modal HTML -->
+
+    <!-- Add Modal HTML -->
     <div id="addEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -352,6 +358,7 @@
             </div>
         </div>
     </div>
+
     <!-- Edit Modal HTML -->
     <div id="editEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -360,6 +367,7 @@
             </div>
         </div>
     </div>
+
     <!-- Delete Modal HTML -->
     <div id="deleteEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -368,6 +376,7 @@
             </div>
         </div>
     </div>
+    
     <!-- Multiple Delete Modal HTML -->
     <div id="deleteMultipleEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -376,6 +385,16 @@
             </div>
         </div>
     </div>
+
+    <!-- NUEVO: View Modal HTML -->
+    <div id="viewEmployeeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                @yield('modulo_ver')
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
