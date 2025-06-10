@@ -148,6 +148,34 @@
                 this.value = valorLimpio;
             });
         });
+
+        // NUEVOS CAMPOS: Validaciones de caracteres
+        document.querySelectorAll('.area_aplicacion').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+                // Solo acepta letras, números, espacios y los caracteres comunes para descripciones
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ().,;-]/g, '').replace(/\s{2,}/g, ' ');
+                this.value = valorLimpio.substring(0, 50); // Limita a 50 caracteres
+            });
+        });
+
+        document.querySelectorAll('.naturaleza_tecnica').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+                // Solo acepta letras, números, espacios y los caracteres comunes para descripciones
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ().,;-]/g, '').replace(/\s{2,}/g, ' ');
+                this.value = valorLimpio.substring(0, 50); // Limita a 50 caracteres
+            });
+        });
+
+        document.querySelectorAll('.objetivo').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+                // Solo acepta letras, números, espacios y los caracteres comunes para descripciones
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ().,;-]/g, '').replace(/\s{2,}/g, ' ');
+                this.value = valorLimpio.substring(0, 255); // Limita a 255 caracteres
+            });
+        });
     </script>
 @endsection
 
@@ -257,7 +285,11 @@
                             data-etapa-id="{{ $proyecto->etapa }}"
                             data-etapa-nombre="{{ $etapaNombre }}"
                             data-video="{{ $proyecto->video }}"
-                            data-fecha-agregado="{{ $proyecto->fecha_agregado }}">
+                            data-fecha-agregado="{{ $proyecto->fecha_agregado }}"
+                            {{-- NUEVOS CAMPOS --}}
+                            data-area-aplicacion="{{ $proyecto->area_aplicacion }}"
+                            data-naturaleza-tecnica="{{ $proyecto->naturaleza_tecnica }}"
+                            data-objetivo="{{ $proyecto->objetivo }}">
                             <i class="material-icons" data-toggle="tooltip" title="Ver Detalles"></i> {{-- Icono de ojito --}}
                         </a>
                         <a href="#editEmployeeModal" class="edit" data-toggle="modal"
@@ -268,7 +300,11 @@
                             data-categoria="{{ $proyecto->categoria }}"
                             data-tipo="{{ $proyecto->tipo }}"
                             data-etapa="{{ $proyecto->etapa }}"
-                            data-video="{{ $proyecto->video }}">
+                            data-video="{{ $proyecto->video }}"
+                            {{-- NUEVOS CAMPOS --}}
+                            data-area-aplicacion="{{ $proyecto->area_aplicacion }}"
+                            data-naturaleza-tecnica="{{ $proyecto->naturaleza_tecnica }}"
+                            data-objetivo="{{ $proyecto->objetivo }}">
                             <i class="material-icons" data-toggle="tooltip" title="Editar"></i></a>
                         <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
                             data-clave-proyecto="{{ $proyecto->clave_proyecto }}"><i class="material-icons"
@@ -317,14 +353,8 @@
         {{-- Muy importante la directiva siguiente. --}}
         @csrf
 
-
-        <input type="hidden" name="clave_proyecto_agregar" id="clave_proyecto_agregar">
-        <input type="hidden" name="nombre_agregar" id="nombre_agregar">
-        <input type="hidden" name="nombre_descriptivo_agregar" id="nombre_descriptivo_agregar">
-        <input type="hidden" name="descripcion_agregar" id="descripcion_agregar">
-        <input type="hidden" name="categoria_agregar" id="categoria_agregar">
-        <input type="hidden" name="tipo_agregar" id="tipo_agregar">
-        <input type="hidden" name="etapa_agregar" id="etapa_agregar">
+        {{-- **ELIMINADOS:** Los hidden inputs se han quitado de aquí --}}
+        {{-- porque los campos visibles ahora enviarán sus valores directamente. --}}
 
         <div class="modal-header">
             <h4 class="modal-title">Agregar @yield('administrar_s')</h4>
@@ -334,27 +364,32 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Clave del Proyecto</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
                 <input id="clave_proyecto_agregar_campo" name="clave_proyecto_agregar" type="text"
                     class="form-control clave_proyecto" pattern="[A-Z0-9\-]{13}" required>
             </div>
             <div class="form-group">
                 <label>Nombre</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
                 <input id="nombre_agregar_campo" name="nombre_agregar" type="text" class="form-control nombre"
                     maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
             </div>
             <div class="form-group">
                 <label>Nombre Descriptivo</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
                 <input id="nombre_descriptivo_agregar_campo" name="nombre_descriptivo_agregar" type="text" class="form-control nombre_descriptivo"
                     maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
             </div>
             <div class="form-group">
                 <label>Descripción</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
                 <textarea id="descripcion_agregar_campo" name="descripcion_agregar" class="form-control descripcion" maxlength="800"
                     rows="5" required></textarea>
             </div>
             <div class="form-group">
                 <label>Categoria</label>
-                <select name="categoria_agregar_nombre" class="form-control" required>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
+                <select name="categoria_agregar" class="form-control" required> {{-- Era 'categoria_agregar_nombre', ahora 'categoria_agregar' --}}
                     @foreach ($categorias as $categoria)
                         <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }}
                         </option>
@@ -363,7 +398,8 @@
             </div>
             <div class="form-group">
                 <label>Tipo</label>
-                <select name="tipo_agregar_nombre" class="form-control" required>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
+                <select name="tipo_agregar" class="form-control" required> {{-- Era 'tipo_agregar_nombre', ahora 'tipo_agregar' --}}
                     @foreach ($tipos as $tipo)
                         <option value="{{ $tipo->idTipo }}" class="form-control"> {{ $tipo->nombre }} </option>
                     @endforeach
@@ -371,7 +407,8 @@
             </div>
             <div class="form-group">
                 <label>Etapa</label>
-                <select name="etapa_agregar_nombre" class="form-control" required>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
+                <select name="etapa_agregar" class="form-control" required> {{-- Era 'etapa_agregar_nombre', ahora 'etapa_agregar' --}}
                     @foreach ($etapas as $etapa)
                         <option value="{{ $etapa->idEtapa }}" class="form-control"> {{ $etapa->nombre }} </option>
                     @endforeach
@@ -379,9 +416,29 @@
             </div>
             <div>
                 <label>Video</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
                 <input id="video_agregar_campo" type="text" name="video_agregar" class="form-control video"
                     placeholder="URL del video (Youtube, Google Drive, etc.)"
                     pattern="^(https:\/\/(www\.)?(youtube\.com\/|drive\.google\.com\/).*)$">
+            </div>
+            {{-- NUEVOS CAMPOS DE FORMULARIO --}}
+            <div class="form-group">
+                <label>Área de Aplicación</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
+                <input id="area_aplicacion_agregar_campo" name="area_aplicacion_agregar" type="text"
+                    class="form-control area_aplicacion" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Naturaleza Técnica</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
+                <input id="naturaleza_tecnica_agregar_campo" name="naturaleza_tecnica_agregar" type="text"
+                    class="form-control naturaleza_tecnica" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Objetivo</label>
+                {{-- CAMBIO: El 'name' ahora coincide con lo que el controlador espera directamente --}}
+                <textarea id="objetivo_agregar_campo" name="objetivo_agregar" class="form-control objetivo" maxlength="255"
+                    rows="3"></textarea>
             </div>
         </div>
 
@@ -394,99 +451,33 @@
     <script>
         $(document).ready(function() {
             $('#addEmployeeModal').on('show.bs.modal', function() {
+                // Limpiar campos al abrir el modal. Los IDs siguen siendo útiles para esto.
                 $('#clave_proyecto_agregar_campo').val('');
                 $('#nombre_agregar_campo').val('');
                 $('#nombre_descriptivo_agregar_campo').val('');
                 $('#descripcion_agregar_campo').val('');
-                // **CORRECCIÓN AQUÍ:** Establece el selectedIndex en 0 para la primera opción
-                $('select[name="categoria_agregar_nombre"]').prop('selectedIndex', 0);
-                $('select[name="tipo_agregar_nombre"]').prop('selectedIndex', 0);
-                $('select[name="etapa_agregar_nombre"]').prop('selectedIndex', 0);
-                $('#video_agregar_campo').val(''); // Corrección: Usar el ID del campo de input
+                // Establece el selectedIndex en 0 para la primera opción
+                $('select[name="categoria_agregar"]').prop('selectedIndex', 0); // Corrección: Nombre del select
+                $('select[name="tipo_agregar"]').prop('selectedIndex', 0);     // Corrección: Nombre del select
+                $('select[name="etapa_agregar"]').prop('selectedIndex', 0);    // Corrección: Nombre del select
+                $('#video_agregar_campo').val('');
+                // Limpiar nuevos campos
+                $('#area_aplicacion_agregar_campo').val('');
+                $('#naturaleza_tecnica_agregar_campo').val('');
+                $('#objetivo_agregar_campo').val('');
             });
         });
     </script>
 
-    {{-- Escucha los valores seleccionados de Categoría y de Tipo y les da a categoria_agregar y tipo_agregar el valor correspondiente al ID de la opción seleccionada. --}}
+    {{-- Script de configuración inicial para el botón de agregar --}}
     <script>
         $(document).ready(function() {
-            $('#btnAgregar').click(function() {
-                var categoria = $('select[name="categoria_agregar_nombre"]').val();
-                var tipo = $('select[name="tipo_agregar_nombre"]').val();
-                var etapa = $('select[name="etapa_agregar_nombre"]').val();
-                var video = $('input[name="video_agregar"]').val();
-
-                $('#categoria_agregar').val(categoria);
-                $('#tipo_agregar').val(tipo);
-                $('#etapa_agregar').val(etapa);
-
-                //Bloque de depuración----
-                // console.log("Categoria: ", $('#categoria_agregar').val());
-                // console.log("Tipo: ", $('#tipo_agregar').val());
-                //Fin de bloque de depuración----
-
-                //Listeners para cuando cambien los valores de los campos
-                document.getElementById('clave_proyecto_agregar_campo').addEventListener('input',
-            function() {
-                    $('#clave_proyecto_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Clave del Proyecto: ", $('#clave_proyecto_agregar').val());
-                    //fin de bloque de depuración----
-                });
-
-                document.getElementById('nombre_agregar_campo').addEventListener('input', function() {
-                    $('#nombre_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Nombre: ", $('#nombre_agregar').val());
-                    //fin de bloque de depuración----
-                });
-
-                document.getElementById('nombre_descriptivo_agregar_campo').addEventListener('input', function() {
-                    $('#nombre_descriptivo_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Nombre Descriptivo: ", $('#nombre_descriptivo_agregar').val());
-                    //fin de bloque de depuración----
-                });
-
-                document.getElementById('descripcion_agregar_campo').addEventListener('input', function() {
-                    $('#descripcion_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Descripción: ", $('#descripcion_agregar').val());
-                    //fin de bloque de depuración----
-                });
-
-                //Listeners para cuando cambien los valores de los select
-                document.querySelector('select[name="categoria_agregar_nombre"]').addEventListener('change',
-                    function() {
-                        $('#categoria_agregar').val(this.value);
-                        //bloque de depuración----
-                        // console.log("Categoria: ", $('#categoria_agregar').val());
-                        //fin de bloque de depuración----
-                    });
-
-                document.querySelector('select[name="tipo_agregar_nombre"]').addEventListener('change',
-                    function() {
-                        $('#tipo_agregar').val(this.value);
-                        //bloque de depuración----
-                        // console.log("Tipo: ", $('#tipo_agregar').val());
-                        //fin de bloque de depuración----
-                    });
-
-                document.querySelector('select[name="etapa_agregar_nombre"]').addEventListener('change',
-                    function() {
-                        $('#etapa_agregar').val(this.value);
-                        //bloque de depuración----
-                        // console.log("Tipo: ", $('#tipo_agregar').val());
-                        //fin de bloque de depuración----
-                    });
-
-                document.querySelector('input[name="video_agregar"]').addEventListener('input', function() {
-                    $('#video_agregar').val(this.value);
-                    //bloque de depuración----
-                    // console.log("Video: ", $('#video_agregar').val());
-                    //fin de bloque de depuración----
-                });
-            });
+            // El script que estaba aquí para el click de #btnAgregar
+            // para copiar valores a hidden inputs ya NO ES NECESARIO,
+            // ya que los campos visibles ahora envían directamente el valor.
+            // Los listeners de 'change' y 'input' para los hidden inputs también se vuelven redundantes.
+            // Solo se mantiene el listener para el 'click' del botón de apertura del modal
+            // (que ya está en el script superior con el 'show.bs.modal').
         });
     </script>
 
@@ -513,6 +504,10 @@
             <input type="hidden" name="tipo_mod" id="tipo_mod">
             <input type="hidden" name="etapa_mod" id="etapa_mod">
             <input type="hidden" name="video_mod" id="video_mod">
+            {{-- NUEVOS CAMPOS OCULTOS --}}
+            <input type="hidden" name="area_aplicacion_mod" id="area_aplicacion_mod">
+            <input type="hidden" name="naturaleza_tecnica_mod" id="naturaleza_tecnica_mod">
+            <input type="hidden" name="objetivo_mod" id="objetivo_mod">
 
             <div class="modal-header">
                 <h4 class="modal-title">Editar @yield('administrar_s')</h4>
@@ -522,6 +517,7 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Clave del Proyecto</label>
+                    {{-- Este 'name' se mantiene con _campo porque el hidden input clave_proyecto_mod es el que se usa en el controlador --}}
                     <input id="clave_proyecto_campo" type="text" class="form-control clave_proyecto ceditar"
                         value="" pattern="[0-9A-Z]{13}" required>
                 </div>
@@ -570,6 +566,19 @@
                     <input id="video_campo" name="video_agregar ceditar" type="url" class="form-control video"
                         placeholder="URL del video (Youtube, Google Drive)">
                 </div>
+                {{-- NUEVOS CAMPOS DE FORMULARIO --}}
+                <div class="form-group">
+                    <label>Área de Aplicación</label>
+                    <input id="area_aplicacion_campo" type="text" class="form-control area_aplicacion ceditar" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label>Naturaleza Técnica</label>
+                    <input id="naturaleza_tecnica_campo" type="text" class="form-control naturaleza_tecnica ceditar" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label>Objetivo</label>
+                    <textarea id="objetivo_campo" class="form-control objetivo ceditar" maxlength="255" rows="3"></textarea>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -592,23 +601,29 @@
                     var tipo = $(this).data('tipo');
                     var etapa = $(this).data('etapa');
                     var video = $(this).data('video');
+                    // NUEVOS CAMPOS
+                    var areaAplicacion = $(this).data('area-aplicacion');
+                    var naturalezaTecnica = $(this).data('naturaleza-tecnica');
+                    var objetivo = $(this).data('objetivo');
 
                     // Se llenan los campos del formulario con los datos del registro a editar
                     $('#clave_proyecto_campo').val(claveProyecto); // Usar ID específico para inputs
                     $('#nombre_campo').val(nombre);
                     $('#nombre_descriptivo_campo').val(nombreDescriptivo);
                     $('#descripcion_campo').val(descripcion);
-
-                    // **CORRECCIÓN AQUÍ:** Usar .val() en el SELECT específico por su atributo 'name'
                     $('select[name="categoria_campo_nombre"]').val(categoria);
                     $('select[name="tipo_campo_nombre"]').val(tipo);
                     $('select[name="etapa_campo_nombre"]').val(etapa);
+                    $('#video_campo').val(video);
+                    // NUEVOS CAMPOS: Llenar en el modal de edición
+                    $('#area_aplicacion_campo').val(areaAplicacion);
+                    $('#naturaleza_tecnica_campo').val(naturalezaTecnica);
+                    $('#objetivo_campo').val(objetivo);
 
-                    $('#video_campo').val(video); // Usar ID específico para inputs
 
                     // Se llenan los campos ocultos con los datos del registro a editar
-                    $('#clave_proyecto_editar').val(claveProyecto);
-                    $('#clave_proyecto_mod').val(claveProyecto);
+                    $('#clave_proyecto_editar').val(claveProyecto); // Clave original
+                    $('#clave_proyecto_mod').val(claveProyecto); // Clave actual (por si se modifica)
                     $('#nombre_mod').val(nombre);
                     $('#nombre_descriptivo_mod').val(nombreDescriptivo);
                     $('#descripcion_mod').val(descripcion);
@@ -616,82 +631,52 @@
                     $('#tipo_mod').val(tipo);
                     $('#etapa_mod').val(etapa);
                     $('#video_mod').val(video);
+                    // NUEVOS CAMPOS: Llenar ocultos
+                    $('#area_aplicacion_mod').val(areaAplicacion);
+                    $('#naturaleza_tecnica_mod').val(naturalezaTecnica);
+                    $('#objetivo_mod').val(objetivo);
 
-                    //Listeners para cuando cambien los campos
+                    //Listeners para cuando cambien los campos y actualizar los hidden inputs
                     document.getElementById('clave_proyecto_campo').addEventListener('input', function() {
                         $('#clave_proyecto_mod').val(this.value);
-                        // console.log('Cambio en clave_proyecto_campo: ' + this.value);
                     });
-
                     document.getElementById('nombre_campo').addEventListener('input', function() {
                         $('#nombre_mod').val(this.value);
-                        // console.log('Cambio en nombre_campo: ' + this.value);
                     });
-
                     document.getElementById('nombre_descriptivo_campo').addEventListener('input', function() {
                         $('#nombre_descriptivo_mod').val(this.value);
-                        // console.log('Cambio en nombre_descriptivo_campo: ' + this.value);
                     });
-
                     document.getElementById('descripcion_campo').addEventListener('input', function() {
                         $('#descripcion_mod').val(this.value);
-                        // console.log('Cambio en descripcion_campo: ' + this.value);
                     });
-
                     document.querySelector('select[name="categoria_campo_nombre"]').addEventListener('change',
                         function() {
                             $('#categoria_mod').val(this.value);
-                            // console.log('Cambio en categoria_campo_nombre: ' + this.value);
                         });
-
                     document.querySelector('select[name="tipo_campo_nombre"]').addEventListener('change',
                         function() {
                             $('#tipo_mod').val(this.value);
-                            // console.log('Cambio en tipo_campo_nombre: ' + this.value);
                         });
-
                     document.querySelector('select[name="etapa_campo_nombre"]').addEventListener('change',
                         function() {
                             $('#etapa_mod').val(this.value);
-                            // console.log('Cambio en etapa_campo_nombre: ' + this.value);
                         });
-
                     document.getElementById('video_campo').addEventListener('input', function() {
                         $('#video_mod').val(this.value);
-                        // console.log('Cambio en video_campo: ' + this.value);
+                    });
+                    // NUEVOS CAMPOS: Listeners para actualizar hidden inputs
+                    document.getElementById('area_aplicacion_campo').addEventListener('input', function() {
+                        $('#area_aplicacion_mod').val(this.value);
+                    });
+                    document.getElementById('naturaleza_tecnica_campo').addEventListener('input', function() {
+                        $('#naturaleza_tecnica_mod').val(this.value);
+                    });
+                    document.getElementById('objetivo_campo').addEventListener('input', function() {
+                        $('#objetivo_mod').val(this.value);
                     });
                 });
-
             });
-
-            // Vaciar los campos al dar clic en "Cancelar" (Para el modal de EDICIÓN, esto es menos crítico,
-            // ya que al reabrir el modal se rellena con los datos actuales. Se comenta para evitar reset innecesario.)
-            /*
-            $('input[type="button"]').click(function() {
-                $('.clave_proyecto').val('');
-                $('.nombre').val('');
-                $('.nombre_descriptivo').val('');
-                $('.descripcion').val('');
-                $('select[name="categoria_campo_nombre"]').val($('select[name="categoria_campo_nombre"] option:first').val());
-                $('select[name="tipo_campo_nombre"]').val($('select[name="tipo_campo_nombre"] option:first').val());
-                $('select[name="etapa_campo_nombre"]').val($('select[name="etapa_campo_nombre"] option:first').val());
-                $('.video').val('');
-            });
-            */
-
-            // Vaciar los campos al hacer submit del formulario (Similar, al reabrir el modal se rellena)
-            /*
-            $('form').submit(function() {
-                $('#clave_proyecto_campo').val('');
-                $('#nombre_campo').val('');
-                $('#nombre_descriptivo_campo').val('');
-                $('#descripcion_campo').val('');
-                $('select[name="categoria_campo_nombre"]').val($('select[name="categoria_campo_nombre"] option:first').val());
-                $('select[name="tipo_campo_nombre"]').val($('select[name="tipo_campo_nombre"] option:first').val());
-                $('select[name="etapa_campo_nombre"]').val($('select[name="etapa_campo_nombre"] option:first').val());
-                $('#video_campo').val('');
-            });
-            */
+            // Las secciones de vaciar campos al cancelar o submit se mantienen comentadas como antes.
         </script>
 
         @yield('script_validacion_campos')
@@ -778,6 +763,10 @@
         <p><strong>Etapa:</strong> <span id="view_etapa"></span></p>
         <p><strong>Video:</strong> <span id="view_video_container"><a id="view_video_link" href="#" target="_blank"></a></span></p>
         <p><strong>Fecha de Agregado:</strong> <span id="view_fecha_agregado"></span></p>
+        {{-- NUEVOS CAMPOS A VISUALIZAR --}}
+        <p><strong>Área de Aplicación:</strong> <span id="view_area_aplicacion"></span></p>
+        <p><strong>Naturaleza Técnica:</strong> <span id="view_naturaleza_tecnica"></span></p>
+        <p><strong>Objetivo:</strong> <span id="view_objetivo" style="white-space: pre-wrap;"></span></p>
     </div>
     <div class="modal-footer">
         <input type="button" class="btn btn-default" data-dismiss="modal" value="Cerrar">
@@ -795,6 +784,10 @@
                 var etapaNombre = $(this).data('etapa-nombre');
                 var video = $(this).data('video');
                 var fechaAgregado = $(this).data('fecha-agregado');
+                // NUEVOS CAMPOS
+                var areaAplicacion = $(this).data('area-aplicacion');
+                var naturalezaTecnica = $(this).data('naturaleza-tecnica');
+                var objetivo = $(this).data('objetivo');
 
                 $('#view_clave_proyecto').text(claveProyecto);
                 $('#view_nombre').text(nombre);
@@ -804,6 +797,11 @@
                 $('#view_tipo').text(tipoNombre);
                 $('#view_etapa').text(etapaNombre);
                 $('#view_fecha_agregado').text(fechaAgregado);
+                // NUEVOS CAMPOS: Mostrar en el modal de ver
+                $('#view_area_aplicacion').text(areaAplicacion);
+                $('#view_naturaleza_tecnica').text(naturalezaTecnica);
+                $('#view_objetivo').text(objetivo);
+
 
                 var videoLink = $('#view_video_link');
                 if (video && video.trim() !== '' && video.trim().toLowerCase() !== 'no') {

@@ -28,7 +28,7 @@ return new class extends Migration {
 
 
             $table->integer('etapa')->default(4);
-            $table->string('video', 255)->default('Sin video');
+            $table->string('video', 255)->nullable();
             $table->string('area_aplicacion', 50)->default('Sin asignar');
             $table->string('naturaleza_tecnica', 50)->default('Sin asignar');
             $table->string('objetivo', 600)->default('Sin asignar');
