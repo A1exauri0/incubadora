@@ -1,4 +1,3 @@
-{{-- INICIO DEL CÓDIGO PARA: layout.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -90,8 +89,9 @@
             width: 60px;
         }
 
+        /* MODIFICACIÓN: Aumenta el ancho de la última columna para las acciones */
         table.table tr th:last-child {
-            width: 140px; /* Aumentado para dar espacio al nuevo botón */
+            width: 130px; /* Ajustado de 100px a 130px para dar espacio */
         }
 
         table.table-striped tbody tr:nth-of-type(odd) {
@@ -108,27 +108,40 @@
             cursor: pointer;
         }
 
-        table.table td:last-child i {
-            opacity: 0.9;
-            font-size: 22px;
-            margin: 0 5px;
+        /* MODIFICACIÓN: Aplica Flexbox al contenedor de los íconos de acción */
+        .action-buttons {
+            display: flex;
+            gap: 8px; /* Espacio entre los botones */
+            justify-content: center; /* Centra horizontalmente los botones dentro de la celda */
+            align-items: center; /* Alinea verticalmente los botones */
+            width: 100%; /* Asegura que el contenedor ocupe todo el ancho de la celda */
+        }
+
+        /* MODIFICACIÓN: Elimina los márgenes del ícono cuando están dentro de action-buttons,
+           ya que 'gap' de flexbox ya maneja el espaciado */
+        .action-buttons .material-icons {
+            margin: 0;
+            font-size: 19px; /* Mantener tamaño original */
+        }
+
+        /* Asegurarse que los 'a' dentro de action-buttons se comporten como flex items */
+        .action-buttons a {
+            display: flex; /* Convierte los enlaces en contenedores flex para centrar el icono si es necesario */
+            align-items: center;
+            justify-content: center;
+            /* Si tienes algún padding/margin adicional aquí, podrías ajustarlo */
         }
 
         table.table td a {
             font-weight: bold;
             color: #566787;
-            display: inline-block;
+            /* display: inline-block; Removido, ahora se maneja con flexbox en .action-buttons a */
             text-decoration: none;
             outline: none !important;
         }
 
         table.table td a:hover {
             color: #2196F3;
-        }
-        
-        /* --- NUEVO: Estilo para el botón de ver --- */
-        table.table td a.view {
-            color: #03A9F4;
         }
 
         table.table td a.edit {
@@ -139,9 +152,13 @@
             color: #F44336;
         }
 
-        table.table td i {
-            font-size: 19px;
+        table.table td a.view { /* Nuevo estilo para el botón de ver */
+            color: #03A9F4; /* Un color azul para diferenciarlo */
         }
+
+        /* table.table td i { Estas reglas ahora pueden ser más específicas si es necesario,
+            font-size: 19px;     pero .action-buttons .material-icons ya lo maneja
+        } */
 
         table.table .avatar {
             border-radius: 50%;
@@ -256,7 +273,7 @@
 
         /* Modal styles */
         .modal .modal-dialog {
-            max-width: 500px; /* Aumentado para mejor visualización */
+            max-width: 400px;
         }
 
         .modal .modal-header,
@@ -343,14 +360,14 @@
                     </tbody>
                 </table>
                 <div class="clearfix">
+                    {{-- <div class="hint-text ocultar">Mostrando <b>@yield('mostrando')</b> de <b>@yield('total_registros')</b> registros</div> --}}
                     <div class="hint-text">Mostrando un máximo <b>20</b> registros por página, hay un total de <b>@yield('total_registros')</b> registros encontrados.</div>
                     @yield('paginacion')
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Add Modal HTML -->
+    <!-- Add Modal HTML (Mantengo el nombre original de 'Employee' para no cambiar su referencia) -->
     <div id="addEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -358,7 +375,6 @@
             </div>
         </div>
     </div>
-
     <!-- Edit Modal HTML -->
     <div id="editEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -367,7 +383,6 @@
             </div>
         </div>
     </div>
-
     <!-- Delete Modal HTML -->
     <div id="deleteEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -376,7 +391,6 @@
             </div>
         </div>
     </div>
-    
     <!-- Multiple Delete Modal HTML -->
     <div id="deleteMultipleEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -386,8 +400,8 @@
         </div>
     </div>
 
-    <!-- NUEVO: View Modal HTML -->
-    <div id="viewEmployeeModal" class="modal fade">
+    {{-- Nuevo: View Modal HTML --}}
+    <div id="viewProjectModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 @yield('modulo_ver')

@@ -1,4 +1,3 @@
-{{-- INICIO DEL CÓDIGO PARA: proyectos.blade.php --}}
 @include('Admin.cruds.layouts.header')
 
 <!-- Se extiende de la clase layout en CRUDs (solamente para CRUDs) -->
@@ -28,6 +27,7 @@
                 $('table tbody input[type="checkbox"]:checked').each(function() {
                     numerosControlSeleccionados.push($(this).val());
 
+                    // Si se selecciona un checkbox, se agrega un input oculto al formulario
                     if (!document.getElementById('clave_proyecto_eliminar_' + $(this).val())) {
                         var input = document.createElement('input');
                         input.type = 'hidden';
@@ -35,16 +35,25 @@
                         input.id = 'clave_proyecto_eliminar_' + $(this).val();
                         input.value = $(this).val();
                         document.getElementById('formulario_eliminar_multiple').appendChild(input);
+                        // console.log('Se agregó el input: ' + input.name);
                     }
+
                 });
 
+                // en caso de que se deseleccione, se elimina el input oculto
                 $('table tbody input[type="checkbox"]:not(:checked)').each(function() {
                     if (document.getElementById('clave_proyecto_eliminar_' + $(this).val())) {
                         document.getElementById('clave_proyecto_eliminar_' + $(this).val()).remove();
+                        // console.log('Se eliminó el input: ' + 'clave_proyecto_eliminar_' + $(this).val());
                     }
+
+                    //Bloque de depuración----
+                    //console.log('Numeros de control seleccionados: ' + numerosControlSeleccionados);
+                    //Fin de bloque de depuración----
                 });
 
                 boton_eliminar = document.getElementById('btnEliminar');
+                //console.log("botoneliminar: ", boton_eliminar);
 
                 if (numerosControlSeleccionados.length === 0) { //Si está vacío el botón se inhabilita
                     boton_eliminar.classList.add('boton-deshabilitado');
@@ -53,8 +62,11 @@
                 }
             }
 
+
+            // Activar tooltip
             $('[data-toggle="tooltip"]').tooltip();
 
+            // Seleccionar/Deseleccionar checkboxes
             var checkbox = $('table tbody input[type="checkbox"]');
             $("#selectAll").click(function() {
                 if (this.checked) {
@@ -75,6 +87,7 @@
                 actualizarNumerosControlSeleccionados();
             });
 
+            // Actualizar el arreglo cuando se carga la página
             actualizarNumerosControlSeleccionados();
         });
     </script>
@@ -83,16 +96,69 @@
 {{-- Script para validación de campos --}}
 @section('script_validacion_campos')
     <script>
-        // ... (Tu script de validación de campos queda igual, no es necesario pegarlo de nuevo) ...
+        document.querySelectorAll('.clave_proyecto').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+                var valorNumerico = valor.replace(/[^A-Z-0-9]+/g, '').replace(/\s{2,}/g, ' ');
+                //No permitir más de 8 dígitos
+                valorNumerico = valorNumerico.substring(0, 13);
+                this.value = valorNumerico;
+            });
+        });
+
+        document.querySelectorAll('.nombre').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+
+                // Solo acepta Letras Mayúsculas y Minúsculas, Números, Espacios, ÁÉÍÓÚ, áéíóú, : - y "
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ:\-"]/g, '').replace(/\s{2,}/g,
+                ' ');
+                this.value = valorLimpio;
+            });
+        });
+
+                document.querySelectorAll('.nombre_descriptivo').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+
+                // Solo acepta Letras Mayúsculas y Minúsculas, Números, Espacios, ÁÉÍÓÚ, áéíóú, : - y "
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ:\-"]/g, '').replace(/\s{2,}/g,
+                ' ');
+                this.value = valorLimpio;
+            });
+        });
+
+        document.querySelectorAll('.descripcion').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+
+                // Sólo acepta Letras Mayúsculas y Minúsculas
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ]+/g, '').replace(/\s{2,}/g, ' ');
+                this.value = valorLimpio;
+            });
+        });
+
+        document.querySelectorAll('.video').forEach(function(element) {
+            element.addEventListener('input', function() {
+                var valor = this.value;
+
+                // Solo acepta Letras Mayúsculas y Minúsculas, Números, "/", ".", ":", "_", "\"
+                var valorLimpio = valor.replace(/[^a-zA-Z0-9\sáéíóúÁÉÍÓÚ\/\.\:_\\]+/g, '').replace(
+                    /\s{2,}/g, ' ');
+                this.value = valorLimpio;
+            });
+        });
     </script>
 @endsection
 
 <!-- Se recibe la lista de columnas a mostrar (nombres) -->
 @section('columnas')
+
     @if (!$proyectos->isEmpty())
         @foreach ($columnas as $columna)
             <th> {{ $columna }} </th>
         @endforeach
+
         <th>Acciones</th>
     @else
         @php
@@ -101,11 +167,13 @@
             </script>";
         @endphp
     @endif
+
 @endsection
 
 
 <!-- Se carga el contenido de la tabla -->
 @section('datos')
+
     {{-- Se manejan los mensajes de error --}}
     @if (session('error'))
         <div id="error-message" style="text-align: center; background-color: rgb(155, 38, 38); color: white; ">
@@ -114,7 +182,7 @@
         <script>
             setTimeout(function() {
                 document.getElementById('error-message').style.display = 'none';
-            }, 10000);
+            }, 10000); // Hide the error message after 5 seconds
         </script>
     @endif
 
@@ -122,18 +190,14 @@
         <p style="text-align: center;">No hay registros</p>
     @else
         @php
-            $proyectosArray = $proyectos->toArray()['data'] ?? $proyectos->toArray(); // Compatible con paginación de Laravel y arrays
-            $segmento = 20;
-            $pagina = request()->get('pagina', 1);
-            $inicio = ($pagina - 1) * $segmento;
-            $proyectos_pagina = array_slice($proyectosArray, $inicio, $segmento);
+            $proyectos = $proyectos->toArray(); // Convert $proyectos to an array
+            $segmento = 20; // Número de registros por página
+            $pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 1; // Página actual
+            $inicio = ($pagina - 1) * $segmento; // Registro inicial de la página actual
+            $proyectos_pagina = array_slice($proyectos, $inicio, $segmento); // Obtener los proyectos de la página actual
         @endphp
 
-        @foreach ($proyectos_pagina as $proyectoData)
-            @php
-                // Para manejar tanto colecciones de objetos como arrays asociativos
-                $proyecto = is_array($proyectoData) ? (object) $proyectoData : $proyectoData;
-            @endphp
+        @foreach ($proyectos_pagina as $proyecto)
             <tr>
                 <td>
                     <span class="custom-checkbox">
@@ -144,59 +208,93 @@
                 <td class="clave_proyecto">{{ $proyecto->clave_proyecto }}</td>
                 <td class="nombre">{{ $proyecto->nombre }}</td>
                 <td class="nombre_descriptivo">{{ $proyecto->nombre_descriptivo }}</td>
-                <td>{{ $categorias->firstWhere('idCategoria', $proyecto->categoria)->nombre ?? 'N/A' }}</td>
-                <td>{{ $tipos->firstWhere('idTipo', $proyecto->tipo)->nombre ?? 'N/A' }}</td>
-                <td>{{ $etapas->firstWhere('idEtapa', $proyecto->etapa)->nombre ?? 'N/A' }}</td>
-                @if ($proyecto->video && $proyecto->video !== 'No' && $proyecto->video !== 'no')
-                    <td class="video"><a href="{{ $proyecto->video }}" target="_blank">Ver Video</a></td>
+                @php
+                    // Obtener nombres de las categorías, tipos y etapas para pasarlos a los data-attributes
+                    $categoriaNombre = '';
+                    foreach ($categorias as $categoria) {
+                        if ($proyecto->categoria === $categoria->idCategoria) {
+                            $categoriaNombre = $categoria->nombre;
+                            echo '<td class="categoria">' . $categoria->nombre . '</td>';
+                            break;
+                        }
+                    }
+                    $tipoNombre = '';
+                    foreach ($tipos as $tipo) {
+                        if ($proyecto->tipo === $tipo->idTipo) {
+                            $tipoNombre = $tipo->nombre;
+                            echo '<td class="tipo">' . $tipo->nombre . '</td>';
+                            break;
+                        }
+                    }
+                    $etapaNombre = '';
+                    foreach ($etapas as $etapa) {
+                        if ($proyecto->etapa === $etapa->idEtapa) {
+                            $etapaNombre = $etapa->nombre;
+                            echo '<td class="etapa">' . $etapa->nombre . '</td>';
+                            break;
+                        }
+                    }
+                @endphp
+                @if ($proyecto->video !== null && $proyecto->video !== 'No' && $proyecto->video !== 'no')
+                    <td class="video"><a href="{{ $proyecto->video }}" target="_blank">Video</a> </td>
                 @else
                     <td class="video">Sin Video</td>
                 @endif
                 <td>{{ $proyecto->fecha_agregado }}</td>
                 <td>
-                    {{-- NUEVO: Botón de Ver (ojo) añadido --}}
-                    <a href="#viewEmployeeModal" class="view" data-toggle="modal"
-                        data-clave-proyecto="{{ $proyecto->clave_proyecto }}" 
-                        data-nombre="{{ $proyecto->nombre }}" 
-                        data-nombre_descriptivo="{{ $proyecto->nombre_descriptivo }}"
-                        data-descripcion="{{ $proyecto->descripcion }}"
-                        data-categoria_nombre="{{ $categorias->firstWhere('idCategoria', $proyecto->categoria)->nombre ?? 'N/A' }}" 
-                        data-tipo_nombre="{{ $tipos->firstWhere('idTipo', $proyecto->tipo)->nombre ?? 'N/A' }}"
-                        data-etapa_nombre="{{ $etapas->firstWhere('idEtapa', $proyecto->etapa)->nombre ?? 'N/A' }}"
-                        data-video="{{ $proyecto->video }}"
-                        data-fecha_agregado="{{ $proyecto->fecha_agregado }}">
-                        <i class="material-icons" data-toggle="tooltip" title="Ver"></i></a>
-                    
-                    <a href="#editEmployeeModal" class="edit" data-toggle="modal"
-                        data-clave-proyecto="{{ $proyecto->clave_proyecto }}" 
-                        data-nombre="{{ $proyecto->nombre }}" 
-                        data-nombre_descriptivo="{{ $proyecto->nombre_descriptivo }}"
-                        data-descripcion="{{ $proyecto->descripcion }}"
-                        data-categoria="{{ $proyecto->categoria }}" 
-                        data-tipo="{{ $proyecto->tipo }}"
-                        data-etapa="{{ $proyecto->etapa }}" 
-                        data-video="{{ $proyecto->video }}">
-                        <i class="material-icons" data-toggle="tooltip" title="Editar"></i></a>
-                        
-                    <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                        data-clave-proyecto="{{ $proyecto->clave_proyecto }}"><i class="material-icons"
-                            data-toggle="tooltip" title="Eliminar"></i></a>
+                    {{-- INICIO DEL NUEVO CONTENEDOR FLEXBOX --}}
+                    <div class="action-buttons">
+                        {{-- Botón para ver detalles (NUEVO) --}}
+                        <a href="#viewProjectModal" class="view" data-toggle="modal"
+                            data-clave-proyecto="{{ $proyecto->clave_proyecto }}"
+                            data-nombre="{{ $proyecto->nombre }}"
+                            data-nombre_descriptivo="{{ $proyecto->nombre_descriptivo }}"
+                            data-descripcion="{{ $proyecto->descripcion }}"
+                            data-categoria-id="{{ $proyecto->categoria }}"
+                            data-categoria-nombre="{{ $categoriaNombre }}"
+                            data-tipo-id="{{ $proyecto->tipo }}"
+                            data-tipo-nombre="{{ $tipoNombre }}"
+                            data-etapa-id="{{ $proyecto->etapa }}"
+                            data-etapa-nombre="{{ $etapaNombre }}"
+                            data-video="{{ $proyecto->video }}"
+                            data-fecha-agregado="{{ $proyecto->fecha_agregado }}">
+                            <i class="material-icons" data-toggle="tooltip" title="Ver Detalles"></i> {{-- Icono de ojito --}}
+                        </a>
+                        <a href="#editEmployeeModal" class="edit" data-toggle="modal"
+                            data-descripcion="{{ $proyecto->descripcion }}"
+                            data-clave-proyecto="{{ $proyecto->clave_proyecto }}"
+                            data-nombre="{{ $proyecto->nombre }}"
+                            data-nombre_descriptivo="{{ $proyecto->nombre_descriptivo }}"
+                            data-categoria="{{ $proyecto->categoria }}"
+                            data-tipo="{{ $proyecto->tipo }}"
+                            data-etapa="{{ $proyecto->etapa }}"
+                            data-video="{{ $proyecto->video }}">
+                            <i class="material-icons" data-toggle="tooltip" title="Editar"></i></a>
+                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
+                            data-clave-proyecto="{{ $proyecto->clave_proyecto }}"><i class="material-icons"
+                                data-toggle="tooltip" title="Eliminar"></i></a>
+                    </div>
+                    {{-- FIN DEL NUEVO CONTENEDOR FLEXBOX --}}
                 </td>
             </tr>
         @endforeach
 
+
         @php
-            $totalPaginas = ceil(count($proyectosArray) / $segmento);
+            $totalPaginas = ceil(count($proyectos) / $segmento); // Total de páginas
         @endphp
 
+        <!-- Mostrar videos de paginación -->
         @section('lista_total_paginas')
             <ul class="pagination">
                 @for ($i = 1; $i <= $totalPaginas; $i++)
-                    <li class="page-item {{ $i == $pagina ? 'active' : '' }}"><a href="?pagina={{ $i }}" class="page-link">{{ $i }}</a></li>
+                    <li class="page-item {{ $i == $pagina ? 'active' : '' }}"><a href="?pagina={{ $i }}"
+                            class="page-link">{{ $i }}</a></li>
                 @endfor
             </ul>
         @endsection
 
+        {{-- Muestra y añade la funcionalidad de los botones siguiente y anterior --}}
         @section('paginacion')
             <ul class="pagination">
                 <li class="page-item {{ $pagina == 1 ? 'disabled' : '' }}">
@@ -209,162 +307,495 @@
             </ul>
         @endsection
     @endif
-@endsection
 
-{{-- Módulos de Agregar, Editar, Eliminar... (La mayoría sin cambios significativos) --}}
+@endsection
 
 {{-- Modulo agregar --}}
 @section('modulo_agregar')
-    {{-- ... Tu código del módulo agregar queda igual ... --}}
-    @parent 
-@endsection
 
+    <form action="{{ route('proyectos.agregar') }}" method="POST" autocomplete="off">
+        {{-- Muy importante la directiva siguiente. --}}
+        @csrf
+
+
+        <input type="hidden" name="clave_proyecto_agregar" id="clave_proyecto_agregar">
+        <input type="hidden" name="nombre_agregar" id="nombre_agregar">
+        <input type="hidden" name="nombre_descriptivo_agregar" id="nombre_descriptivo_agregar">
+        <input type="hidden" name="descripcion_agregar" id="descripcion_agregar">
+        <input type="hidden" name="categoria_agregar" id="categoria_agregar">
+        <input type="hidden" name="tipo_agregar" id="tipo_agregar">
+        <input type="hidden" name="etapa_agregar" id="etapa_agregar">
+
+        <div class="modal-header">
+            <h4 class="modal-title">Agregar @yield('administrar_s')</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Clave del Proyecto</label>
+                <input id="clave_proyecto_agregar_campo" name="clave_proyecto_agregar" type="text"
+                    class="form-control clave_proyecto" pattern="[A-Z0-9\-]{13}" required>
+            </div>
+            <div class="form-group">
+                <label>Nombre</label>
+                <input id="nombre_agregar_campo" name="nombre_agregar" type="text" class="form-control nombre"
+                    maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
+            </div>
+            <div class="form-group">
+                <label>Nombre Descriptivo</label>
+                <input id="nombre_descriptivo_agregar_campo" name="nombre_descriptivo_agregar" type="text" class="form-control nombre_descriptivo"
+                    maxlength="50" pattern="[A-Za-z0-9\-: ]{1,50}" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="descripcion_agregar_campo" name="descripcion_agregar" class="form-control descripcion" maxlength="800"
+                    rows="5" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Categoria</label>
+                <select name="categoria_agregar_nombre" class="form-control" required>
+                    @foreach ($categorias as $categoria)
+                        <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tipo</label>
+                <select name="tipo_agregar_nombre" class="form-control" required>
+                    @foreach ($tipos as $tipo)
+                        <option value="{{ $tipo->idTipo }}" class="form-control"> {{ $tipo->nombre }} </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Etapa</label>
+                <select name="etapa_agregar_nombre" class="form-control" required>
+                    @foreach ($etapas as $etapa)
+                        <option value="{{ $etapa->idEtapa }}" class="form-control"> {{ $etapa->nombre }} </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label>Video</label>
+                <input id="video_agregar_campo" type="text" name="video_agregar" class="form-control video"
+                    placeholder="URL del video (Youtube, Google Drive, etc.)"
+                    pattern="^(https:\/\/(www\.)?(youtube\.com\/|drive\.google\.com\/).*)$">
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+            <input type="submit" class="btn btn-success" value="Agregar">
+        </div>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            $('#addEmployeeModal').on('show.bs.modal', function() {
+                $('#clave_proyecto_agregar_campo').val('');
+                $('#nombre_agregar_campo').val('');
+                $('#nombre_descriptivo_agregar_campo').val('');
+                $('#descripcion_agregar_campo').val('');
+                // **CORRECCIÓN AQUÍ:** Establece el selectedIndex en 0 para la primera opción
+                $('select[name="categoria_agregar_nombre"]').prop('selectedIndex', 0);
+                $('select[name="tipo_agregar_nombre"]').prop('selectedIndex', 0);
+                $('select[name="etapa_agregar_nombre"]').prop('selectedIndex', 0);
+                $('#video_agregar_campo').val(''); // Corrección: Usar el ID del campo de input
+            });
+        });
+    </script>
+
+    {{-- Escucha los valores seleccionados de Categoría y de Tipo y les da a categoria_agregar y tipo_agregar el valor correspondiente al ID de la opción seleccionada. --}}
+    <script>
+        $(document).ready(function() {
+            $('#btnAgregar').click(function() {
+                var categoria = $('select[name="categoria_agregar_nombre"]').val();
+                var tipo = $('select[name="tipo_agregar_nombre"]').val();
+                var etapa = $('select[name="etapa_agregar_nombre"]').val();
+                var video = $('input[name="video_agregar"]').val();
+
+                $('#categoria_agregar').val(categoria);
+                $('#tipo_agregar').val(tipo);
+                $('#etapa_agregar').val(etapa);
+
+                //Bloque de depuración----
+                // console.log("Categoria: ", $('#categoria_agregar').val());
+                // console.log("Tipo: ", $('#tipo_agregar').val());
+                //Fin de bloque de depuración----
+
+                //Listeners para cuando cambien los valores de los campos
+                document.getElementById('clave_proyecto_agregar_campo').addEventListener('input',
+            function() {
+                    $('#clave_proyecto_agregar').val(this.value);
+                    //bloque de depuración----
+                    // console.log("Clave del Proyecto: ", $('#clave_proyecto_agregar').val());
+                    //fin de bloque de depuración----
+                });
+
+                document.getElementById('nombre_agregar_campo').addEventListener('input', function() {
+                    $('#nombre_agregar').val(this.value);
+                    //bloque de depuración----
+                    // console.log("Nombre: ", $('#nombre_agregar').val());
+                    //fin de bloque de depuración----
+                });
+
+                document.getElementById('nombre_descriptivo_agregar_campo').addEventListener('input', function() {
+                    $('#nombre_descriptivo_agregar').val(this.value);
+                    //bloque de depuración----
+                    // console.log("Nombre Descriptivo: ", $('#nombre_descriptivo_agregar').val());
+                    //fin de bloque de depuración----
+                });
+
+                document.getElementById('descripcion_agregar_campo').addEventListener('input', function() {
+                    $('#descripcion_agregar').val(this.value);
+                    //bloque de depuración----
+                    // console.log("Descripción: ", $('#descripcion_agregar').val());
+                    //fin de bloque de depuración----
+                });
+
+                //Listeners para cuando cambien los valores de los select
+                document.querySelector('select[name="categoria_agregar_nombre"]').addEventListener('change',
+                    function() {
+                        $('#categoria_agregar').val(this.value);
+                        //bloque de depuración----
+                        // console.log("Categoria: ", $('#categoria_agregar').val());
+                        //fin de bloque de depuración----
+                    });
+
+                document.querySelector('select[name="tipo_agregar_nombre"]').addEventListener('change',
+                    function() {
+                        $('#tipo_agregar').val(this.value);
+                        //bloque de depuración----
+                        // console.log("Tipo: ", $('#tipo_agregar').val());
+                        //fin de bloque de depuración----
+                    });
+
+                document.querySelector('select[name="etapa_agregar_nombre"]').addEventListener('change',
+                    function() {
+                        $('#etapa_agregar').val(this.value);
+                        //bloque de depuración----
+                        // console.log("Tipo: ", $('#tipo_agregar').val());
+                        //fin de bloque de depuración----
+                    });
+
+                document.querySelector('input[name="video_agregar"]').addEventListener('input', function() {
+                    $('#video_agregar').val(this.value);
+                    //bloque de depuración----
+                    // console.log("Video: ", $('#video_agregar').val());
+                    //fin de bloque de depuración----
+                });
+            });
+        });
+    </script>
+
+    @yield('script_validacion_campos')
+
+@endsection
 
 {{-- Modulo editar --}}
 @section('modulo_editar')
+
     @if ($proyectos)
         <form action="{{ route('proyectos.editar') }}" method="POST" autocomplete="off">
+            {{-- Muy importante la directiva siguiente. --}}
             @csrf
+
+            {{-- Aquí se debe guardar el numero de control a enviar al método del controlador para eliminar. --}}
             <input type="hidden" name="clave_proyecto_editar" id="clave_proyecto_editar">
-            {{-- ... El resto de tu formulario de edición ... --}}
+
+            <input type="hidden" name="clave_proyecto_mod" id="clave_proyecto_mod">
             <input type="hidden" name="nombre_mod" id="nombre_mod">
             <input type="hidden" name="nombre_descriptivo_mod" id="nombre_descriptivo_mod">
-            {{-- ... etc ... --}}
+            <input type="hidden" name="descripcion_mod" id="descripcion_mod">
+            <input type="hidden" name="categoria_mod" id="categoria_mod">
+            <input type="hidden" name="tipo_mod" id="tipo_mod">
+            <input type="hidden" name="etapa_mod" id="etapa_mod">
+            <input type="hidden" name="video_mod" id="video_mod">
+
             <div class="modal-header">
-                 <h4 class="modal-title">Editar @yield('administrar_s')</h4>
+                <h4 class="modal-title">Editar @yield('administrar_s')</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
+
             <div class="modal-body">
-                {{-- ... Todos tus campos de formulario de edición ... --}}
+                <div class="form-group">
+                    <label>Clave del Proyecto</label>
+                    <input id="clave_proyecto_campo" type="text" class="form-control clave_proyecto ceditar"
+                        value="" pattern="[0-9A-Z]{13}" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input id="nombre_campo" type="text" class="form-control nombre ceditar" value=""
+                        maxlength="50" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre Descriptivo</label>
+                    <input id="nombre_descriptivo_campo" type="text" class="form-control nombre_descriptivo ceditar"
+                        value="" maxlength="50" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="descripcion_campo" name="descripcion_agregar ceditar" class="form-control descripcion" maxlength="200"
+                        rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select name="categoria_campo_nombre" class="form-control" required>
+                        @foreach ($categorias as $categoria)
+                            <option value="{{ $categoria->idCategoria }}" class="form-control"> {{ $categoria->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select name="tipo_campo_nombre" class="form-control" required>
+                        @foreach ($tipos as $tipo)
+                            <option value="{{ $tipo->idTipo }}" class="form-control"> {{ $tipo->nombre }} </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Etapa</label>
+                    <select name="etapa_campo_nombre" class="form-control" required>
+                        @foreach ($etapas as $etapa)
+                            <option value="{{ $etapa->idEtapa }}" class="form-control"> {{ $etapa->nombre }} </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label>Video</label>
+                    <input id="video_campo" name="video_agregar ceditar" type="url" class="form-control video"
+                        placeholder="URL del video (Youtube, Google Drive)">
+                </div>
             </div>
+
             <div class="modal-footer">
                 <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
                 <input type="submit" class="btn btn-info" value="Guardar">
             </div>
         </form>
 
+        {{-- Escucha que identifica según el atributo data-clave-proyecto el no. control que se va a editar. --}}
         <script>
+            // Se ejecuta cuando el documento esté listo
             $(document).ready(function() {
                 $('a.edit').click(function() {
+                    // Se obtienen los datos del registro a editar
                     var claveProyecto = $(this).data('clave-proyecto');
                     var nombre = $(this).data('nombre');
-                    var nombreDescriptivo = $(this).data('nombre_descriptivo'); // CORREGIDO
+                    var nombreDescriptivo = $(this).data('nombre_descriptivo');
                     var descripcion = $(this).data('descripcion');
                     var categoria = $(this).data('categoria');
                     var tipo = $(this).data('tipo');
                     var etapa = $(this).data('etapa');
                     var video = $(this).data('video');
 
-                    // Llenar campos del formulario
-                    $('#editEmployeeModal #clave_proyecto_campo').val(claveProyecto);
-                    $('#editEmployeeModal #nombre_campo').val(nombre);
-                    $('#editEmployeeModal #nombre_descriptivo_campo').val(nombreDescriptivo);
-                    $('#editEmployeeModal #descripcion_campo').val(descripcion);
-                    $('#editEmployeeModal select[name="categoria_campo_nombre"]').val(categoria);
-                    $('#editEmployeeModal select[name="tipo_campo_nombre"]').val(tipo);
-                    $('#editEmployeeModal select[name="etapa_campo_nombre"]').val(etapa);
-                    $('#editEmployeeModal #video_campo').val(video);
+                    // Se llenan los campos del formulario con los datos del registro a editar
+                    $('#clave_proyecto_campo').val(claveProyecto); // Usar ID específico para inputs
+                    $('#nombre_campo').val(nombre);
+                    $('#nombre_descriptivo_campo').val(nombreDescriptivo);
+                    $('#descripcion_campo').val(descripcion);
 
-                    // Llenar campos ocultos
+                    // **CORRECCIÓN AQUÍ:** Usar .val() en el SELECT específico por su atributo 'name'
+                    $('select[name="categoria_campo_nombre"]').val(categoria);
+                    $('select[name="tipo_campo_nombre"]').val(tipo);
+                    $('select[name="etapa_campo_nombre"]').val(etapa);
+
+                    $('#video_campo').val(video); // Usar ID específico para inputs
+
+                    // Se llenan los campos ocultos con los datos del registro a editar
                     $('#clave_proyecto_editar').val(claveProyecto);
                     $('#clave_proyecto_mod').val(claveProyecto);
                     $('#nombre_mod').val(nombre);
-                    // ANTES: $('#nombre_descriptivo_mod').val(nombre); -> INCORRECTO
-                    $('#nombre_descriptivo_mod').val(nombreDescriptivo); // CORREGIDO
+                    $('#nombre_descriptivo_mod').val(nombreDescriptivo);
                     $('#descripcion_mod').val(descripcion);
                     $('#categoria_mod').val(categoria);
                     $('#tipo_mod').val(tipo);
                     $('#etapa_mod').val(etapa);
                     $('#video_mod').val(video);
-                    
-                    // ... Tus listeners de cambio de campos ...
+
+                    //Listeners para cuando cambien los campos
+                    document.getElementById('clave_proyecto_campo').addEventListener('input', function() {
+                        $('#clave_proyecto_mod').val(this.value);
+                        // console.log('Cambio en clave_proyecto_campo: ' + this.value);
+                    });
+
+                    document.getElementById('nombre_campo').addEventListener('input', function() {
+                        $('#nombre_mod').val(this.value);
+                        // console.log('Cambio en nombre_campo: ' + this.value);
+                    });
+
+                    document.getElementById('nombre_descriptivo_campo').addEventListener('input', function() {
+                        $('#nombre_descriptivo_mod').val(this.value);
+                        // console.log('Cambio en nombre_descriptivo_campo: ' + this.value);
+                    });
+
+                    document.getElementById('descripcion_campo').addEventListener('input', function() {
+                        $('#descripcion_mod').val(this.value);
+                        // console.log('Cambio en descripcion_campo: ' + this.value);
+                    });
+
+                    document.querySelector('select[name="categoria_campo_nombre"]').addEventListener('change',
+                        function() {
+                            $('#categoria_mod').val(this.value);
+                            // console.log('Cambio en categoria_campo_nombre: ' + this.value);
+                        });
+
+                    document.querySelector('select[name="tipo_campo_nombre"]').addEventListener('change',
+                        function() {
+                            $('#tipo_mod').val(this.value);
+                            // console.log('Cambio en tipo_campo_nombre: ' + this.value);
+                        });
+
+                    document.querySelector('select[name="etapa_campo_nombre"]').addEventListener('change',
+                        function() {
+                            $('#etapa_mod').val(this.value);
+                            // console.log('Cambio en etapa_campo_nombre: ' + this.value);
+                        });
+
+                    document.getElementById('video_campo').addEventListener('input', function() {
+                        $('#video_mod').val(this.value);
+                        // console.log('Cambio en video_campo: ' + this.value);
+                    });
                 });
+
             });
+
+            // Vaciar los campos al dar clic en "Cancelar" (Para el modal de EDICIÓN, esto es menos crítico,
+            // ya que al reabrir el modal se rellena con los datos actuales. Se comenta para evitar reset innecesario.)
+            /*
+            $('input[type="button"]').click(function() {
+                $('.clave_proyecto').val('');
+                $('.nombre').val('');
+                $('.nombre_descriptivo').val('');
+                $('.descripcion').val('');
+                $('select[name="categoria_campo_nombre"]').val($('select[name="categoria_campo_nombre"] option:first').val());
+                $('select[name="tipo_campo_nombre"]').val($('select[name="tipo_campo_nombre"] option:first').val());
+                $('select[name="etapa_campo_nombre"]').val($('select[name="etapa_campo_nombre"] option:first').val());
+                $('.video').val('');
+            });
+            */
+
+            // Vaciar los campos al hacer submit del formulario (Similar, al reabrir el modal se rellena)
+            /*
+            $('form').submit(function() {
+                $('#clave_proyecto_campo').val('');
+                $('#nombre_campo').val('');
+                $('#nombre_descriptivo_campo').val('');
+                $('#descripcion_campo').val('');
+                $('select[name="categoria_campo_nombre"]').val($('select[name="categoria_campo_nombre"] option:first').val());
+                $('select[name="tipo_campo_nombre"]').val($('select[name="tipo_campo_nombre"] option:first').val());
+                $('select[name="etapa_campo_nombre"]').val($('select[name="etapa_campo_nombre"] option:first').val());
+                $('#video_campo').val('');
+            });
+            */
         </script>
+
         @yield('script_validacion_campos')
+
     @endif
 @endsection
 
 
 {{-- Modulo eliminar --}}
 @section('modulo_eliminar')
-    @parent
-    {{-- Tu código queda igual --}}
+
+    <form action="{{ route('proyectos.eliminar') }}" method="POST">
+        {{-- Muy importante la directiva siguiente. --}}
+        @csrf
+
+        {{-- Aquí se debe guardar el numero de control a enviar al método del controlador para eliminar. --}}
+        <input type="hidden" name="clave_proyecto_eliminar" id="clave_proyecto_eliminar">
+
+        <div class="modal-header">
+            <h4 class="modal-title">Eliminar @yield('administrar_s')</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <div class="modal-body">
+            <p>¿Seguro que quiere eliminar este registro?</p>
+            <p class="text-warning"><small>Esta acción no se podrá deshacer.</small></p>
+        </div>
+        <div class="modal-footer">
+            <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+            <input type="submit" class="btn btn-danger" value="Eliminar">
+        </div>
+    </form>
+
+    {{-- Escucha que identifica según el atributo data-clave-proyecto el registro que se va a eliminar. --}}
+    <script>
+        $(document).ready(function() {
+            $('a.delete').click(function() {
+                var clave_proyecto = $(this).data('clave-proyecto');
+                $('#clave_proyecto_eliminar').val(clave_proyecto);
+
+                //console.log("No control:", noControl);
+            });
+        });
+    </script>
+
 @endsection
 
 
 {{-- Modulo eliminar para multiples registros --}}
 @section('modulo_eliminar_multiple')
-    @parent
-    {{-- Tu código queda igual --}}
+    <form id="formulario_eliminar_multiple" action="{{ route('proyectos.eliminarMultiple') }}" method="POST">
+
+        {{-- Muy importante la directiva siguiente. --}}
+        @csrf
+
+        <div class="modal-header">
+            <h4 class="modal-title">Eliminar @yield('administrar_s')</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <div class="modal-body">
+            <p>¿Seguro que quieres eliminar estos registros?</p>
+            <p class="text-warning"><small>Esta acción no se podrá deshacer.</small></p>
+        </div>
+        <div class="modal-footer">
+            <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+            <input type="submit" class="btn btn-danger" value="Eliminar">
+        </div>
+    </form>
+
 @endsection
 
-
-{{-- NUEVO: Módulo para ver detalles del proyecto --}}
+{{-- NUEVO: Modulo para ver detalles del proyecto --}}
 @section('modulo_ver')
     <div class="modal-header">
-        <h4 class="modal-title">Detalles del @yield('administrar_s')</h4>
+        <h4 class="modal-title">Detalles del Proyecto</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     </div>
     <div class="modal-body">
-        <div class="form-group">
-            <h5>Clave del Proyecto</h5>
-            <p id="view_clave_proyecto"></p>
-        </div>
-        <div class="form-group">
-            <h5>Nombre</h5>
-            <p id="view_nombre"></p>
-        </div>
-        <div class="form-group">
-            <h5>Nombre Descriptivo</h5>
-            <p id="view_nombre_descriptivo"></p>
-        </div>
-        <div class="form-group">
-            <h5>Descripción</h5>
-            <p id="view_descripcion" style="white-space: pre-wrap;"></p>
-        </div>
-        <div class="form-group">
-            <h5>Categoría</h5>
-            <p id="view_categoria"></p>
-        </div>
-        <div class="form-group">
-            <h5>Tipo</h5>
-            <p id="view_tipo"></p>
-        </div>
-        <div class="form-group">
-            <h5>Etapa</h5>
-            <p id="view_etapa"></p>
-        </div>
-        <div class="form-group">
-            <h5>Video</h5>
-            <a id="view_video_link" href="#" target="_blank"></a>
-            <p id="view_no_video" style="display: none;">Sin video disponible</p>
-        </div>
-        <div class="form-group">
-            <h5>Fecha de Registro</h5>
-            <p id="view_fecha_agregado"></p>
-        </div>
+        <p><strong>Clave del Proyecto:</strong> <span id="view_clave_proyecto"></span></p>
+        <p><strong>Nombre:</strong> <span id="view_nombre"></span></p>
+        <p><strong>Nombre Descriptivo:</strong> <span id="view_nombre_descriptivo"></span></p>
+        <p><strong>Descripción:</strong> <span id="view_descripcion" style="white-space: pre-wrap;"></span></p>
+        <p><strong>Categoría:</strong> <span id="view_categoria"></span></p>
+        <p><strong>Tipo:</strong> <span id="view_tipo"></span></p>
+        <p><strong>Etapa:</strong> <span id="view_etapa"></span></p>
+        <p><strong>Video:</strong> <span id="view_video_container"><a id="view_video_link" href="#" target="_blank"></a></span></p>
+        <p><strong>Fecha de Agregado:</strong> <span id="view_fecha_agregado"></span></p>
     </div>
     <div class="modal-footer">
-        <input type="button" class="btn btn-info" data-dismiss="modal" value="Cerrar">
+        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cerrar">
     </div>
 
-    {{-- NUEVO: Script para poblar el modal de visualización --}}
     <script>
         $(document).ready(function() {
             $('a.view').click(function() {
-                // Obtener datos del botón presionado
                 var claveProyecto = $(this).data('clave-proyecto');
                 var nombre = $(this).data('nombre');
                 var nombreDescriptivo = $(this).data('nombre_descriptivo');
                 var descripcion = $(this).data('descripcion');
-                var categoriaNombre = $(this).data('categoria_nombre');
-                var tipoNombre = $(this).data('tipo_nombre');
-                var etapaNombre = $(this).data('etapa_nombre');
+                var categoriaNombre = $(this).data('categoria-nombre');
+                var tipoNombre = $(this).data('tipo-nombre');
+                var etapaNombre = $(this).data('etapa-nombre');
                 var video = $(this).data('video');
-                var fechaAgregado = $(this).data('fecha_agregado');
+                var fechaAgregado = $(this).data('fecha-agregado');
 
-                // Poblar el modal con los datos
                 $('#view_clave_proyecto').text(claveProyecto);
                 $('#view_nombre').text(nombre);
                 $('#view_nombre_descriptivo').text(nombreDescriptivo);
@@ -374,13 +805,13 @@
                 $('#view_etapa').text(etapaNombre);
                 $('#view_fecha_agregado').text(fechaAgregado);
 
-                // Manejar el enlace del video
-                if (video && video !== 'No' && video !== 'no') {
-                    $('#view_video_link').attr('href', video).text('Ver video en una nueva pestaña').show();
-                    $('#view_no_video').hide();
+                var videoLink = $('#view_video_link');
+                if (video && video.trim() !== '' && video.trim().toLowerCase() !== 'no') {
+                    videoLink.attr('href', video).text('Ver Video');
+                    videoLink.parent().show(); // Muestra el contenedor si hay video
                 } else {
-                    $('#view_video_link').hide();
-                    $('#view_no_video').show();
+                    videoLink.parent().hide(); // Oculta el contenedor si no hay video
+                    videoLink.attr('href', '#').text('Sin Video'); // Resetea el texto por si acaso
                 }
             });
         });
