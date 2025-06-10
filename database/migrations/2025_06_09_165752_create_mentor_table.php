@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB; 
 
 return new class extends Migration
 {
@@ -11,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('especialidades', function (Blueprint $table) {
-            $table->id('idEspecialidad');
-            $table->string('nombre', 100); 
-            $table->timestamps(); 
+        Schema::create('mentor', function (Blueprint $table) {
+            $table->increments('idMentor'); 
+            $table->string('nombre', 50)->nullable(); 
+            $table->dateTime('fecha_agregado')->default(DB::raw('CURRENT_TIMESTAMP')); 
         });
     }
 
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('especialidades');
+        Schema::dropIfExists('mentor');
     }
 };
