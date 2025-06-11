@@ -21,7 +21,7 @@ use App\Http\Controllers\{
     MentorController,
     ServicioController,
     InicioController,
-    habilidadesAMController,
+    habilidadesAMController, // NUEVO: Asegúrate de que el nombre de la clase sea exactamente 'habilidadesAMController'
     TokenController
 };
 
@@ -170,16 +170,29 @@ Route::group(['middleware' => ['role:admin']], function () {
 
     //CRUD Usuarios
     Route::get('/c_usuarios', [UsuarioController::class, 'index']);
-    // Route::post('/c_usuarios/agregar', [UsuarioController::class, 'agregar'])->name('usuarios.agregar');
+    // Route::post('/c_usuarios/agregar', [UsuarioController::class, 'agregar'])->name('usuarios.agregar'); // Comentada o eliminada si no se usa
     Route::post('/c_usuarios/editar', [UsuarioController::class, 'editar'])->name('usuarios.editar');
     Route::post('/c_usuarios/eliminar', [UsuarioController::class, 'eliminar'])->name('usuarios.eliminar');
     Route::post('c_usuarios/eliminarMultiple', [UsuarioController::class, 'eliminarMultiple'])->name('usuarios.eliminarMultiple');
 
-    Route::get('/c_habilidadesAM', [habilidadesAMController::class, 'index']);
-    Route::post('/c_habilidadesAM/agregar', [habilidadesAMController::class, 'agregar'])->name('habilidadesAM.agregar');
-    Route::post('/c_habilidadesAM/editar', [habilidadesAMController::class,'editar'])->name('habilidadesAM.editar');
-    Route::post('/c_habilidadesAM/eliminar', [HabilidadesAMController::class,'eliminar'])->name('habilidadesAM.editar');
-    Route::post('/c_habilidadesAM/eliminarMultiple', [HabilidadesAMController::class,'eliminarMultiple'])->name('habilidadesAM.eliminarMultiple');
+    // RUTAS PARA EL NUEVO CRUD DE ASIGNACIÓN DE HABILIDADES A ASESORES/MENTORES
+    // Ojo: Asegúrate de que el controlador se llama 'habilidadesAMController' en el archivo App\Http\Controllers
+    Route::prefix('c_habilidadesAM_asignar')->group(function () { // Cambiado el prefijo para evitar colisión con c_habilidades
+        Route::get('/', [habilidadesAMController::class, 'index'])->name('habilidadesAM.index');
+        Route::post('/get-usuarios-por-tipo', [habilidadesAMController::class, 'getUsuariosPorTipo'])->name('habilidadesAM.getUsuariosPorTipo');
+        Route::post('/get-habilidades-usuario', [habilidadesAMController::class, 'getHabilidadesUsuario'])->name('habilidadesAM.getHabilidadesUsuario');
+        Route::post('/add-habilidad', [habilidadesAMController::class, 'addHabilidad'])->name('habilidadesAM.addHabilidad');
+        Route::post('/remove-habilidad', [habilidadesAMController::class, 'removeHabilidad'])->name('habilidadesAM.removeHabilidad');
+    });
+
+    // Estas rutas estaban previamente en tu código, pero apuntaban al controlador incorrecto
+    // o tenían nombres de ruta que no concordaban con las acciones.
+    // Las he comentado/eliminado para evitar conflictos y que se usen las nuevas rutas AJAX.
+    // Route::get('/c_habilidadesAM', [habilidadesAMController::class, 'index']);
+    // Route::post('/c_habilidadesAM/agregar', [habilidadesAMController::class, 'agregar'])->name('habilidadesAM.agregar');
+    // Route::post('/c_habilidadesAM/editar', [habilidadesAMController::class,'editar'])->name('habilidadesAM.editar');
+    // Route::post('/c_habilidadesAM/eliminar', [HabilidadesAMController::class,'eliminar'])->name('habilidadesAM.editar');
+    // Route::post('/c_habilidadesAM/eliminarMultiple', [HabilidadesAMController::class,'eliminarMultiple'])->name('habilidadesAM.eliminarMultiple');
 });
 
 

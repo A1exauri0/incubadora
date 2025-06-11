@@ -275,6 +275,7 @@
                                         </div>
                                     </div>
                                     <a href="/c_habilidades">Habilidades</a>
+                                    <a href="/c_habilidadesAM_asignar">HabilidadesAM</a>
                                     <a href="/c_mentores">Mentores</a>
                                     <a href="/c_servicios">Servicios</a>
                                 </div>

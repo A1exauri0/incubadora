@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Asesor; // Asegúrate de que este modelo exista
-use App\Models\Mentor; // Asegúrate de que este modelo exista
-use App\Models\Habilidad; // Asegúrate de que este modelo exista
+use App\Models\Asesor;
+use App\Models\Mentor;
+use App\Models\Habilidad;
 
-class habilidadesAMController extends Controller // Nombre del controlador según tu snippet
+class HabilidadAsesorMentorController extends Controller
 {
     /**
      * Muestra la vista principal del CRUD de asignación de habilidades.
@@ -15,34 +15,24 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
     public function index()
     {
         $titulo = "Asignar Habilidades";
-        // Las colecciones completas se pasan inicialmente,
-        // pero la interacción será con AJAX
-        $asesores = Asesor::all(['idAsesor', 'nombre']);
-        $mentores = Mentor::all(['idMentor', 'nombre']);
-        $habilidades = Habilidad::all(['idHabilidad', 'nombre']); // Todas las habilidades disponibles
+        $asesores = Asesor::all(['idAsesor', 'nombre']); // Solo id y nombre
+        $mentores = Mentor::all(['idMentor', 'nombre']); // Solo id y nombre
+        $habilidades = Habilidad::all(['idHabilidad', 'nombre']); // Solo id y nombre
 
-        // Esta vista no usará las secciones 'total_registros', 'columnas', 'datos', 'paginacion' del layout,
-        // ya que su contenido es completamente dinámico y no una tabla CRUD estándar.
-        // Lo que se pasa es para la inicialización de los dropdowns.
         return view('Admin.cruds.habilidades_asignar', compact('titulo', 'asesores', 'mentores', 'habilidades'));
     }
 
     /**
      * Obtiene los usuarios (asesores o mentores) según el tipo seleccionado.
-     * Responde con JSON.
      */
     public function getUsuariosPorTipo(Request $request)
     {
-        $request->validate(['tipo' => 'required|in:asesor,mentor']);
-
         $tipo = $request->input('tipo');
         $usuarios = [];
 
         if ($tipo === 'asesor') {
-            // Alias 'idAsesor' a 'id' para uniformar la estructura de respuesta
             $usuarios = Asesor::all(['idAsesor as id', 'nombre'])->toArray();
         } elseif ($tipo === 'mentor') {
-            // Alias 'idMentor' a 'id' para uniformar la estructura de respuesta
             $usuarios = Mentor::all(['idMentor as id', 'nombre'])->toArray();
         }
 
@@ -51,15 +41,9 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
 
     /**
      * Obtiene las habilidades actuales del usuario seleccionado y las disponibles.
-     * Responde con JSON.
      */
     public function getHabilidadesUsuario(Request $request)
     {
-        $request->validate([
-            'tipo' => 'required|in:asesor,mentor',
-            'idUsuario' => 'required|integer',
-        ]);
-
         $tipo = $request->input('tipo');
         $idUsuario = $request->input('idUsuario');
 
@@ -69,22 +53,20 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
         if ($tipo === 'asesor') {
             $asesor = Asesor::find($idUsuario);
             if ($asesor) {
-                // Obtener habilidades del asesor con su ID y nombre
                 $currentSkills = $asesor->habilidades()->get(['habilidad.idHabilidad', 'habilidad.nombre'])->toArray();
             }
         } elseif ($tipo === 'mentor') {
             $mentor = Mentor::find($idUsuario);
             if ($mentor) {
-                // Obtener habilidades del mentor con su ID y nombre
                 $currentSkills = $mentor->habilidades()->get(['habilidad.idHabilidad', 'habilidad.nombre'])->toArray();
             }
         }
 
-        // Obtener todas las habilidades de la base de datos
+        // Obtener todas las habilidades
         $allSkills = Habilidad::all(['idHabilidad', 'nombre'])->toArray();
 
         // Calcular habilidades disponibles (todas - actuales)
-        $currentSkillIds = array_column($currentSkills, 'idHabilidad'); // Obtener solo los IDs de las habilidades actuales
+        $currentSkillIds = array_column($currentSkills, 'idHabilidad');
         foreach ($allSkills as $skill) {
             if (!in_array($skill['idHabilidad'], $currentSkillIds)) {
                 $availableSkills[] = $skill;
@@ -99,14 +81,13 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
 
     /**
      * Asigna una habilidad a un asesor o mentor.
-     * Responde con JSON.
      */
     public function addHabilidad(Request $request)
     {
         $request->validate([
             'tipo' => 'required|in:asesor,mentor',
             'idUsuario' => 'required|integer',
-            'idHabilidad' => 'required|integer|exists:habilidad,idHabilidad', // Valida que la habilidad exista
+            'idHabilidad' => 'required|integer',
         ]);
 
         $tipo = $request->input('tipo');
@@ -114,11 +95,12 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
         $idHabilidad = $request->input('idHabilidad');
 
         try {
-            $usuario = null;
             if ($tipo === 'asesor') {
                 $usuario = Asesor::find($idUsuario);
             } elseif ($tipo === 'mentor') {
                 $usuario = Mentor::find($idUsuario);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Tipo de usuario inválido.'], 400);
             }
 
             if (!$usuario) {
@@ -131,22 +113,20 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
             return response()->json(['success' => true, 'message' => 'Habilidad asignada con éxito.']);
 
         } catch (\Exception $e) {
-            // Manejar errores de base de datos, aunque attach ya debería manejar duplicados internamente
-            // Esta excepción se activaría si hay otro tipo de error de DB
+            // Manejar errores de base de datos, como violación de clave primaria (si no se usara attach())
             return response()->json(['success' => false, 'message' => 'Error al asignar la habilidad: ' . $e->getMessage()], 500);
         }
     }
 
     /**
      * Desasigna una habilidad de un asesor o mentor.
-     * Responde con JSON.
      */
     public function removeHabilidad(Request $request)
     {
         $request->validate([
             'tipo' => 'required|in:asesor,mentor',
             'idUsuario' => 'required|integer',
-            'idHabilidad' => 'required|integer|exists:habilidad,idHabilidad', // Valida que la habilidad exista
+            'idHabilidad' => 'required|integer',
         ]);
 
         $tipo = $request->input('tipo');
@@ -154,11 +134,12 @@ class habilidadesAMController extends Controller // Nombre del controlador segú
         $idHabilidad = $request->input('idHabilidad');
 
         try {
-            $usuario = null;
             if ($tipo === 'asesor') {
                 $usuario = Asesor::find($idUsuario);
             } elseif ($tipo === 'mentor') {
                 $usuario = Mentor::find($idUsuario);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Tipo de usuario inválido.'], 400);
             }
 
             if (!$usuario) {

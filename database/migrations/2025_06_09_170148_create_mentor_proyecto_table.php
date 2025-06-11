@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mentor_proyecto', function (Blueprint $table) {
-            $table->unsignedInteger('idMentor')->nullable();
+            $table->unsignedBigInteger('idMentor')->nullable();
             $table->char('clave_proyecto', 50)->nullable();
             $table->dateTime('fecha_agregado')->default(DB::raw('CURRENT_TIMESTAMP'));
 

@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
             ProyectoResultadosSeeder::class,
             RolePermissionSeeder::class,
             ModelHasRolesSeeder::class,
+            HabilidadAsesorSeeder::class,
+            HabilidadMentorSeeder::class
         ]);
 
     }

@@ -7,26 +7,25 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB; // Importar la fachada DB
 use Illuminate\Support\Arr; // Importar la clase Arr para métodos útiles
 
-class HabilidadAsesorSeeder extends Seeder
+class HabilidadMentorSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Opcional: Puedes truncar la tabla si siempre quieres empezar desde cero.
-        // Cuidado si ya tienes datos importantes en esta tabla pivote.
-        // DB::table('habilidad_asesor')->truncate();
+        // Opcional: Puedes truncar la tabla antes de sembrar para evitar duplicados.
+        // DB::table('habilidad_mentor')->truncate();
 
-        // Obtener los IDs de los primeros 3 asesores
-        $asesorIds = DB::table('asesor')->pluck('idAsesor')->take(3)->toArray();
+        // Obtener los IDs de los primeros 3 mentores
+        $mentorIds = DB::table('mentor')->pluck('idMentor')->take(3)->toArray();
 
         // Obtener los IDs de las primeras 2 habilidades
         $habilidadIdsAvailable = DB::table('habilidad')->pluck('idHabilidad')->take(2)->toArray();
 
         // Verificar si tenemos suficientes datos para sembrar
-        if (empty($asesorIds)) {
-            $this->command->warn("Advertencia: No se encontraron asesores. Asegúrate de que la tabla 'asesor' tenga al menos 3 registros.");
+        if (empty($mentorIds)) {
+            $this->command->warn("Advertencia: No se encontraron mentores. Asegúrate de que la tabla 'mentor' tenga al menos 3 registros.");
             return;
         }
 
@@ -36,13 +35,12 @@ class HabilidadAsesorSeeder extends Seeder
         }
 
         $data = [];
-        // Asignar 1 o 2 habilidades aleatorias a cada uno de los 3 asesores seleccionados
-        foreach ($asesorIds as $asesorId) {
-            // Seleccionar cuántas habilidades asignar a este asesor (entre 1 y 2, dado que solo hay 2 disponibles)
+        // Asignar 1 o 2 habilidades aleatorias a cada uno de los 3 mentores seleccionados
+        foreach ($mentorIds as $mentorId) {
+            // Seleccionar cuántas habilidades asignar a este mentor (entre 1 y 2)
             $numHabilidadesToAssign = rand(1, count($habilidadIdsAvailable));
-            
+
             // Seleccionar habilidades únicas aleatoriamente del pool disponible
-            // Arr::random puede devolver un solo valor o un array, dependiendo de $numHabilidadesToAssign
             $selectedHabilidades = Arr::random($habilidadIdsAvailable, $numHabilidadesToAssign);
 
             // Asegurarse de que $selectedHabilidades siempre sea un array para el foreach
@@ -52,16 +50,15 @@ class HabilidadAsesorSeeder extends Seeder
 
             foreach ($selectedHabilidades as $habilidadId) {
                 $data[] = [
-                    'idAsesor' => $asesorId,
+                    'idMentor' => $mentorId,
                     'idHabilidad' => $habilidadId,
                 ];
             }
         }
 
         // Usar insertOrIgnore para que no falle si ya existen entradas duplicadas
-        // (por ejemplo, si ejecutas el seeder varias veces sin truncar la tabla)
-        DB::table('habilidad_asesor')->insertOrIgnore($data);
+        DB::table('habilidad_mentor')->insertOrIgnore($data);
 
-        $this->command->info('Tabla habilidad_asesor sembrada con ' . count($data) . ' registros (sin duplicados preexistentes).');
+        $this->command->info('Tabla habilidad_mentor sembrada con ' . count($data) . ' registros (sin duplicados preexistentes).');
     }
 }

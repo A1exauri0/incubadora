@@ -4,11 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- ¡NUEVO: Importante para peticiones AJAX! --}}
     <title>@yield('titulo') - ITTG</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    {{-- Scripts JS en el head (se cargarán antes, considerar mover a @stack('scripts') para optimización si es posible) --}}
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
@@ -89,7 +91,6 @@
             width: 60px;
         }
 
-        /* MODIFICACIÓN: Aumenta el ancho de la última columna para las acciones */
         table.table tr th:last-child {
             width: 130px; /* Ajustado de 100px a 130px para dar espacio */
         }
@@ -326,89 +327,100 @@
 </head>
 
 <body>
-    <div class="container-xl">
-        <div class="table-responsive">
-            <div class="table-wrapper">
-                <div class="table-title">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h2>Administrar <b>@yield('administrar')</b></h2>
-                        </div>
-                        <div class="col-sm-6">
-                            <a id="btnAgregar" href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
-                                    class="material-icons"></i> <span>Agregar @yield('administrar_s')</span></a>
-                            <a id="btnEliminar" href="#deleteMultipleEmployeeModal" class="btn btn-danger" data-toggle="modal">
-                                <i class="material-icons"></i> <span>Eliminar</span></a>
-
+    {{-- AHORA EL CONTENIDO PRINCIPAL SE INYECTA AQUÍ --}}
+    @section('content')
+        <div class="container-xl">
+            <div class="table-responsive">
+                <div class="table-wrapper">
+                    <div class="table-title">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h2>Administrar <b>@yield('administrar')</b></h2>
+                            </div>
+                            <div class="col-sm-6">
+                                {{-- Estos botones solo aparecen si la sección 'modulo_agregar' existe --}}
+                                @hasSection('modulo_agregar')
+                                <a id="btnAgregar" href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
+                                        class="material-icons"></i> <span>Agregar @yield('administrar_s')</span></a>
+                                @endif
+                                {{-- Estos botones solo aparecen si la sección 'modulo_eliminar_multiple' existe --}}
+                                @hasSection('modulo_eliminar_multiple')
+                                <a id="btnEliminar" href="#deleteMultipleEmployeeModal" class="btn btn-danger" data-toggle="modal">
+                                    <i class="material-icons"></i> <span>Eliminar</span></a>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    <table id='tabla_datos' class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                @hasSection('script_checkboxes') {{-- Mostrar checkbox solo si se usa el script --}}
+                                <th>
+                                    <span class="custom-checkbox">
+                                        <input type="checkbox" id="selectAll">
+                                        <label for="selectAll"></label>
+                                    </span>
+                                </th>
+                                @endif
+                                @yield('columnas')
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @yield('datos')
+                        </tbody>
+                    </table>
+                    <div class="clearfix">
+                        {{-- <div class="hint-text ocultar">Mostrando <b>@yield('mostrando')</b> de <b>@yield('total_registros')</b> registros</div> --}}
+                        <div class="hint-text">Mostrando un máximo <b>20</b> registros por página, hay un total de <b>@yield('total_registros')</b> registros encontrados.</div>
+                        @yield('paginacion')
+                    </div>
                 </div>
-                <table id='tabla_datos' class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>
-                                <span class="custom-checkbox">
-                                    <input type="checkbox" id="selectAll">
-                                    <label for="selectAll"></label>
-                                </span>
-                            </th>
-                            @yield('columnas')
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @yield('datos')
-                    </tbody>
-                </table>
-                <div class="clearfix">
-                    {{-- <div class="hint-text ocultar">Mostrando <b>@yield('mostrando')</b> de <b>@yield('total_registros')</b> registros</div> --}}
-                    <div class="hint-text">Mostrando un máximo <b>20</b> registros por página, hay un total de <b>@yield('total_registros')</b> registros encontrados.</div>
-                    @yield('paginacion')
+            </div>
+        </div>
+        <!-- Add Modal HTML -->
+        <div id="addEmployeeModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @yield('modulo_agregar')
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Add Modal HTML (Mantengo el nombre original de 'Employee' para no cambiar su referencia) -->
-    <div id="addEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                @yield('modulo_agregar')
+        <!-- Edit Modal HTML -->
+        <div id="editEmployeeModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @yield('modulo_editar')
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Edit Modal HTML -->
-    <div id="editEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                @yield('modulo_editar')
+        <!-- Delete Modal HTML -->
+        <div id="deleteEmployeeModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @yield('modulo_eliminar')
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Delete Modal HTML -->
-    <div id="deleteEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                @yield('modulo_eliminar')
+        <!-- Multiple Delete Modal HTML -->
+        <div id="deleteMultipleEmployeeModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                        @yield('modulo_eliminar_multiple')
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Multiple Delete Modal HTML -->
-    <div id="deleteMultipleEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                    @yield('modulo_eliminar_multiple')
-            </div>
-        </div>
-    </div>
 
-    {{-- Nuevo: View Modal HTML --}}
-    <div id="viewProjectModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                @yield('modulo_ver')
+        {{-- View Modal HTML (para ver detalles) --}}
+        <div id="viewProjectModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @yield('modulo_ver')
+                </div>
             </div>
         </div>
-    </div>
+    @show {{-- @show permite que la sección 'content' tenga un contenido por defecto --}}
 
+    @stack('scripts') {{-- ¡NUEVO: Aquí se inyectarán los scripts personalizados de las vistas! --}}
 </body>
 
 </html>
