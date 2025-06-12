@@ -1,17 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>@yield('titulo') - ITTG</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    
     <style>
         .ocultar {
             display: none;
@@ -91,7 +89,8 @@
 
         /* MODIFICACIÓN: Aumenta el ancho de la última columna para las acciones */
         table.table tr th:last-child {
-            width: 130px; /* Ajustado de 100px a 130px para dar espacio */
+            width: 130px;
+            /* Ajustado de 100px a 130px para dar espacio */
         }
 
         table.table-striped tbody tr:nth-of-type(odd) {
@@ -111,22 +110,28 @@
         /* MODIFICACIÓN: Aplica Flexbox al contenedor de los íconos de acción */
         .action-buttons {
             display: flex;
-            gap: 8px; /* Espacio entre los botones */
-            justify-content: center; /* Centra horizontalmente los botones dentro de la celda */
-            align-items: center; /* Alinea verticalmente los botones */
-            width: 100%; /* Asegura que el contenedor ocupe todo el ancho de la celda */
+            gap: 8px;
+            /* Espacio entre los botones */
+            justify-content: center;
+            /* Centra horizontalmente los botones dentro de la celda */
+            align-items: center;
+            /* Alinea verticalmente los botones */
+            width: 100%;
+            /* Asegura que el contenedor ocupe todo el ancho de la celda */
         }
 
         /* MODIFICACIÓN: Elimina los márgenes del ícono cuando están dentro de action-buttons,
-           ya que 'gap' de flexbox ya maneja el espaciado */
+          ya que 'gap' de flexbox ya maneja el espaciado */
         .action-buttons .material-icons {
             margin: 0;
-            font-size: 19px; /* Mantener tamaño original */
+            font-size: 19px;
+            /* Mantener tamaño original */
         }
 
         /* Asegurarse que los 'a' dentro de action-buttons se comporten como flex items */
         .action-buttons a {
-            display: flex; /* Convierte los enlaces en contenedores flex para centrar el icono si es necesario */
+            display: flex;
+            /* Convierte los enlaces en contenedores flex para centrar el icono si es necesario */
             align-items: center;
             justify-content: center;
             /* Si tienes algún padding/margin adicional aquí, podrías ajustarlo */
@@ -152,12 +157,14 @@
             color: #F44336;
         }
 
-        table.table td a.view { /* Nuevo estilo para el botón de ver */
-            color: #03A9F4; /* Un color azul para diferenciarlo */
+        table.table td a.view {
+            /* Nuevo estilo para el botón de ver */
+            color: #03A9F4;
+            /* Un color azul para diferenciarlo */
         }
 
         /* table.table td i { Estas reglas ahora pueden ser más específicas si es necesario,
-            font-size: 19px;     pero .action-buttons .material-icons ya lo maneja
+          font-size: 19px;     pero .action-buttons .material-icons ya lo maneja
         } */
 
         table.table .avatar {
@@ -367,7 +374,6 @@
             </div>
         </div>
     </div>
-    <!-- Add Modal HTML (Mantengo el nombre original de 'Employee' para no cambiar su referencia) -->
     <div id="addEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -375,7 +381,6 @@
             </div>
         </div>
     </div>
-    <!-- Edit Modal HTML -->
     <div id="editEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -383,7 +388,6 @@
             </div>
         </div>
     </div>
-    <!-- Delete Modal HTML -->
     <div id="deleteEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -391,7 +395,6 @@
             </div>
         </div>
     </div>
-    <!-- Multiple Delete Modal HTML -->
     <div id="deleteMultipleEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">

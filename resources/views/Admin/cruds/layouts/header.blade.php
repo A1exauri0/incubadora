@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-100" data-bs-theme="auto">
+<html lang="es" class="h-100" data-bs-theme="auto">
 
 <head>
 
@@ -8,18 +8,13 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
-    <!-- <title>@yield('titulo') - ITTG</title> -->
-
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sticky-footer-navbar/">
-
-
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <!-- Favicons -->
     <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
     <link rel="icon" href="favicon.ico" sizes="32x32" type="x-icon">
     <link rel="icon" href="favicon.ico" sizes="16x16" type="x-icon">
@@ -158,40 +153,31 @@
         }
 
         /* Submenú estilos */
-        .dropdown.submenu {
-            position: relative;
-        }
-
-        .dropdown.submenu .content {
-            left: 100%;
-            /* Posiciona el submenú a la derecha */
-            top: 0;
-            display: none;
-            /* Oculta el submenú por defecto */
-            position: absolute;
+        .dropdown-menu {
             background-color: #036ee0;
-            box-shadow: 2px 2px 2px #000000;
+            border: none;
         }
 
-        .dropdown.submenu:hover .content {
-            display: block;
-            /* Muestra el submenú al pasar el cursor */
-        }
-
-        .dropdown.submenu a {
-            padding: 8px 15px;
-            text-decoration: none;
+        .dropdown-menu .dropdown-item {
             color: #ffffff;
         }
 
-        .dropdown.submenu .content a:hover {
+        .dropdown-menu .dropdown-item:hover,
+        .dropdown-menu .dropdown-item:focus {
             background-color: #084b92;
-            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .dropdown-menu .dropdown-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-nav .nav-item .nav-link.dropdown-toggle {
+            color: #ffffff;
         }
     </style>
 
 
-    <!-- Custom styles for this template -->
     <link href="css/style.css" rel="stylesheet">
 </head>
 
@@ -242,12 +228,14 @@
 
 
     <header>
-        <!-- Fixed navbar -->
         <nav class="navbar navbar-expand-md navbar-dark fixed-top">
             <div class="container-fluid">
-                <img src="{{ asset('images/logo_tec.png') }}" alt="Logo Tec" width="50" style="margin-right: 10px;">
-                <a class="navbar-brand" href="#">IncubaTec</a>                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <a href="/home">
+                    <img src="{{ asset('images/logo_tec.png') }}" alt="Logo Tec" width="50"
+                        style="margin-right: 10px;">
+                </a> <a class="navbar-brand" href="">IncubaTec</a> <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
+                    aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -256,37 +244,45 @@
                             <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <!--DROPDOWN-->
-                            <div class="dropdown">
-                                <a class="nav-link active" href="#">Catálogos</a>
-                                <div class="content">
-                                    <a href="/c_alumnos">Alumnos</a>
-                                    <a href="/c_asesores">Asesores</a>
-                                    <a href="/c_carreras">Carreras</a>
-                                    <a href="/c_categorias">Categorías</a>
-                                    <a href="/c_tokens">Tokens</a>
-                                    <!-- Submenú -->
-                                    <div class="dropdown submenu">
-                                        <a class="nav-link" href="/c_proyectos">&nbsp;Proyectos ></a>
-                                        <div class="content">
-                                            <a href="/c_etapas">Etapas</a>
-                                            <a href="/c_tipos">Tipos</a>
-                                            <a href="/c_participantes">Participantes</a>
-                                        </div>
-                                    </div>
-                                    <a href="/c_habilidades">Habilidades</a>
-                                    <a href="/c_mentores">Mentores</a>
-                                    <a href="/c_servicios">Servicios</a>
-                                </div>
-                            </div>
-                            <!--DROPDOWN-->
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Catálogos
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/c_alumnos">Alumnos</a></li>
+                                <li><a class="dropdown-item" href="/c_asesores">Asesores</a></li>
+                                <li><a class="dropdown-item" href="/c_carreras">Carreras</a></li>
+                                <li><a class="dropdown-item" href="/c_categorias">Categorías</a></li>
+                                <li><a class="dropdown-item" href="/c_tokens">Tokens</a></li>
+                                <li><a class="dropdown-item" href="/c_habilidades">Habilidades</a></li>
+                                <li><a class="dropdown-item" href="/c_mentores">Mentores</a></li>
+                                <li><a class="dropdown-item" href="/c_servicios">Servicios</a></li>
+
+                            </ul>
                         </li>
+                        <li class="nav-item">
+                            <div class="btn-group">
+                                <a href="/c_proyectos" class="btn btn-primary">Proyectos</a>
+                                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                                    <span class="visually-hidden">Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/c_participantes">Participantes</a></li>
+                                    <li><a class="dropdown-item" href="/c_tipos">Tipos</a></li>
+                                    <li><a class="dropdown-item" href="/c_etapas">Etapas</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                            </li>
 
                     </ul>
 
-                    <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}" method="POST">
+                    <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}"
+                        method="POST">
                         @csrf
-                        <button class="btn btn-danger" type="submit" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <button class="btn btn-danger" type="submit"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Cerrar sesión
                         </button>
                     </form>
@@ -295,6 +291,13 @@
         </nav>
     </header>
 
-    <!-- Begin page content -->
     <main class="flex-shrink-0">
         <div class="container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

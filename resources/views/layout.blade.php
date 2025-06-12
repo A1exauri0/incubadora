@@ -154,35 +154,27 @@
         }
 
         /* Submenú estilos */
-        .dropdown.submenu {
-            position: relative;
-        }
-
-        .dropdown.submenu .content {
-            left: 100%;
-            /* Posiciona el submenú a la derecha */
-            top: 0;
-            display: none;
-            /* Oculta el submenú por defecto */
-            position: absolute;
+        .dropdown-menu {
             background-color: #036ee0;
-            box-shadow: 2px 2px 2px #000000;
+            border: none;
         }
 
-        .dropdown.submenu:hover .content {
-            display: block;
-            /* Muestra el submenú al pasar el cursor */
-        }
-
-        .dropdown.submenu a {
-            padding: 8px 15px;
-            text-decoration: none;
+        .dropdown-menu .dropdown-item {
             color: #ffffff;
         }
 
-        .dropdown.submenu .content a:hover {
+        .dropdown-menu .dropdown-item:hover,
+        .dropdown-menu .dropdown-item:focus {
             background-color: #084b92;
-            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .dropdown-menu .dropdown-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-nav .nav-item .nav-link.dropdown-toggle {
+            color: #ffffff;
         }
     </style>
 
@@ -196,8 +188,11 @@
         <!-- Fixed navbar -->
         <nav class="navbar navbar-expand-md navbar-dark fixed-top">
             <div class="container-fluid">
-                <img src="{{ asset('images/logo_tec.png') }}" alt="Logo Tec" width="50" style="margin-right: 10px;">
-                <a class="navbar-brand" href="#">IncubaTec</a>
+                <a href="/home">
+                    <img src="{{ asset('images/logo_tec.png') }}" alt="Logo Tec" width="50"
+                        style="margin-right: 10px;">
+                </a>
+                <a class="navbar-brand" href="/home">IncubaTec</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                     aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -211,38 +206,47 @@
                         <li class="nav-item dropdown">
                             <!--ADMIN-->
                             @can('mostrar admin')
-                                <div class="dropdown">
-                                    <a class="nav-link active" href="#">Catálogos</a>
-                                    <div class="content">
-                                        <a href="/c_alumnos">Alumnos</a>
-                                        <a href="/c_asesores">Asesores</a>
-                                        <a href="/c_carreras">Carreras</a>
-                                        <a href="/c_categorias">Categorías</a>
-                                        <a href="/c_tokens">Tokens</a>
-                                        <!-- Submenú -->
-                                        <div class="dropdown submenu">
-                                            <a class="nav-link" href="/c_proyectos">&nbsp;Proyectos ></a>
-                                            <div class="content">
-                                                <a href="/c_etapas">Etapas</a>
-                                                <a href="/c_tipos">Tipos</a>
-                                                <a href="/c_participantes">Participantes</a>
-                                            </div>
-                                        </div>
-                                        <a href="/c_habilidades">Habilidades</a>
-                                        <a href="/c_mentores">Mentores</a>
-                                        <a href="/c_servicios">Servicios</a>
-                                    </div>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Catálogos
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/c_alumnos">Alumnos</a></li>
+                                    <li><a class="dropdown-item" href="/c_asesores">Asesores</a></li>
+                                    <li><a class="dropdown-item" href="/c_carreras">Carreras</a></li>
+                                    <li><a class="dropdown-item" href="/c_categorias">Categorías</a></li>
+                                    <li><a class="dropdown-item" href="/c_tokens">Tokens</a></li>
+                                    <li><a class="dropdown-item" href="/c_habilidades">Habilidades</a></li>
+                                    <li><a class="dropdown-item" href="/c_mentores">Mentores</a></li>
+                                    <li><a class="dropdown-item" href="/c_servicios">Servicios</a></li>
+
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <div class="btn-group">
+                                    <a href="/c_proyectos" class="btn btn-primary">Proyectos</a>
+                                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                                        <span class="visually-hidden">Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/c_participantes">Participantes</a></li>
+                                        <li><a class="dropdown-item" href="/c_tipos">Tipos</a></li>
+                                        <li><a class="dropdown-item" href="/c_etapas">Etapas</a></li>
+                                    </ul>
                                 </div>
-                            @endcan
-
-                            <!--ALUMNO-->
-                            @can('mostrar alumno')
-
-                            @endcan
+                            </li>
+                        @endcan
+                        <!--ALUMNO-->
+                        @can('mostrar alumno')
+                        @endcan
                         </li>
+
                     </ul>
 
-                    <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}" method="POST">
+                    <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}"
+                        method="POST">
                         @csrf
                         <button class="btn btn-danger" type="submit"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -282,7 +286,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
+    </script>
 </body>
 
 </html>
