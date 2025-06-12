@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mentor', function (Blueprint $table) {
-            $table->increments('idMentor'); 
+            $table->id('idMentor');
             $table->string('nombre', 50)->nullable(); 
             $table->dateTime('fecha_agregado')->default(DB::raw('CURRENT_TIMESTAMP')); 
         });

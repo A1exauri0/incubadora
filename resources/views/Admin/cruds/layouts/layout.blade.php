@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- ¡NUEVO: Importante para peticiones AJAX! --}}
     <title>@yield('titulo') - ITTG</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     
@@ -87,7 +88,6 @@
             width: 60px;
         }
 
-        /* MODIFICACIÓN: Aumenta el ancho de la última columna para las acciones */
         table.table tr th:last-child {
             width: 130px;
             /* Ajustado de 100px a 130px para dar espacio */
@@ -403,15 +403,17 @@
         </div>
     </div>
 
-    {{-- Nuevo: View Modal HTML --}}
-    <div id="viewProjectModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                @yield('modulo_ver')
+        {{-- View Modal HTML (para ver detalles) --}}
+        <div id="viewProjectModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @yield('modulo_ver')
+                </div>
             </div>
         </div>
-    </div>
+    @show {{-- @show permite que la sección 'content' tenga un contenido por defecto --}}
 
+    @stack('scripts') {{-- ¡NUEVO: Aquí se inyectarán los scripts personalizados de las vistas! --}}
 </body>
 
 </html>
