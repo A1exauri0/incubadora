@@ -255,13 +255,14 @@
                                 <li><a class="dropdown-item" href="/c_categorias">Categorías</a></li>
                                 <li><a class="dropdown-item" href="/c_tokens">Tokens</a></li>
                                 <li><a class="dropdown-item" href="/c_habilidades">Habilidades</a></li>
+                                <li><a class="dropdown-item" href="/c_habilidadesAM">Habilidades AM</a></li>
                                 <li><a class="dropdown-item" href="/c_mentores">Mentores</a></li>
                                 <li><a class="dropdown-item" href="/c_servicios">Servicios</a></li>
 
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <div class="btn-group">
+                            <div class="btn-group dropend">
                                 <a href="/c_proyectos" class="btn btn-primary">Proyectos</a>
                                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
                                     data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">

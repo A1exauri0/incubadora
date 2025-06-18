@@ -36,76 +36,65 @@
 @else
     @for ($i = 0; $i < $maxRows; $i++)
         <tr>
-            <!-- COLUMNA DE ALUMNOS -->
             <td class="alumno_proyecto">
                 @if (isset($alumno_proyecto[$i]))
-                    <!-- NOMBRE DEL ALUMNO -->
                     @foreach ($alumnos as $alumno)
                         @if ($alumno_proyecto[$i]->no_control === $alumno->no_control)
                             {{ $alumno->nombre }}
                         @endif
                     @endforeach
-                    <!-- BOTON DE ELIMINAR -->
                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                        data-no-control="{{ $alumno_proyecto[$i]->no_control }}">
+                        data-no-control="{{ $alumno_proyecto[$i]->no_control }}"
+                        data-clave-proyecto="{{ $alumno_proyecto[$i]->clave_proyecto }}">
                         <i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i>
                     </a>
                 @else
-                    <!-- Mostrar solo si no hay alumnos en toda la tabla -->
                     @if (!$hayAlumnos)
                         <span>No hay Alumnos registrados</span>
                     @endif
                 @endif
             </td>
 
-            <!-- COLUMNA DE CARRERAS -->
             <td class="carrera_alumno_proyecto">
-                <!-- CARRERA DEL ALUMNO -->
                 @foreach ($alumnos as $alumno)
-                    @if ($alumno_proyecto[$i]->no_control === $alumno->no_control)
+                    @if (isset($alumno_proyecto[$i]) && $alumno_proyecto[$i]->no_control === $alumno->no_control)
                         {{ $alumno->carrera }}
                     @endif
                 @endforeach
             </td>
 
-            <!-- COLUMNA DE ASESORES -->
             <td class="asesor_proyecto">
                 @if (isset($asesor_proyecto[$i]))
-                    <!-- ID DEL ASESOR -->
                     @foreach ($asesores as $asesor)
                         @if ($asesor_proyecto[$i]->idAsesor === $asesor->idAsesor)
                             {{ $asesor->nombre }}
                         @endif
                     @endforeach
-                    <!-- BOTON DE ELIMINAR -->
                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                        data-idasesor="{{ $asesor_proyecto[$i]->idAsesor }}">
+                        data-idasesor="{{ $asesor_proyecto[$i]->idAsesor }}"
+                        data-clave-proyecto="{{ $asesor_proyecto[$i]->clave_proyecto }}">
                         <i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i>
                     </a>
                 @else
-                    <!-- Mostrar solo si no hay asesores en toda la tabla -->
                     @if (!$hayAsesores)
                         <span>No hay Asesores registrados</span>
                     @endif
                 @endif
             </td>
 
-            <!-- COLUMNA DE MENTORES -->
             <td class="mentor_proyecto">
                 @if (isset($mentor_proyecto[$i]))
-                    <!-- ID DEL MENTOR -->
                     @foreach ($mentores as $mentor)
                         @if ($mentor_proyecto[$i]->idMentor === $mentor->idMentor)
                             {{ $mentor->nombre }}
                         @endif
                     @endforeach
-                    <!-- BOTON DE ELIMINAR -->
                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                        data-idmentor="{{ $mentor_proyecto[$i]->idMentor }}">
+                        data-idmentor="{{ $mentor_proyecto[$i]->idMentor }}"
+                        data-clave-proyecto="{{ $mentor_proyecto[$i]->clave_proyecto }}">
                         <i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i>
                     </a>
                 @else
-                    <!-- Mostrar solo si no hay mentores en toda la tabla -->
                     @if (!$hayMentores)
                         <span>No hay Mentores registrados</span>
                     @endif
@@ -207,6 +196,7 @@
     <input type="hidden" name="no_control_eliminar" id="no_control_eliminar">
     <input type="hidden" name="idAsesor_eliminar" id="idAsesor_eliminar">
     <input type="hidden" name="idMentor_eliminar" id="idMentor_eliminar">
+    <input type="hidden" name="clave_proyecto_eliminar" id="clave_proyecto_eliminar">
 
     <div class="modal-header">
         <h4 class="modal-title">Eliminar @yield('administrar_s')</h4>
@@ -229,10 +219,12 @@
             var noControlEliminar = $(this).data('no-control');
             var idAsesorEliminar = $(this).data('idasesor');
             var idMentorEliminar = $(this).data('idmentor');
+            var claveProyectoEliminar = $(this).data('clave-proyecto');
 
             $('#no_control_eliminar').val(noControlEliminar);
             $('#idAsesor_eliminar').val(idAsesorEliminar);
             $('#idMentor_eliminar').val(idMentorEliminar);
+            $('#clave_proyecto_eliminar').val(claveProyectoEliminar);
 
             //console.log("No control:", noControl);
         });
@@ -249,7 +241,6 @@
 </div>
 
 <div class="modal-body row">
-    <!-- Columna para la tabla -->
     <div class="col-md-6">
         <table class="table table-bordered">
             <thead>
@@ -269,7 +260,6 @@
         </table>
     </div>
 
-    <!-- Columna para el gráfico -->
     <div class="col-md-6">
         <canvas id="carrerasChart" width="400" height="400"></canvas>
     </div>

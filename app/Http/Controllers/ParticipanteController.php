@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ParticipanteController extends Controller
 {
@@ -171,12 +171,30 @@ class ParticipanteController extends Controller
         $no_control = $request->input('no_control_eliminar');
         $idAsesor = $request->input('idAsesor_eliminar');
         $idMentor = $request->input('idMentor_eliminar');
+        $clave_proyecto = $request->input('clave_proyecto_eliminar'); // Recuperamos la clave del proyecto
 
-        DB::table('alumno_proyecto')->where('no_control', '=', $no_control)->delete();
-        DB::table('asesor_proyecto')->where('idAsesor', '=', $idAsesor)->delete();
-        DB::table('mentor_proyecto')->where('idMentor', '=', $idMentor)->delete();
+        if ($no_control) {
+            DB::table('alumno_proyecto')
+                ->where('no_control', $no_control)
+                ->where('clave_proyecto', $clave_proyecto) // Filtramos por el proyecto específico
+                ->delete();
+        }
 
-        return back();
+        if ($idAsesor) {
+            DB::table('asesor_proyecto')
+                ->where('idAsesor', $idAsesor)
+                ->where('clave_proyecto', $clave_proyecto) // Filtramos por el proyecto específico
+                ->delete();
+        }
+
+        if ($idMentor) {
+            DB::table('mentor_proyecto')
+                ->where('idMentor', $idMentor)
+                ->where('clave_proyecto', $clave_proyecto) // Filtramos por el proyecto específico
+                ->delete();
+        }
+
+        return back()->with('success', 'Participante eliminado del proyecto correctamente.');
     }
     public function generarPDF(Request $request)
     {
@@ -233,6 +251,4 @@ class ParticipanteController extends Controller
         // Mostrar el PDF
         return $pdf->stream('proyecto_' . $clave_proyecto . '.pdf');
     }
-
-
 }

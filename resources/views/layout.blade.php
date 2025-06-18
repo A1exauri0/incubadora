@@ -185,7 +185,6 @@
 
 <body class="d-flex flex-column h-100">
     <header>
-        <!-- Fixed navbar -->
         <nav class="navbar navbar-expand-md navbar-dark fixed-top">
             <div class="container-fluid">
                 <a href="/home">
@@ -200,12 +199,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <!--ADMIN-->
-                            @can('mostrar admin')
+                        @can('mostrar admin')
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
@@ -220,11 +217,10 @@
                                     <li><a class="dropdown-item" href="/c_habilidades">Habilidades</a></li>
                                     <li><a class="dropdown-item" href="/c_mentores">Mentores</a></li>
                                     <li><a class="dropdown-item" href="/c_servicios">Servicios</a></li>
-
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <div class="btn-group">
+                                <div class="btn-group dropend">
                                     <a href="/c_proyectos" class="btn btn-primary">Proyectos</a>
                                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
                                         data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
@@ -238,21 +234,35 @@
                                 </div>
                             </li>
                         @endcan
-                        <!--ALUMNO-->
                         @can('mostrar alumno')
+                            {{-- Coloca aquí los elementos de menú para alumnos si los hay --}}
                         @endcan
-                        </li>
-
                     </ul>
 
-                    <form class="d-flex" role="search" id="logout-form" action="{{ route('logout') }}"
-                        method="POST">
-                        @csrf
-                        <button class="btn btn-danger" type="submit"
-                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Cerrar sesión
-                        </button>
-                    </form>
+                    {{-- Mover el menú desplegable del usuario fuera del form si no es estrictamente necesario que esté dentro --}}
+                    <ul class="navbar-nav"> {{-- Usamos otro ul para los elementos de la derecha, como el usuario --}}
+                        @auth
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    {{ Auth::user()->name }}
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                        onclick="event.preventDefault();
+                                                 document.getElementById('logout-form-actual').submit();">
+                                        {{-- Cambiado el ID del form --}}
+                                        {{ __('Cerrar sesión') }}
+                                    </a>
+                                    {{-- El formulario oculto de logout debe estar aquí, o fuera de la navbar --}}
+                                    <form id="logout-form-actual" action="{{ route('logout') }}" method="POST"
+                                        class="d-none">
+                                        @csrf
+                                    </form>
+                                </div>
+                            </li>
+                        @endauth
+                    </ul>
                 </div>
             </div>
         </nav>

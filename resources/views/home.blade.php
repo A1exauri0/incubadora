@@ -24,6 +24,8 @@
 @endsection
 
 @section('content')
+
+@hasanyrole('admin|alumno')
 <div class="container-fluid" style="padding-top: 30px">
     <h1 style="text-align: center;">Proyectos</h1>
     <div class="row">
@@ -36,13 +38,15 @@
             <h2 class="mt-3">Proyectos</h2>
             <div style="height: 500px; overflow-y: auto;">
                 <ul class="list-group">
-                    @foreach ($proyectos as $proyecto)
+                    @forelse ($proyectos as $proyecto)
                         <li class="list-group-item list-group-item-{{ $proyecto->clase }}"
                             onclick="mostrarDetalles('{{ $proyecto->clave_proyecto }}', '{{ $proyecto->nombre }}', '{{ $proyecto->descripcion }}', '{{ $proyecto->categoria }}', '{{ $proyecto->tipo }}', '{{ $proyecto->etapa }}', '{{ $proyecto->fecha_agregado }}', '{{ $proyecto->video }}')">
                             <strong>Nombre:</strong> {{ $proyecto->nombre }}<br>
                             <strong>Fecha de registro:</strong> {{ $proyecto->fecha_agregado }}
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="list-group-item">No hay proyectos registrados.</li>
+                    @endforelse
                 </ul>
             </div>
         </div>
@@ -65,10 +69,10 @@
         </div>
     </div>
 </div>
+@endhasanyrole
 
 <script>
     function mostrarDetalles(clave, nombre, descripcion, categoria, tipo, etapa, fecha, video) {
-        // Actualizar datos en los campos de detalles
         document.getElementById('detallesNombre').textContent = nombre;
         document.getElementById('detallesDescripcion').textContent = descripcion;
         document.getElementById('detallesCategoria').textContent = categoria;
@@ -76,7 +80,6 @@
         document.getElementById('detallesEtapa').textContent = etapa;
         document.getElementById('detallesFecha').textContent = fecha;
 
-        // Mostrar video si está disponible
         const videoContainer = document.getElementById('detallesVideo');
         if (video) {
             videoContainer.innerHTML = `<iframe width="100%" height="315" src="${video.replace("watch?v=", "embed/")}" frameborder="0" allowfullscreen></iframe>`;
@@ -87,9 +90,8 @@
         document.getElementById('detallesProyecto').style.display = 'block';
     }
 
-    // Mostrar detalles del primer proyecto al cargar la página
     document.addEventListener('DOMContentLoaded', function () {
-        const primerProyecto = <?php echo json_encode($proyectos[0]); ?>; // Asume que hay al menos un proyecto
+        const primerProyecto = @json($proyectos->first());
         if (primerProyecto) {
             mostrarDetalles(
                 primerProyecto.clave_proyecto,
