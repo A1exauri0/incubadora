@@ -58,50 +58,69 @@ class ParticipanteController extends Controller
     
         if ($tipo === 'alumno') {
             $resultados = DB::table('alumno')
-                ->join('alumno_proyecto', 'alumno.no_control', '=', 'alumno_proyecto.no_control')
-                ->join('proyecto', 'alumno_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
-                ->where('alumno.nombre', 'LIKE', '%' . $query . '%')
-                ->orWhere('alumno.no_control', 'LIKE', '%' . $query . '%')
+                ->where('nombre', 'LIKE', '%' . $query . '%')
+                ->orWhere('no_control', 'LIKE', '%' . $query . '%')
                 ->select(
-                    'alumno.no_control as id',
-                    'alumno.nombre',
-                    DB::raw('GROUP_CONCAT(proyecto.nombre) as proyectos')
+                    'no_control as id',
+                    'nombre'
                 )
-                ->groupBy('alumno.no_control', 'alumno.nombre')
                 ->get();
+            
+            // Adjuntar los proyectos a cada alumno encontrado
+            foreach ($resultados as $alumno) {
+                $proyectos = DB::table('alumno_proyecto')
+                    ->join('proyecto', 'alumno_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                    ->where('alumno_proyecto.no_control', $alumno->id)
+                    ->pluck('proyecto.nombre')
+                    ->implode(', ');
+                $alumno->proyectos = $proyectos ?: 'Sin proyectos';
+            }
+
         } elseif ($tipo === 'asesor') {
             $resultados = DB::table('asesor')
-                ->join('asesor_proyecto', 'asesor.idAsesor', '=', 'asesor_proyecto.idAsesor')
-                ->join('proyecto', 'asesor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
-                ->where('asesor.nombre', 'LIKE', '%' . $query . '%')
-                ->orWhere('asesor.idAsesor', 'LIKE', '%' . $query . '%')
+                ->where('nombre', 'LIKE', '%' . $query . '%')
+                ->orWhere('idAsesor', 'LIKE', '%' . $query . '%')
                 ->select(
-                    'asesor.idAsesor as id',
-                    'asesor.nombre',
-                    DB::raw('GROUP_CONCAT(proyecto.nombre) as proyectos')
+                    'idAsesor as id',
+                    'nombre'
                 )
-                ->groupBy('asesor.idAsesor', 'asesor.nombre')
                 ->get();
+
+            // Adjuntar los proyectos a cada asesor encontrado
+            foreach ($resultados as $asesor) {
+                $proyectos = DB::table('asesor_proyecto')
+                    ->join('proyecto', 'asesor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                    ->where('asesor_proyecto.idAsesor', $asesor->id)
+                    ->pluck('proyecto.nombre')
+                    ->implode(', ');
+                $asesor->proyectos = $proyectos ?: 'Sin proyectos';
+            }
+
         } elseif ($tipo === 'mentor') {
             $resultados = DB::table('mentor')
-                ->join('mentor_proyecto', 'mentor.idMentor', '=', 'mentor_proyecto.idMentor')
-                ->join('proyecto', 'mentor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
-                ->where('mentor.nombre', 'LIKE', '%' . $query . '%')
-                ->orWhere('mentor.idMentor', 'LIKE', '%' . $query . '%')
+                ->where('nombre', 'LIKE', '%' . $query . '%')
+                ->orWhere('idMentor', 'LIKE', '%' . $query . '%')
                 ->select(
-                    'mentor.idMentor as id',
-                    'mentor.nombre',
-                    DB::raw('GROUP_CONCAT(proyecto.nombre) as proyectos')
+                    'idMentor as id',
+                    'nombre'
                 )
-                ->groupBy('mentor.idMentor', 'mentor.nombre')
                 ->get();
+            
+            // Adjuntar los proyectos a cada mentor encontrado
+            foreach ($resultados as $mentor) {
+                $proyectos = DB::table('mentor_proyecto')
+                    ->join('proyecto', 'mentor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                    ->where('mentor_proyecto.idMentor', $mentor->id)
+                    ->pluck('proyecto.nombre')
+                    ->implode(', ');
+                $mentor->proyectos = $proyectos ?: 'Sin proyectos';
+            }
         }
     
         return response()->json($resultados);
     }
     
-    
-
+    // ... (el resto de tus métodos: agregar, eliminar, generarPDF, etc., no cambian)
     public function agregar(Request $request)
     {
         $tipo = $request->input('tipo_agregar');
@@ -119,7 +138,7 @@ class ParticipanteController extends Controller
                 return back()->with('error', 'El alumno ya está registrado en 2 proyectos.');
             }
 
-            // Verificar si el alumno ya está en ese proyecto   
+            // Verificar si el alumno ya está en ese proyecto   
             $existe = DB::table('alumno_proyecto')
                 ->where('no_control', $identificador)
                 ->where('clave_proyecto', $clave_proyecto)
