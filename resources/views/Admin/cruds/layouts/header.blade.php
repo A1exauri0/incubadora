@@ -145,7 +145,7 @@
         }
 
         .navbar {
-            background-color: #036ee0;
+            background-color: #036ee0 !important;
         }
 
         .navbar-brand {
@@ -154,18 +154,18 @@
 
         /* Submenú estilos */
         .dropdown-menu {
-            background-color: #036ee0;
+            background-color: #036ee0 !important;
             border: none;
         }
 
         .dropdown-menu .dropdown-item {
-            color: #ffffff;
+            color: #ffffff !important;
         }
 
         .dropdown-menu .dropdown-item:hover,
         .dropdown-menu .dropdown-item:focus {
-            background-color: #084b92;
-            color: #ffffff;
+            background-color: #084b92 !important;
+            color: #ffffff !important;
         }
 
         .dropdown-menu .dropdown-divider {
@@ -173,7 +173,28 @@
         }
 
         .navbar-nav .nav-item .nav-link.dropdown-toggle {
-            color: #ffffff;
+            color: #ffffff !important;
+        }
+
+        /* ** ESTILOS PARA HACER LA LETRA MÁS GRANDE EN EL MENÚ ** */
+        .navbar-nav .nav-link {
+            font-size: 1.15rem !important;
+            padding-top: .75rem !important;
+            padding-bottom: .75rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+
+        .navbar-nav .btn-group .btn {
+            font-size: 1.15rem !important;
+            padding: .5rem 1rem !important;
+        }
+
+        .navbar-nav .btn-group .dropdown-toggle-split {
+            font-size: 1.15rem !important;
+            padding-top: .5rem !important;
+            padding-bottom: .5rem !important;
         }
     </style>
 
@@ -244,8 +265,8 @@
                             <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 Catálogos
                             </a>
                             <ul class="dropdown-menu">
@@ -275,7 +296,7 @@
                                 </ul>
                             </div>
                         </li>
-                            </li>
+                        </li>
 
                     </ul>
 
@@ -295,9 +316,9 @@
     <main class="flex-shrink-0">
         <div class="container"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+        </script>
 
 </body>
 
