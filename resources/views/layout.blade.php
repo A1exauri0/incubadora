@@ -210,13 +210,13 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/c_alumnos">Alumnos</a></li>
-                                    <li><a class="dropdown-item" href="/c_asesores">Asesores</a></li>
                                     <li><a class="dropdown-item" href="/c_carreras">Carreras</a></li>
                                     <li><a class="dropdown-item" href="/c_categorias">Categorías</a></li>
                                     <li><a class="dropdown-item" href="/c_tokens">Tokens</a></li>
                                     <li><a class="dropdown-item" href="/c_habilidades">Habilidades</a></li>
                                     <li><a class="dropdown-item" href="/c_mentores">Mentores</a></li>
                                     <li><a class="dropdown-item" href="/c_servicios">Servicios</a></li>
+                                    <li><a class="dropdown-item" href="/c_usuarios">Usuarios</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
@@ -233,9 +233,31 @@
                                     </ul>
                                 </div>
                             </li>
+                            <li class="nav-item">
+                                <div class="btn-group dropend">
+                                    <a href="/c_asesores" class="btn btn-primary">Asesores</a>
+                                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                                        <span class="visually-hidden">Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/c_habilidadesAM_asignar">Asignar
+                                                habilidades</a></li>
+
+                                    </ul>
+                                </div>
+                            </li>
                         @endcan
                         @can('mostrar alumno')
                             {{-- Coloca aquí los elementos de menú para alumnos si los hay --}}
+                        @endcan
+                        @can('mostrar asesor')
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/home">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/home">Mis Habilidades</a>
+                            </li>
                         @endcan
                     </ul>
 
