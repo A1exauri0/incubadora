@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('layouts.layout')
 
 @section('titulo', $titulo)
 
@@ -26,7 +26,7 @@
 @section('content')
 
     @hasanyrole('admin|alumno|asesor|mentor')
-        <div class="container-fluid" style="padding-top: 30px">
+        <div class="container-fluid" style="">
             <h1 style="text-align: center;">Proyectos</h1>
             <div class="row">
                 <!-- Simbología de colores -->

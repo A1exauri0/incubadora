@@ -1,5 +1,5 @@
-@include('Admin.cruds.layouts.header')
-@extends('Admin.cruds.layouts.layout')
+<!-- Se extiende de la clase layout en CRUDs (solamente para CRUDs) -->
+@extends('layouts.layoutCrud')
 
 @section('titulo', $titulo)
 @section('administrar', 'Habilidades de Usuarios')

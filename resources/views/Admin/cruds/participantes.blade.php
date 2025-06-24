@@ -1,6 +1,7 @@
-@include('Admin.cruds.layouts.header')
+<!-- Se extiende de la clase layout en CRUDs (solamente para CRUDs) -->
+@extends('layouts.layoutParticipantes')
 
-@extends('Admin.cruds.layouts.layoutParticipantes')
+{{-- Título de la página --}}
 
 @section('titulo', $titulo)
 

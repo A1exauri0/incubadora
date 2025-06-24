@@ -1,0 +1,19 @@
+.footer-custom {
+    background-color: #02397c;
+    color: #ffffff;
+    padding: 15px 10px;
+    font-size: 13px;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+    border-top: 3px solid #162c50;
+    margin-top: auto;
+}
+
+
+.footer-custom .footer-text {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.footer-custom strong {
+    color: #aad4ff;
+}

@@ -255,7 +255,7 @@ class ParticipanteController extends Controller
             ->get();
 
         // Generar el PDF con los mismos datos que tienes en la vista
-        $pdf = PDF::loadView('Admin.cruds.layouts.pdf', compact(
+        $pdf = PDF::loadView('layouts.pdf', compact(
             'proyecto',
             'alumno_proyecto',
             'asesor_proyecto',

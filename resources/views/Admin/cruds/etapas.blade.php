@@ -1,7 +1,5 @@
-@include('Admin.cruds.layouts.header')
-
 <!-- Se extiende de la clase layout en CRUDs (solamente para CRUDs) -->
-@extends('Admin.cruds.layouts.layout')
+@extends('layouts.layoutCrud')
 
 <!-- Se recibe la variable del título que tendrá la página en la pestaña -->
 @section('titulo', $titulo)

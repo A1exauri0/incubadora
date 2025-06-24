@@ -91,7 +91,7 @@
         <p class="s1" style="padding-left: 107pt;text-indent: 0pt;text-align: left;"><span>
                 <br>
                 <center>
-                    <img width="500" height="65" src="storage/logos_tec.PNG" alt="Logo Tec" />
+                    <img width="50" height="65" src="{{ public_path('images/logo_tec.png') }}" alt="Logo Tec" />
                 </center>
             </span> <span>
                 <table border="0" cellspacing="0" cellpadding="0">

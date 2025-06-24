@@ -1,29 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- ¡NUEVO: Importante para peticiones AJAX! --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- Importante para peticiones AJAX --}}
+    <!-- Título de la página -->
     <title>@yield('titulo') - ITTG</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <!-- jQuery, Popper.js, Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/styleCrud.css') }}">
     <link rel="stylesheet" href="{{ asset('css/tables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
     @yield('script_checkboxes')
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100" style="padding-top: 70px;">
+    @include('components.header')
     @section('content')
-
         <div class="container-xl">
             <div class="table-responsive">
                 <div class="table-wrapper">
@@ -52,7 +55,6 @@
                         <thead>
                             <tr>
                                 @hasSection('script_checkboxes')
-                                    {{-- Mostrar checkbox solo si se usa el script --}}
                                     <th>
                                         <span class="custom-checkbox">
                                             <input type="checkbox" id="selectAll">
@@ -114,13 +116,12 @@
                 </div>
             </div>
         </div>
-    @show {{-- @show permite que la sección 'content' tenga un contenido por defecto --}}
+    @show
 
-    {{-- En tu layout.blade.php o en un footer si lo tienes --}}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     @stack('scripts')
+
 </body>
+@include('components.footer')
 
 </html>
