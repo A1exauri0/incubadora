@@ -105,6 +105,8 @@
                     <table id="tabla_datos" class="table table-striped table-hover">
                         <thead>
                             <tr>
+                                    <th>Líder</th>
+
                                 <th>
                                     Alumnos
                                 </th>
@@ -124,12 +126,6 @@
                             @yield('datos')
                         </tbody>
                     </table>
-                </div>
-                <div class="clearfix">
-                    <div class="hint-text">Mostrando un máximo <b>20</b> registros por página, hay un total de
-                        <b>@yield('total_registros')</b> registros encontrados.
-                    </div>
-                    @yield('paginacion')
                 </div>
             </div>
         </div>
@@ -161,6 +157,9 @@
             </div>
         </div>
     </div>
+
+    {{-- Incluir el nuevo modal de cambio de líder --}}
+    @yield('modulo_cambiar_lider')
 
 @include('components.footer')
 

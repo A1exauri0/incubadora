@@ -270,4 +270,33 @@ class ParticipanteController extends Controller
         // Mostrar el PDF
         return $pdf->stream('proyecto_' . $clave_proyecto . '.pdf');
     }
+        public function actualizarLider(Request $request)
+    {
+        $noControlNuevoLider = $request->input('no_control_nuevo_lider');
+        $claveProyecto = $request->input('clave_proyecto');
+
+        try {
+            DB::beginTransaction();
+
+            // Desactivar el líder actual para este proyecto
+            DB::table('alumno_proyecto')
+                ->where('clave_proyecto', $claveProyecto)
+                ->where('lider', 1)
+                ->update(['lider' => 0]);
+
+            // Activar el nuevo líder
+            DB::table('alumno_proyecto')
+                ->where('clave_proyecto', $claveProyecto)
+                ->where('no_control', $noControlNuevoLider)
+                ->update(['lider' => 1]);
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Líder actualizado correctamente.']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el líder: ' . $e->getMessage()], 500);
+        }
+    }
 }

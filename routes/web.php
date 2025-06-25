@@ -45,8 +45,8 @@ Auth::routes(['verify' => true]);
 
 //Home
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
-->middleware(['auth', 'verified'])
-->name('home');
+    ->middleware(['auth', 'verified'])
+    ->name('home');
 
 //Verificacion
 Route::get('/email/verify', function () {
@@ -146,6 +146,7 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/c_participantes/eliminar', [ParticipanteController::class, 'eliminar'])->name('participantes.eliminar');
     Route::post('c_participantes/eliminarMultiple', [ParticipanteController::class, 'eliminarMultiple'])->name('participantes.eliminarMultiple');
     Route::post('c_participantes/mostrarParticipantes', [ParticipanteController::class, 'mostrarParticipantes'])->name('participantes.mostrarParticipantes');
+    Route::post('/c_participantes/actualizarLider', [ParticipanteController::class, 'actualizarLider'])->name('participantes.actualizarLider');
 
     //CRUD Proyectos
     Route::get('/c_proyectos', [ProyectoController::class, 'index']);
