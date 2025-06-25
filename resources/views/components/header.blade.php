@@ -18,50 +18,51 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="/home">Inicio</a>
                     </li>
+                    @can('mostrar admin')
+                        <!-- Dropdown Catálogos -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="catalogosDropdown"
+                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Catálogos
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="catalogosDropdown">
+                                <a class="dropdown-item" href="/c_alumnos">Alumnos</a>
+                                <a class="dropdown-item" href="/c_carreras">Carreras</a>
+                                <a class="dropdown-item" href="/c_categorias">Categorías</a>
+                                <a class="dropdown-item" href="/c_tokens">Tokens</a>
+                                <a class="dropdown-item" href="/c_habilidades">Habilidades</a>
+                                <a class="dropdown-item" href="/c_habilidadesAM">Habilidades AM</a>
+                                <a class="dropdown-item" href="/c_mentores">Mentores</a>
+                                <a class="dropdown-item" href="/c_servicios">Servicios</a>
+                            </div>
+                        </li>
 
-                    <!-- Dropdown Catálogos -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="catalogosDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Catálogos
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="catalogosDropdown">
-                            <a class="dropdown-item" href="/c_alumnos">Alumnos</a>
-                            <a class="dropdown-item" href="/c_carreras">Carreras</a>
-                            <a class="dropdown-item" href="/c_categorias">Categorías</a>
-                            <a class="dropdown-item" href="/c_tokens">Tokens</a>
-                            <a class="dropdown-item" href="/c_habilidades">Habilidades</a>
-                            <a class="dropdown-item" href="/c_habilidadesAM">Habilidades AM</a>
-                            <a class="dropdown-item" href="/c_mentores">Mentores</a>
-                            <a class="dropdown-item" href="/c_servicios">Servicios</a>
-                        </div>
-                    </li>
+                        <!-- Dropdown Proyectos -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="proyectosDropdown"
+                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Proyectos
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="proyectosDropdown">
+                                <a class="dropdown-item" href="/c_proyectos">Todos</a>
+                                <a class="dropdown-item" href="/c_participantes">Participantes</a>
+                                <a class="dropdown-item" href="/c_tipos">Tipos</a>
+                                <a class="dropdown-item" href="/c_etapas">Etapas</a>
+                            </div>
+                        </li>
 
-                    <!-- Dropdown Proyectos -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="proyectosDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Proyectos
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="proyectosDropdown">
-                            <a class="dropdown-item" href="/c_proyectos">Todos</a>
-                            <a class="dropdown-item" href="/c_participantes">Participantes</a>
-                            <a class="dropdown-item" href="/c_tipos">Tipos</a>
-                            <a class="dropdown-item" href="/c_etapas">Etapas</a>
-                        </div>
-                    </li>
-
-                    <!-- Dropdown Asesores -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="asesoresDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Asesores
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="asesoresDropdown">
-                            <a class="dropdown-item" href="/c_asesores">Listado</a>
-                            <a class="dropdown-item" href="/c_habilidadesAM_asignar">Asignar habilidades</a>
-                        </div>
-                    </li>
+                        <!-- Dropdown Asesores -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="asesoresDropdown"
+                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Asesores
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="asesoresDropdown">
+                                <a class="dropdown-item" href="/c_asesores">Listado</a>
+                                <a class="dropdown-item" href="/c_habilidadesAM_asignar">Asignar habilidades</a>
+                            </div>
+                        </li>
+                    @endcan
                 </ul>
 
                 <!-- Logout -->

@@ -4,9 +4,11 @@
 
 {{-- Modulo simbologia --}}
 @section('modulo_simbologia')
+    {{-- Asegúrate de que el ID del modal sea 'simbologiaModal' --}}
     <div class="modal-header">
         <h4 class="modal-title">Simbología</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        {{-- Cambiado de data-bs-dismiss a data-dismiss para Bootstrap 4 --}}
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     </div>
     <div class="modal-body">
         <ul class="list-group mb-3" id="contenido">
@@ -19,19 +21,22 @@
         </ul>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        {{-- Cambiado de data-bs-dismiss a data-dismiss para Bootstrap 4 --}}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
     </div>
 @endsection
 
 @section('content')
 
     @hasanyrole('admin|alumno|asesor|mentor')
-        <div class="container-fluid" style="">
+        <div class="container-fluid">
             <h1 style="text-align: center;">Proyectos</h1>
             <div class="row">
                 <!-- Simbología de colores -->
                 <div class="col-md-4">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#simbologiaEmployeeModal">
+                    {{-- Cambiado data-bs-toggle a data-toggle y data-bs-target a data-target --}}
+                    {{-- El target ahora apunta a #simbologiaModal --}}
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#simbologiaModal">
                         Ver Simbología
                     </button>
 
