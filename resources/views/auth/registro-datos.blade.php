@@ -1,71 +1,72 @@
-@extends('layout')
+@extends('layouts.layout')
 
 @section('titulo', $titulo)
 
 @section('content')
-    <div class="container">
-        <h2>Registro de Datos</h2>
-        <form method="POST" action="{{ route('registro.datos.guardar') }}">
-            @csrf
-            {{-- No de control --}}
-            <div class="mb-3">
-                <label for="no_control" class="form-label">Número de Control</label>
-                <input type="text" class="form-control" name="no_control" id="no_control"
-                    value="{{ $alumno->no_control ?? '' }}" required>
+    <div class="container mt-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Registro de Datos</h5>
             </div>
-            {{-- Nombre --}}
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" name="nombre" id="nombre" value="{{ $alumno->nombre ?? '' }}"
-                    required>
-            </div>
-            {{-- Carrera --}}
-            <div class="mb-3">
-                <label for="carrera" class="form-label">Carrera</label>
-                <select name="carrera" id="carrera" class="form-select" required>
-                    @foreach ($carreras as $carrera)
-                        <option value="{{ $carrera->nombre }}"
-                            {{ isset($alumno->carrera) && $alumno->carrera == $carrera->nombre ? 'selected' : '' }}>
-                            {{ $carrera->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ route('registro.datos.guardar') }}">
+                    @csrf
+                    <div class="form-row">
+                        {{-- Número de Control --}}
+                        <div class="form-group col-md-6">
+                            <label for="no_control">Número de Control</label>
+                            <input type="text" class="form-control" name="no_control" id="no_control"
+                                value="{{ $alumno->no_control ?? '' }}" required>
+                        </div>
 
-            {{-- Telefono --}}
-            <div class="mb-3">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <input type="text" class="form-control" name="telefono" id="telefono"
-                    value="{{ $alumno->telefono ?? '' }}" required>
-            </div>
-            {{-- Semestre --}}
-            <div class="mb-3">
-                <label for="semestre" class="form-label">Semestre</label>
-                <select name="semestre" id="semestre" class="form-select" required>
-                    <option value="1" {{ isset($alumno->semestre) && $alumno->semestre == 1 ? 'selected' : '' }}>1°
-                        semestre</option>
-                    <option value="2" {{ isset($alumno->semestre) && $alumno->semestre == 2 ? 'selected' : '' }}>2°
-                        semestre</option>
-                    <option value="3" {{ isset($alumno->semestre) && $alumno->semestre == 3 ? 'selected' : '' }}>3°
-                        semestre</option>
-                    <option value="4" {{ isset($alumno->semestre) && $alumno->semestre == 4 ? 'selected' : '' }}>4°
-                        semestre</option>
-                    <option value="5" {{ isset($alumno->semestre) && $alumno->semestre == 5 ? 'selected' : '' }}>5°
-                        semestre</option>
-                    <option value="6" {{ isset($alumno->semestre) && $alumno->semestre == 6 ? 'selected' : '' }}>6°
-                        semestre</option>
-                    <option value="7" {{ isset($alumno->semestre) && $alumno->semestre == 7 ? 'selected' : '' }}>7°
-                        semestre</option>
-                    <option value="8" {{ isset($alumno->semestre) && $alumno->semestre == 8 ? 'selected' : '' }}>8°
-                        semestre</option>
-                    <option value="9" {{ isset($alumno->semestre) && $alumno->semestre == 9 ? 'selected' : '' }}>9°
-                        semestre</option>
-                    <option value="10" {{ isset($alumno->semestre) && $alumno->semestre == 10 ? 'selected' : '' }}>10°
-                        semestre</option>
-                </select>
-            </div>
+                        {{-- Nombre --}}
+                        <div class="form-group col-md-6">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" id="nombre"
+                                value="{{ $alumno->nombre ?? '' }}" required>
+                        </div>
+                    </div>
 
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
+                    <div class="form-row">
+                        {{-- Carrera --}}
+                        <div class="form-group col-md-6">
+                            <label for="carrera">Carrera</label>
+                            <select name="carrera" id="carrera" class="form-control" required>
+                                @foreach ($carreras as $carrera)
+                                    <option value="{{ $carrera->nombre }}"
+                                        {{ isset($alumno->carrera) && $alumno->carrera == $carrera->nombre ? 'selected' : '' }}>
+                                        {{ $carrera->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Teléfono --}}
+                        <div class="form-group col-md-6">
+                            <label for="telefono">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono" id="telefono"
+                                value="{{ $alumno->telefono ?? '' }}" required>
+                        </div>
+                    </div>
+
+                    {{-- Semestre --}}
+                    <div class="form-group">
+                        <label for="semestre">Semestre</label>
+                        <select name="semestre" id="semestre" class="form-control" required>
+                            @for ($i = 1; $i <= 10; $i++)
+                                <option value="{{ $i }}"
+                                    {{ isset($alumno->semestre) && $alumno->semestre == $i ? 'selected' : '' }}>
+                                    {{ $i }}° semestre
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
