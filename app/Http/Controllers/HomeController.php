@@ -35,16 +35,19 @@ class HomeController extends Controller
         // Verificar el rol del usuario
         if ($user->hasRole('admin')) {
             // Admin ve todos los proyectos
-            $proyectos = DB::table('proyecto')->get();
+            $proyectos = DB::table('proyecto')
+                         ->select('proyecto.*', DB::raw('0 as es_lider')) // Los admins no son líderes de proyectos específicos en esta vista
+                         ->get();
         } elseif ($user->hasRole('alumno')) {
             // Obtener no_control del alumno por su correo institucional
             $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
 
             if ($alumno) {
+                // Modificación aquí: Incluir el campo 'lider' de alumno_proyecto como 'es_lider'
                 $proyectos = DB::table('proyecto')
                     ->join('alumno_proyecto', 'proyecto.clave_proyecto', '=', 'alumno_proyecto.clave_proyecto')
                     ->where('alumno_proyecto.no_control', $alumno->no_control)
-                    ->select('proyecto.*')
+                    ->select('proyecto.*', 'alumno_proyecto.lider as es_lider') // Añadido 'lider as es_lider'
                     ->get();
             }
         } elseif ($user->hasRole('asesor')) {
@@ -54,19 +57,19 @@ class HomeController extends Controller
             if ($asesor) {
                 $proyectos = DB::table('proyecto')
                     ->join('asesor_proyecto', 'proyecto.clave_proyecto', '=', 'asesor_proyecto.clave_proyecto')
-                    ->where('asesor_proyecto.idAsesor', $asesor->idAsesor) // Usar $asesor->idAsesor
-                    ->select('proyecto.*')
+                    ->where('asesor_proyecto.idAsesor', $asesor->idAsesor)
+                    ->select('proyecto.*', DB::raw('0 as es_lider')) // Los asesores no son líderes
                     ->get();
             }
         } elseif ($user->hasRole('mentor')) {
             // Obtener idMentor del mentor por su correo electrónico
-            $mentor = DB::table('mentor')->where('correo_electronico', $user->email)->first(); // Asumiendo 'correo_institucional' para mentor
+            $mentor = DB::table('mentor')->where('correo_electronico', $user->email)->first();
 
             if ($mentor) {
                 $proyectos = DB::table('proyecto')
                     ->join('mentor_proyecto', 'proyecto.clave_proyecto', '=', 'mentor_proyecto.clave_proyecto')
-                    ->where('mentor_proyecto.idMentor', $mentor->idMentor) // Usar $mentor->idMentor
-                    ->select('proyecto.*')
+                    ->where('mentor_proyecto.idMentor', $mentor->idMentor)
+                    ->select('proyecto.*', DB::raw('0 as es_lider')) // Los mentores no son líderes
                     ->get();
             }
         }

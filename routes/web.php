@@ -202,4 +202,6 @@ Route::group(['middleware' => ['role:alumno']], function () {
     Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
         ->middleware(['auth', 'verified'])
         ->name('registro.datos.guardar');
+    Route::get('/proyectos/{clave_proyecto}/editar', [ProyectoController::class, 'edit'])->name('proyectos.edit');
+    Route::put('/proyectos/{clave_proyecto}', [ProyectoController::class, 'update'])->name('proyectos.update');
 });
