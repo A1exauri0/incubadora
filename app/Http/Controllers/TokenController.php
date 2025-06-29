@@ -4,89 +4,132 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TokenCreatedMail;
+use Illuminate\Support\Facades\URL;
 
 class TokenController extends Controller
 {
+    // Asegúrate de que esta línea esté presente si quieres proteger todas las rutas del controlador
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $tokens = DB::table('token_rol')->orderBy('idToken', 'desc')->get();
-        $columnas = ['ID', 'Token', 'Rol','Correo'];
+        // Asegurarse de que el nombre del rol se obtiene para cada token para la vista
+        foreach ($tokens as $token_item) {
+            $role_name = DB::table('roles')->where('id', $token_item->rol)->first();
+            $token_item->rol_nombre = $role_name ? $role_name->name : 'Desconocido';
+        }
+        $columnas = ['ID', 'Token', 'Rol', 'Correo'];
         $total_registros = $tokens->count();
         $roles = DB::table('roles')->get();
 
-        //dd($alumnos);
-
         $titulo = "CRUD Tokens";
 
-        return view('Admin.cruds.tokens', compact('tokens','roles', 'titulo', 'columnas', 'total_registros'));
+        return view('Admin.cruds.tokens', compact('tokens', 'roles', 'titulo', 'columnas', 'total_registros'));
     }
 
     public function registro_existe($correo)
     {
         $existe = DB::table('token_rol')->where('correo', '=', $correo)->count();
-
-        if ($existe > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return $existe > 0;
     }
 
     public function agregar(Request $request)
     {
         $token = uniqid();
         $correo = $request->input('correo_agregar');
-        $rol = $request->input('rol_agregar');
+        $rolName = $request->input('rol_agregar');
 
-        //convertir el rol a su id
-        $rol = DB::table('roles')->where('name', '=', $rol)->first()->id;
+        $rolObject = DB::table('roles')->where('name', '=', $rolName)->first();
+
+        if (!$rolObject) {
+            return back()->with('error', 'El rol seleccionado no es válido.');
+        }
+
+        $rolId = $rolObject->id;
 
         if ($this->registro_existe($correo)) {
-            return back()->with('error', 'El correo ya tiene un código asignado, si quiere cambiarlo elimine el existente primero.');
+            return back()->with('error', 'El correo ya tiene un código asignado. Si quiere cambiarlo, elimine el existente primero.');
         } else {
-            DB::table('token_rol')->insert(['token' => $token, 'correo' => $correo, 'rol' => $rol]);
+            DB::table('token_rol')->insert([
+                'token' => $token,
+                'correo' => $correo,
+                'rol' => $rolId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            try {
+                // CAMBIO CLAVE AQUÍ: Añadir 'email' a los parámetros de la URL
+                $registrationUrl = route('register', ['token' => $token, 'email' => $correo]);
+
+                Mail::to($correo)->send(new TokenCreatedMail(
+                    $token,
+                    $correo,
+                    $rolName,
+                    $registrationUrl,
+                    'Completar Registro'
+                ));
+
+                return back()->with('success', 'Correo enviado.');
+            } catch (\Exception $e) {
+                return back()->with('error', 'Token generado, pero falló el envío del correo: ' . $e->getMessage());
+            }
         }
-        return back();
     }
 
     public function editar(Request $request)
     {
         $idtoken = $request->input('idToken_editar');
         $correo = $request->input('correo_mod');
-        $rol = $request->input('rol_mod');
-        //convertir el rol a su id
-        $rol = DB::table('roles')->where('name', '=', $rol)->first()->id;
+        $rolName = $request->input('rol_mod');
 
-        DB::table('token_rol')->where('idToken', '=', $idtoken)->update(['correo' => $correo, 'rol' => $rol]);
-        return back();
+        $rolObject = DB::table('roles')->where('name', '=', $rolName)->first();
+
+        if (!$rolObject) {
+            return back()->with('error', 'El rol seleccionado no es válido para la edición.');
+        }
+        $rolId = $rolObject->id;
+
+        $existingTokenForCorreo = DB::table('token_rol')
+                                    ->where('correo', $correo)
+                                    ->where('idToken', '!=', $idtoken)
+                                    ->first();
+
+        if ($existingTokenForCorreo) {
+            return back()->with('error', 'El correo ya está asignado a otro token.');
+        }
+
+        DB::table('token_rol')->where('idToken', '=', $idtoken)->update([
+            'correo' => $correo,
+            'rol' => $rolId,
+            'updated_at' => now(),
+        ]);
+        return back()->with('success', 'Token actualizado exitosamente.');
     }
 
     public function eliminar(Request $request)
     {
         $idtoken = $request->input('idToken_eliminar');
-
         DB::table('token_rol')->where('idToken', '=', $idtoken)->delete();
-
-        return back();
+        return back()->with('success', 'Token eliminado exitosamente.');
     }
 
     public function eliminarMultiple(Request $request)
     {
-        // realiza la eliiminacion de los registros seleccionados
-        $nos_control = DB::table('token_rol')->select('idToken')->get();
+        $idTokensToDelete = $request->input('options', []);
 
-
-        foreach ($nos_control as $nc) {
-            try {
-                $existe = $request->input('idToken_eliminar_' . $nc->idToken);
-                if ($existe != null) {
-                    DB::table('token_rol')->where('idToken', '=', $nc->idToken)->delete();
-                }
-            } catch (\Exception $e) {
-                $existe = null;
-            }
+        if (empty($idTokensToDelete)) {
+            return back()->with('error', 'No se seleccionaron tokens para eliminar.');
         }
 
-        return back();
+        DB::table('token_rol')->whereIn('idToken', $idTokensToDelete)->delete();
+
+        return back()->with('success', 'Tokens seleccionados eliminados exitosamente.');
     }
 }

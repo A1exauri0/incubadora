@@ -3,24 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\User; // Asume que tienes un modelo User
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // Para interactuar con la tabla token_rol
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
     /**
@@ -28,7 +18,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/home'; // Cambia esto a tu ruta deseada después del registro
 
     /**
      * Create a new controller instance.
@@ -52,6 +42,18 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'token' => [ // Reglas de validación para el token
+                'nullable', // El token puede ser nulo si el usuario no ingresa uno
+                'string',
+                'exists:token_rol,token', // Verifica que el token exista en la tabla token_rol
+                // Aquí puedes agregar una regla custom para verificar si el token ya fue usado
+                function ($attribute, $value, $fail) {
+                    $tokenRecord = DB::table('token_rol')->where('token', $value)->first();
+                    if ($tokenRecord && DB::table('users')->where('email', $tokenRecord->correo)->exists()) {
+                        $fail('Este token ya ha sido utilizado para registrar el correo: ' . $tokenRecord->correo);
+                    }
+                },
+            ],
         ]);
     }
 
@@ -63,17 +65,49 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        // Crear usuario
+        // Lógica para crear el usuario
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-    
-        // Asignar rol de alumno
-        $user->assignRole('alumno');
-    
+
+        // Lógica para asignar rol basada en el token
+        if (isset($data['token']) && !empty($data['token'])) {
+            $tokenRecord = DB::table('token_rol')->where('token', $data['token'])->first();
+
+            if ($tokenRecord) {
+                // Verificar que el correo del token coincida con el correo de registro
+                if ($tokenRecord->correo !== $data['email']) {
+                    // Si no coinciden, puedes decidir qué hacer:
+                    // 1. No asignar el rol y tal vez mostrar un error o revertir el registro.
+                    //    Por simplicidad, en este ejemplo, no asignaremos el rol y el usuario se registrará sin él
+                    //    o se redirigirá con un error (depende de tu flujo).
+                    //    Si quieres que el registro falle si el correo no coincide, debes poner esto en el validador.
+                    //    Para este flujo, asumimos que la validación ya pasó y el token es válido y no usado.
+                    //    Si el email no coincide, simplemente no le asignamos el rol del token.
+                    return $user; // El usuario se registra, pero sin el rol del token si el correo no coincide.
+                }
+
+                // Asignar el rol al usuario
+                $rolName = DB::table('roles')->where('id', $tokenRecord->rol)->first()->name;
+                // Asume que tu modelo User tiene el trait HasRoles (ej. de Spatie/Laravel-Permission)
+                // Si no usas un paquete de roles, deberás implementar tu propia lógica de asignación
+                if (method_exists($user, 'assignRole')) {
+                    $user->assignRole($rolName);
+                }
+                
+                // Opcional: Eliminar el token después de usarlo
+                DB::table('token_rol')->where('idToken', $tokenRecord->idToken)->delete();
+            }
+        }
+        
         return $user;
     }
-    
+
+    // Método para mostrar el formulario de registro (si Laravel UI no lo tiene)
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
+    }
 }
