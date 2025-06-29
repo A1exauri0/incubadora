@@ -21,7 +21,7 @@ use App\Http\Controllers\{
     MentorController,
     ServicioController,
     InicioController,
-    habilidadesAMController, // NUEVO: Asegúrate de que el nombre de la clase sea exactamente 'habilidadesAMController'
+    habilidadesAMController,
     TokenController
 };
 
@@ -70,16 +70,33 @@ Route::post('email/verification-notification', function () {
     \Illuminate\Support\Facades\Notification::send(auth()->user(), new \Illuminate\Auth\Notifications\VerifyEmail);
 })->middleware('auth')->name('verification.send');
 
-Route::group(['middleware' => ['role:admin']], function () {
-    /*
-    Route::prefix('c_alumnos')->group(function () {
-    Route::get('/', [AlumnoController::class, 'index']);
-    Route::post('/agregar', [AlumnoController::class, 'agregar'])->name('alumnos.agregar');
-    Route::post('/editar', [AlumnoController::class, 'editar'])->name('alumnos.editar');
-    Route::post('/eliminar', [AlumnoController::class, 'eliminar'])->name('alumnos.eliminar');
-    Route::post('/eliminarMultiple', [AlumnoController::class, 'eliminarMultiple'])->name('alumnos.eliminarMultiple');
+// =========================================================================
+// RUTAS COMUNES PARA USUARIOS AUTENTICADOS Y VERIFICADOS
+// (Aquí se incluye registro-datos, accesible por todos los roles que lo necesiten)
+// =========================================================================
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Rutas para completar el registro de datos (accesible para todos los roles verificados)
+    // ESTA ES LA ÚNICA DEFINICIÓN DE registro-datos
+    Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
+    Route::post('/registro-datos', [RegistroDatosController::class, 'store'])->name('registro.datos.guardar');
+
+    // Rutas específicas para el rol de alumno (si solo ellos pueden editar proyectos)
+    // Este grupo es SOLO para rutas EXCLUSIVAS de alumno, NO registro-datos
+    Route::group(['middleware' => ['role:alumno']], function () {
+        Route::get('/proyectos/{clave_proyecto}/editar', [ProyectoController::class, 'edit'])->name('proyectos.edit');
+        Route::put('/proyectos/{clave_proyecto}', [ProyectoController::class, 'update'])->name('proyectos.update');
+    });
+
+    // Añade aquí rutas específicas para otros roles si las hay, p.ej.
+    // Route::group(['middleware' => ['role:asesor']], function () {
+    //     Route::get('/asesor/dashboard', [AsesorController::class, 'dashboard'])->name('asesor.dashboard');
+    // });
 });
- */
+
+// =========================================================================
+// RUTAS DE ADMINISTRACIÓN (Protegidas por middleware 'role:admin')
+// =========================================================================
+Route::group(['middleware' => ['role:admin']], function () {
 
     //CRUD Alumnos
     Route::get('/c_alumnos', [AlumnoController::class, 'index']);
@@ -140,7 +157,7 @@ Route::group(['middleware' => ['role:admin']], function () {
 
     //CRUD Participantes
     Route::get('/c_participantes', [ParticipanteController::class, 'index']);
-    route::get('/participantes/buscar', [ParticipanteController::class, 'buscarParticipante'])->name('participantes.buscar');
+    Route::get('/participantes/buscar', [ParticipanteController::class, 'buscarParticipante'])->name('participantes.buscar');
     Route::post('/participantes/generar-pdf', [ParticipanteController::class, 'generarPDF'])->name('participantes.generarPDF');
     Route::post('/participantes/agregar', [ParticipanteController::class, 'agregar'])->name('participantes.agregar');
     Route::post('/c_participantes/eliminar', [ParticipanteController::class, 'eliminar'])->name('participantes.eliminar');
@@ -171,37 +188,16 @@ Route::group(['middleware' => ['role:admin']], function () {
 
     //CRUD Usuarios
     Route::get('/c_usuarios', [UsuarioController::class, 'index']);
-    // Route::post('/c_usuarios/agregar', [UsuarioController::class, 'agregar'])->name('usuarios.agregar'); // Comentada o eliminada si no se usa
     Route::post('/c_usuarios/editar', [UsuarioController::class, 'editar'])->name('usuarios.editar');
     Route::post('/c_usuarios/eliminar', [UsuarioController::class, 'eliminar'])->name('usuarios.eliminar');
     Route::post('c_usuarios/eliminarMultiple', [UsuarioController::class, 'eliminarMultiple'])->name('usuarios.eliminarMultiple');
 
     // RUTAS PARA EL NUEVO CRUD DE ASIGNACIÓN DE HABILIDADES A ASESORES/MENTORES
-    // Ojo: Asegúrate de que el controlador se llama 'habilidadesAMController' en el archivo App\Http\Controllers
-    Route::prefix('c_habilidadesAM_asignar')->group(function () { // Cambiado el prefijo para evitar colisión con c_habilidades
+    Route::prefix('c_habilidadesAM_asignar')->group(function () {
         Route::get('/', [habilidadesAMController::class, 'index'])->name('habilidadesAM.index');
         Route::post('/get-usuarios-por-tipo', [habilidadesAMController::class, 'getUsuariosPorTipo'])->name('habilidadesAM.getUsuariosPorTipo');
         Route::post('/get-habilidades-usuario', [habilidadesAMController::class, 'getHabilidadesUsuario'])->name('habilidadesAM.getHabilidadesUsuario');
         Route::post('/add-habilidad', [habilidadesAMController::class, 'addHabilidad'])->name('habilidadesAM.addHabilidad');
         Route::post('/remove-habilidad', [habilidadesAMController::class, 'removeHabilidad'])->name('habilidadesAM.removeHabilidad');
     });
-
-    // Estas rutas estaban previamente en tu código, pero apuntaban al controlador incorrecto
-    // o tenían nombres de ruta que no concordaban con las acciones.
-    // Las he comentado/eliminado para evitar conflictos y que se usen las nuevas rutas AJAX.
-    // Route::get('/c_habilidadesAM', [habilidadesAMController::class, 'index']);
-    // Route::post('/c_habilidadesAM/agregar', [habilidadesAMController::class, 'agregar'])->name('habilidadesAM.agregar');
-    // Route::post('/c_habilidadesAM/editar', [habilidadesAMController::class,'editar'])->name('habilidadesAM.editar');
-    // Route::post('/c_habilidadesAM/eliminar', [HabilidadesAMController::class,'eliminar'])->name('habilidadesAM.editar');
-    // Route::post('/c_habilidadesAM/eliminarMultiple', [HabilidadesAMController::class,'eliminarMultiple'])->name('habilidadesAM.eliminarMultiple');
-});
-
-
-Route::group(['middleware' => ['role:alumno']], function () {
-    Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
-    Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
-        ->middleware(['auth', 'verified'])
-        ->name('registro.datos.guardar');
-    Route::get('/proyectos/{clave_proyecto}/editar', [ProyectoController::class, 'edit'])->name('proyectos.edit');
-    Route::put('/proyectos/{clave_proyecto}', [ProyectoController::class, 'update'])->name('proyectos.update');
 });
