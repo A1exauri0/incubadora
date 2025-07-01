@@ -4,10 +4,8 @@
 
 {{-- Modulo simbologia --}}
 @section('modulo_simbologia')
-    {{-- Asegúrate de que el ID del modal sea 'simbologiaModal' --}}
     <div class="modal-header">
         <h4 class="modal-title">Simbología</h4>
-        {{-- Cambiado de data-bs-dismiss a data-dismiss para Bootstrap 4 --}}
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     </div>
     <div class="modal-body">
@@ -21,20 +19,17 @@
         </ul>
     </div>
     <div class="modal-footer">
-        {{-- Cambiado de data-bs-dismiss a data-dismiss para Bootstrap 4 --}}
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
     </div>
 @endsection
 
+{{-- Modulo contenido --}}
 @section('content')
-
     @hasanyrole('admin|alumno|asesor|mentor')
         <div class="container-fluid">
             <h1 style="text-align: center;">Proyectos</h1>
             <div class="row">
                 <div class="col-md-4">
-                    {{-- Cambiado data-bs-toggle a data-toggle y data-bs-target a data-target --}}
-                    {{-- El target ahora apunta a #simbologiaModal --}}
                     <button class="btn btn-primary" data-toggle="modal" data-target="#simbologiaModal">
                         Ver Simbología
                     </button>
@@ -48,12 +43,12 @@
                                         '{{ $proyecto->clave_proyecto }}',
                                         '{{ $proyecto->nombre }}',
                                         '{{ $proyecto->descripcion }}',
-                                        '{{ $proyecto->categoria }}',
-                                        '{{ $proyecto->tipo }}',
-                                        '{{ $proyecto->etapa }}',
+                                        '{{ $proyecto->nombre_categoria }}', {{-- Usar el nombre --}}
+                                        '{{ $proyecto->nombre_tipo }}',      {{-- Usar el nombre --}}
+                                        '{{ $proyecto->nombre_etapa }}',     {{-- Usar el nombre --}}
                                         '{{ $proyecto->fecha_agregado }}',
                                         '{{ $proyecto->video }}',
-                                        '{{ $proyecto->es_lider ?? 0 }}' {{-- Asegúrate de pasar este valor --}}
+                                        '{{ $proyecto->es_lider ?? 0 }}'
                                     )">
                                     <strong>Nombre:</strong> {{ $proyecto->nombre }}<br>
                                     <strong>Fecha de registro:</strong> {{ $proyecto->fecha_agregado }}
@@ -96,9 +91,9 @@
         function mostrarDetalles(clave, nombre, descripcion, categoria, tipo, etapa, fecha, video, esLider) {
             document.getElementById('detallesNombre').textContent = nombre;
             document.getElementById('detallesDescripcion').textContent = descripcion;
-            document.getElementById('detallesCategoria').textContent = categoria;
-            document.getElementById('detallesTipo').textContent = tipo;
-            document.getElementById('detallesEtapa').textContent = etapa;
+            document.getElementById('detallesCategoria').textContent = categoria; 
+            document.getElementById('detallesTipo').textContent = tipo;           
+            document.getElementById('detallesEtapa').textContent = etapa;         
             document.getElementById('detallesFecha').textContent = fecha;
 
             const videoContainer = document.getElementById('detallesVideo');
@@ -111,10 +106,9 @@
 
             // Lógica para mostrar/ocultar el botón "Editar Proyecto"
             const botonEditar = document.getElementById('botonEditarProyecto');
-            if (esLider == 1) { // Asegúrate de que 'esLider' sea un valor booleano o 0/1
+            if (esLider == 1) {
                 botonEditar.style.display = 'block';
-                // Asigna la URL de edición al botón, usando la clave del proyecto
-                botonEditar.href = `/proyectos/${clave}/editar`; // Asegúrate de que esta ruta exista en tus rutas de Laravel
+                botonEditar.href = `/proyectos/${clave}/editar`;
             } else {
                 botonEditar.style.display = 'none';
             }
@@ -129,12 +123,12 @@
                     primerProyecto.clave_proyecto,
                     primerProyecto.nombre,
                     primerProyecto.descripcion,
-                    primerProyecto.categoria,
-                    primerProyecto.tipo,
-                    primerProyecto.etapa,
+                    primerProyecto.nombre_categoria, 
+                    primerProyecto.nombre_tipo,      
+                    primerProyecto.nombre_etapa,     
                     primerProyecto.fecha_agregado,
                     primerProyecto.video,
-                    primerProyecto.es_lider ?? 0 // Pasa el valor de 'es_lider' aquí
+                    primerProyecto.es_lider ?? 0
                 );
             }
         });

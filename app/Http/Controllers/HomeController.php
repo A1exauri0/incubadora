@@ -19,74 +19,103 @@ class HomeController extends Controller
 
         // Obtener todos los datos necesarios
         $etapas = DB::table('etapas')->get();
-        $colores = DB::table('color')->get();
-        $categorias = DB::table('categoria')->get();
-        $tipos = DB::table('tipo')->get();
+        $colores = DB::table('color')->get(); 
+        $categorias = DB::table('categoria')->get(); 
+        $tipos = DB::table('tipo')->get();           
 
         // Asignar clase de color a cada etapa
+        // Esta lógica es crucial para que $etapas tenga la propiedad 'clase'
         foreach ($etapas as $etapa) {
             if ($color = $colores->firstWhere('nombre', $etapa->color)) {
                 $etapa->clase = $color->clase;
+            } else {
+                $etapa->clase = 'secondary'; // Clase por defecto si no se encuentra el color
             }
         }
 
         $proyectos = collect(); // Inicializar como colección vacía por defecto
 
+        // Definir las columnas comunes a seleccionar en todas las consultas de proyectos
+        $commonSelects = [
+            'proyecto.clave_proyecto',
+            'proyecto.nombre',
+            'proyecto.descripcion',
+            'proyecto.fecha_agregado',
+            'proyecto.video',
+            'proyecto.categoria as categoria_id', 
+            'proyecto.tipo as tipo_id',           
+            'proyecto.etapa as etapa_id',         
+            'categoria.nombre as nombre_categoria', // Nombre de la categoría
+            'tipo.nombre as nombre_tipo',           // Nombre del tipo
+            'etapas.nombre as nombre_etapa',         // Nombre de la etapa
+        ];
+
+        // Construir la consulta base con los JOINs necesarios
+        $baseQuery = DB::table('proyecto')
+                        ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+                        ->join('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
+                        ->join('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa');
+
+
         // Verificar el rol del usuario
         if ($user->hasRole('admin')) {
             // Admin ve todos los proyectos
-            $proyectos = DB::table('proyecto')
-                         ->select('proyecto.*', DB::raw('0 as es_lider')) // Los admins no son líderes de proyectos específicos en esta vista
-                         ->get();
+            $proyectos = $baseQuery->select(array_merge($commonSelects, [DB::raw('0 as es_lider')]))
+                                   ->get();
         } elseif ($user->hasRole('alumno')) {
-            // Obtener no_control del alumno por su correo institucional
             $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
 
             if ($alumno) {
-                // Modificación aquí: Incluir el campo 'lider' de alumno_proyecto como 'es_lider'
-                $proyectos = DB::table('proyecto')
-                    ->join('alumno_proyecto', 'proyecto.clave_proyecto', '=', 'alumno_proyecto.clave_proyecto')
+                $proyectos = DB::table('alumno_proyecto')
+                    ->join('proyecto', 'alumno_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                    ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+                    ->join('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
+                    ->join('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
                     ->where('alumno_proyecto.no_control', $alumno->no_control)
-                    ->select('proyecto.*', 'alumno_proyecto.lider as es_lider') // Añadido 'lider as es_lider'
+                    ->select(array_merge($commonSelects, ['alumno_proyecto.lider as es_lider']))
                     ->get();
             }
         } elseif ($user->hasRole('asesor')) {
-            // Obtener idAsesor del asesor por su correo electrónico
             $asesor = DB::table('asesor')->where('correo_electronico', $user->email)->first();
 
             if ($asesor) {
-                $proyectos = DB::table('proyecto')
-                    ->join('asesor_proyecto', 'proyecto.clave_proyecto', '=', 'asesor_proyecto.clave_proyecto')
+                $proyectos = DB::table('asesor_proyecto')
+                    ->join('proyecto', 'asesor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                    ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+                    ->join('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
+                    ->join('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
                     ->where('asesor_proyecto.idAsesor', $asesor->idAsesor)
-                    ->select('proyecto.*', DB::raw('0 as es_lider')) // Los asesores no son líderes
+                    ->select(array_merge($commonSelects, [DB::raw('0 as es_lider')]))
                     ->get();
             }
         } elseif ($user->hasRole('mentor')) {
-            // Obtener idMentor del mentor por su correo electrónico
             $mentor = DB::table('mentor')->where('correo_electronico', $user->email)->first();
 
             if ($mentor) {
-                $proyectos = DB::table('proyecto')
-                    ->join('mentor_proyecto', 'proyecto.clave_proyecto', '=', 'mentor_proyecto.clave_proyecto')
+                $proyectos = DB::table('mentor_proyecto')
+                    ->join('proyecto', 'mentor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
+                    ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+                    ->join('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
+                    ->join('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
                     ->where('mentor_proyecto.idMentor', $mentor->idMentor)
-                    ->select('proyecto.*', DB::raw('0 as es_lider')) // Los mentores no son líderes
+                    ->select(array_merge($commonSelects, [DB::raw('0 as es_lider')]))
                     ->get();
             }
         }
         // Si no tiene ninguno de los roles anteriores, $proyectos seguirá siendo una colección vacía.
 
-        // Asignar clase a cada proyecto según su etapa (solo si hay proyectos)
+        // Ahora que tenemos 'etapa_id' en cada proyecto y 'clase' en cada 'etapa' de la colección $etapas
         foreach ($proyectos as $proyecto) {
-            $etapa = $etapas->firstWhere('idEtapa', $proyecto->etapa);
-            $proyecto->clase = $etapa->clase ?? 'default-class';
+            $etapaObj = $etapas->firstWhere('idEtapa', $proyecto->etapa_id);
+            $proyecto->clase = $etapaObj->clase ?? 'secondary'; 
         }
 
         return view('home', [
             'titulo' => 'Inicio',
             'proyectos' => $proyectos,
-            'categorias' => $categorias,
-            'tipos' => $tipos,
-            'etapas' => $etapas,
+            'categorias' => $categorias, 
+            'tipos' => $tipos,           
+            'etapas' => $etapas,        
         ]);
     }
 }
