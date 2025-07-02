@@ -14,6 +14,12 @@ class AlumnoProyectoSeeder extends Seeder
     {
         DB::table('alumno_proyecto')->insert([
             [
+                'clave_proyecto' => '0000000000050',
+                'no_control' => '21270650',
+                'fecha_agregado' => '2024-08-27 11:11:43',
+                'lider' => true,
+            ],
+            [
                 'clave_proyecto' => '0000000000045',
                 'no_control' => '20270236',
                 'fecha_agregado' => '2024-08-27 11:11:43',

@@ -14,9 +14,18 @@ class AlumnoSeeder extends Seeder
     {
         // Opcional: Para limpiar la tabla antes de insertar si ejecutas el seeder varias veces.
         // Esto es útil durante el desarrollo para asegurar que no haya duplicados.
-        DB::table('alumno')->delete(); 
+        DB::table('alumno')->delete();
 
         $alumnos = [
+            [
+                'no_control' => '21270650',
+                'nombre' => 'Jose Estrada',
+                'carrera' => 'Ingeniería en Sistemas Computacionales',
+                'correo_institucional' => 'L21270650@tuxtla.tecnm.mx',
+                'telefono' => '9611234567',
+                'semestre' => 3,
+                'fecha_agregado' => '2024-08-28 10:10:40',
+            ],
             [
                 'no_control' => '00000001',
                 'nombre' => 'Francisco Alberto Pérez Hernández',
