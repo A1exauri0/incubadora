@@ -22,7 +22,8 @@ use App\Http\Controllers\{
     ServicioController,
     InicioController,
     habilidadesAMController,
-    TokenController
+    TokenController,
+    NotificationController
 };
 
 /*
@@ -62,35 +63,40 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Ruta para la vista personalizada de correo verificado
-Route::get('/email-verified', function () {
-    return view('auth.email-verified');
-})->name('email.confirmed');
-
 Route::post('email/verification-notification', function () {
     \Illuminate\Support\Facades\Notification::send(auth()->user(), new \Illuminate\Auth\Notifications\VerifyEmail);
 })->middleware('auth')->name('verification.send');
 
 // =========================================================================
 // RUTAS COMUNES PARA USUARIOS AUTENTICADOS Y VERIFICADOS
-// (Aquí se incluye registro-datos, accesible por todos los roles que lo necesiten)
 // =========================================================================
 Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas para completar el registro de datos (accesible para todos los roles verificados)
-    // ESTA ES LA ÚNICA DEFINICIÓN DE registro-datos
     Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
     Route::post('/registro-datos', [RegistroDatosController::class, 'store'])->name('registro.datos.guardar');
 
-    // Rutas específicas para el rol de alumno (si solo ellos pueden editar proyectos)
-    // Este grupo es SOLO para rutas EXCLUSIVAS de alumno, NO registro-datos
+    // Rutas de Notificaciones (para administradores)
+    Route::group(['middleware' => ['role:admin']], function () {
+        Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');
+        Route::post('/notifications/mark-as-read', [NotificationController::class, 'markNotificationsAsRead'])->name('notifications.markAsRead');
+        // Rutas para la revisión de propuestas de proyectos por el administrador
+        Route::get('/admin/proyectos/propuestas', [ProyectoController::class, 'listProposals'])->name('admin.proyectos.propuestas');
+        Route::post('/admin/proyectos/propuestas/{clave_proyecto}/review', [ProyectoController::class, 'reviewProposal'])->name('admin.proyectos.propuestas.review');
+        // NUEVA RUTA PARA GENERAR PDF
+        Route::get('/admin/proyectos/{clave_proyecto}/ficha-tecnica-pdf', [ProyectoController::class, 'generateFichaTecnicaPdf'])->name('admin.proyectos.ficha_tecnica_pdf');
+    });
+
+    // Rutas específicas para el rol de alumno
     Route::group(['middleware' => ['role:alumno']], function () {
         Route::get('/proyectos/{clave_proyecto}/editar', [ProyectoController::class, 'edit'])->name('proyectos.edit');
         Route::put('/proyectos/{clave_proyecto}', [ProyectoController::class, 'update'])->name('proyectos.update');
+
+        // Rutas para que el alumno cree una propuesta de proyecto
+        Route::get('/c_proyectos_alumno/crear', [ProyectoController::class, 'createProposalForm'])->name('proyectos.crear_propuesta');
+        Route::post('/c_proyectos_alumno/store-proposal', [ProyectoController::class, 'storeProposal'])->name('proyectos.store_proposal');
     });
 
-    // Añade aquí rutas específicas para otros roles si las hay, p.ej.
-    // Route::group(['middleware' => ['role:asesor']], function () {
-    //     Route::get('/asesor/dashboard', [AsesorController::class, 'dashboard'])->name('asesor.dashboard');
-    // });
+    // ... (otras rutas protegidas generales)
 });
 
 // =========================================================================

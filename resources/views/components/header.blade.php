@@ -48,6 +48,8 @@
                                 <a class="dropdown-item" href="/c_participantes">Participantes</a>
                                 <a class="dropdown-item" href="/c_tipos">Tipos</a>
                                 <a class="dropdown-item" href="/c_etapas">Etapas</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ route('admin.proyectos.propuestas') }}">Revisar Propuestas</a>
                             </div>
                         </li>
 
@@ -63,15 +65,61 @@
                             </div>
                         </li>
                     @endcan
+                    @can('mostrar alumno')
+                        <!-- Dropdown Proyectos Alumno -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="proyectosAlumnoDropdown"
+                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Proyectos
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="proyectosAlumnoDropdown">
+                                <a class="dropdown-item" href="/c_proyectos_alumno">Mis Proyectos</a>
+                                <a class="dropdown-item" href="{{ route('proyectos.crear_propuesta') }}">Crear Propuesta de Proyecto</a>
+                            </div>
+                        </li>
+                    @endcan
                 </ul>
 
-                <!-- Logout -->
+                <!-- Logout y Notificaciones -->
                 <ul class="navbar-nav ml-auto">
                     @auth
+                        {{-- Notificaciones para el Admin --}}
+                        @if (Auth::user()->hasRole('admin'))
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" href="#" id="notificationsDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-bell"></i>
+                                    @if (isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
+                                        <span class="badge badge-pill badge-danger notifications-badge">{{ $unreadNotificationsCount }}</span>
+                                    @endif
+                                </a>
+                                {{-- Contenido del dropdown de notificaciones --}}
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown">
+                                    <h6 class="dropdown-header">Notificaciones</h6>
+                                    <div id="notifications-list">
+                                        {{-- Las notificaciones se cargarán aquí con JavaScript --}}
+                                        <a class="dropdown-item text-center text-muted" href="#">Cargando
+                                            notificaciones...</a>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-center" href="#" id="markAllRead">Marcar todas
+                                        como leídas</a>
+                                </div>
+                            </li>
+                        @endif
+
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ Auth::user()->name }}
+                                {{-- Mostrar coronita si el usuario tiene el rol 'admin' --}}
+                                @if (Auth::user()->hasRole('admin'))
+                                    <i class="fas fa-user-tie text-white me-2" title="Administrador"></i>
+                                @endif
+                                {{-- Mostrar coronita si el usuario es líder (variable del View Composer) --}}
+                                @if (isset($isLeader) && $isLeader)
+                                    <i class="fas fa-crown text-warning me-2" title="Líder de Proyecto"></i>
+                                @endif
+                                <span class="ml-1">{{ Auth::user()->name }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('logout') }}"
@@ -89,3 +137,123 @@
         </div>
     </nav>
 </header>
+
+{{-- Script para manejar las notificaciones --}}
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationsDropdown = document.getElementById('notificationsDropdown');
+            const notificationsList = document.getElementById('notifications-list');
+            const markAllReadBtn = document.getElementById('markAllRead');
+            const notificationsBadge = document.querySelector('.notifications-badge');
+
+            function loadNotifications() {
+                notificationsList.innerHTML =
+                    '<a class="dropdown-item text-center text-muted" href="#">Cargando notificaciones...</a>';
+
+                fetch('{{ route('notifications.unread') }}', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error('Network response was not ok. Status: ' + response.status + ' - ' + text);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        notificationsList.innerHTML = '';
+
+                        if (data.length === 0) {
+                            notificationsList.innerHTML =
+                                '<a class="dropdown-item text-center text-muted" href="#">No hay notificaciones</a>';
+                        } else {
+                            data.forEach(notification => {
+                                const notificationItem = document.createElement('a');
+                                notificationItem.classList.add('dropdown-item');
+                                notificationItem.href = notification.link;
+
+                                let notificationHtml = `<div>${notification.message}</div>`;
+                                notificationHtml += `<small class="text-muted">${notification.time}</small>`;
+
+                                notificationItem.innerHTML = notificationHtml;
+
+                                notificationItem.addEventListener('click', function(e) {
+                                    markNotificationAsRead(notification.id);
+                                });
+                                notificationsList.appendChild(notificationItem);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar notificaciones:', error);
+                        notificationsList.innerHTML =
+                            '<a class="dropdown-item text-center text-danger" href="#">Error al cargar notificaciones.</a>';
+                    });
+            }
+
+            function markNotificationAsRead(notificationId = null) {
+                const formData = new FormData();
+                if (notificationId) {
+                    formData.append('id', notificationId);
+                }
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+                fetch('{{ route('notifications.markAsRead') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                             return response.text().then(text => {
+                                throw new Error('Network response was not ok. Status: ' + response.status + ' - ' + text);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            if (notificationsBadge) {
+                                if (data.unread_count > 0) {
+                                    notificationsBadge.textContent = data.unread_count;
+                                    notificationsBadge.style.display = 'inline-block';
+                                } else {
+                                    notificationsBadge.style.display = 'none';
+                                }
+                            }
+                            loadNotifications();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al marcar notificaciones como leídas:', error);
+                    });
+            }
+
+            if (notificationsDropdown) {
+                // Aquí usamos el evento 'click' directo en lugar de 'show.bs.dropdown'
+                notificationsDropdown.addEventListener('click', function(e) {
+                    // Solo si el dropdown no está ya abierto, cargamos las notificaciones.
+                    // Bootstrap se encarga de abrir/cerrar el dropdown con data-toggle="dropdown".
+                    // loadNotifications() se llama cuando el usuario hace clic.
+                    loadNotifications();
+                });
+            }
+
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    markNotificationAsRead();
+                });
+            }
+        });
+    </script>
+@endpush

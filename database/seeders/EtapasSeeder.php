@@ -31,6 +31,12 @@ class EtapasSeeder extends Seeder
                 'nombre' => 'V.º B.º Administrador',
                 'descripcion' => 'Visto bueno del administrador.',
                 'color' => 'Verde'
+            ],
+            [
+                'idEtapa' => 4,
+                'nombre' => 'Rechazado',
+                'descripcion' => 'Proyecto rechazado.',
+                'color' => 'Rojo'
             ]
         ]);
     }
