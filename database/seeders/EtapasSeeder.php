@@ -16,28 +16,22 @@ class EtapasSeeder extends Seeder
         DB::table('etapas')->insert([
             [
                 'idEtapa' => 1,
-                'nombre' => 'Inicio',
-                'descripcion' => 'Proyecto en fase de inicio.',
-                'color' => 'Verde'
-            ],
-            [
-                'idEtapa' => 2,
-                'nombre' => 'Desarrollo',
-                'descripcion' => 'Proyecto en fase de desarrollo.',
-                'color' => 'Amarillo'
-            ],
-            [
-                'idEtapa' => 3,
-                'nombre' => 'Final',
-                'descripcion' => 'Proyecto en fase final.',
-                'color' => 'Rojo'
-            ],
-            [
-                'idEtapa' => 4,
                 'nombre' => 'PENDIENTE',
                 'descripcion' => 'Proyecto pendiente de revisión o acción.',
                 'color' => 'Gris'
             ],
+            [
+                'idEtapa' => 2,
+                'nombre' => 'V.º B.º Asesor',
+                'descripcion' => 'Visto bueno del asesor.',
+                'color' => 'Amarillo'
+            ],
+            [
+                'idEtapa' => 3,
+                'nombre' => 'V.º B.º Administrador',
+                'descripcion' => 'Visto bueno del administrador.',
+                'color' => 'Verde'
+            ]
         ]);
     }
 }
