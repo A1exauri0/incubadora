@@ -82,7 +82,7 @@ class ProyectoController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function adminUpdate(Request $request) // Renombrado de 'editar'
+    public function editar(Request $request) // Renombrado de 'editar'
     {
         $clave_proyecto = $request->input('clave_proyecto_editar'); // Clave original del proyecto a editar
         $clave_proyecto_mod = $request->input('clave_proyecto_mod'); // Nueva clave (si se modificó)
