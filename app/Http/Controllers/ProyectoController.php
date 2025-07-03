@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\AdminActivityNotification;
+use App\Notifications\AdminActivityNotification; // Mantener si aún la usas en otros lugares
+use App\Notifications\NewProposalNotification; // Importar la nueva clase de notificación
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf; // Importa la Facade de Dompdf
 
@@ -79,6 +80,9 @@ class ProyectoController extends Controller
 
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
+                // Aquí puedes decidir si quieres seguir usando AdminActivityNotification o cambiar a NewProposalNotification
+                // Si quieres que los admins reciban un correo por "proyecto agregado directamente", podrías usar NewProposalNotification aquí también.
+                // Por ahora, mantendremos AdminActivityNotification para este caso, ya que la solicitud era para 'storeProposal'.
                 $admin->notify(new AdminActivityNotification('Proyecto "' . $nombre . '" agregado directamente por administrador.', '/c_proyectos', 'proyecto_agregado_admin'));
             }
 
@@ -333,13 +337,18 @@ class ProyectoController extends Controller
                 'lider' => 1,
             ]);
 
+            // Obtener todos los usuarios con el rol 'admin'
             $admins = User::role('admin')->get();
+            // Definir el enlace a la vista de propuestas
             $proposalLink = route('admin.proyectos.propuestas');
+
+            // Enviar la nueva notificación (que incluye correo y base de datos) a cada administrador
             foreach ($admins as $admin) {
-                $admin->notify(new AdminActivityNotification(
-                    'Nueva propuesta de proyecto de ' . $user->name . ': "' . $request->input('nombre'),
-                    $proposalLink,
-                    'proposal_submitted'
+                $admin->notify(new NewProposalNotification(
+                    $request->input('nombre'), // Nombre del proyecto
+                    $request->input('clave_proyecto'), // Clave del proyecto
+                    $user->name, // Nombre del usuario que envía la propuesta
+                    $proposalLink // Enlace a la vista de propuestas
                 ));
             }
 
