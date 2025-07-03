@@ -1,7 +1,5 @@
-@include('Admin.cruds.layouts.header')
-
 <!-- Se extiende de la clase layout en CRUDs (solamente para CRUDs) -->
-@extends('Admin.cruds.layouts.layout')
+@extends('layouts.layoutCrud')
 
 <!-- Se recibe la variable del título que tendrá la página en la pestaña -->
 @section('titulo', $titulo)
@@ -143,7 +141,7 @@
 
 <!-- Se carga el contenido de la tabla -->
 @section('datos')
-    
+
     {{-- Se manejan los mensajes de error --}}
     @if (session('error'))
         <div id="error-message" style="text-align: center; background-color: rgb(155, 38, 38); color: white; ">
@@ -207,7 +205,7 @@
                 @endfor
             </ul>
         @endsection
-        
+
         {{-- Muestra y añade la funcionalidad de los botones siguiente y anterior --}}
         @section('paginacion')
             <ul class="pagination">

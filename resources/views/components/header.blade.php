@@ -32,6 +32,7 @@
                                 <a class="dropdown-item" href="/c_habilidades">Habilidades</a>
                                 <a class="dropdown-item" href="/c_mentores">Mentores</a>
                                 <a class="dropdown-item" href="/c_servicios">Servicios</a>
+                                <a class="dropdown-item" href="/c_usuarios">Usuarios</a>
                             </div>
                         </li>
 
