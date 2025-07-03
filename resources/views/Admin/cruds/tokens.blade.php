@@ -5,10 +5,10 @@
 @section('titulo', $titulo)
 
 <!-- ¿Qué se va a administrar en plural? -->
-@section('administrar', 'Tokens')
+@section('administrar', 'Tokens de Usuarios')
 
 <!-- ¿Qué se va a administrar en singular? -->
-@section('administrar_s', 'Token')
+@section('administrar_s', 'Token de Usuario')
 
 @section('total_registros', $total_registros)
 

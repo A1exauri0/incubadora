@@ -28,7 +28,7 @@ class TokenController extends Controller
         $total_registros = $tokens->count();
         $roles = DB::table('roles')->get();
 
-        $titulo = "CRUD Tokens";
+        $titulo = "Agregar Usuario";
 
         return view('Admin.cruds.tokens', compact('tokens', 'roles', 'titulo', 'columnas', 'total_registros'));
     }

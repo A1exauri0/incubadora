@@ -29,9 +29,7 @@
                                 <a class="dropdown-item" href="/c_alumnos">Alumnos</a>
                                 <a class="dropdown-item" href="/c_carreras">Carreras</a>
                                 <a class="dropdown-item" href="/c_categorias">Categorías</a>
-                                <a class="dropdown-item" href="/c_tokens">Tokens</a>
                                 <a class="dropdown-item" href="/c_habilidades">Habilidades</a>
-                                <a class="dropdown-item" href="/c_habilidadesAM">Habilidades AM</a>
                                 <a class="dropdown-item" href="/c_mentores">Mentores</a>
                                 <a class="dropdown-item" href="/c_servicios">Servicios</a>
                             </div>
@@ -49,7 +47,8 @@
                                 <a class="dropdown-item" href="/c_tipos">Tipos</a>
                                 <a class="dropdown-item" href="/c_etapas">Etapas</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{ route('admin.proyectos.propuestas') }}">Revisar Propuestas</a>
+                                <a class="dropdown-item" href="{{ route('admin.proyectos.propuestas') }}">Revisar
+                                    Propuestas</a>
                             </div>
                         </li>
 
@@ -64,6 +63,17 @@
                                 <a class="dropdown-item" href="/c_habilidadesAM_asignar">Asignar habilidades</a>
                             </div>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/c_tokens">Registrar usuario
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-person-fill-add" viewBox="0 0 16 16">
+                                    <path
+                                        d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                    <path
+                                        d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
+                                </svg></a>
+
+                        </li>
                     @endcan
                     @can('mostrar alumno')
                         <!-- Dropdown Proyectos Alumno -->
@@ -74,7 +84,9 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="proyectosAlumnoDropdown">
                                 <a class="dropdown-item" href="/c_proyectos_alumno">Mis Proyectos</a>
-                                <a class="dropdown-item" href="{{ route('proyectos.crear_propuesta') }}">Crear Propuesta de Proyecto</a>
+                                <a class="dropdown-item" href="{{ route('proyectos.crear_propuesta') }}">Crear Propuesta
+                                    de
+                                    Proyecto</a>
                             </div>
                         </li>
                     @endcan
@@ -85,12 +97,13 @@
                     @auth
                         {{-- Notificaciones para el Admin --}}
                         @if (Auth::user()->hasRole('admin'))
-                            <li class="nav-item dropdown">
+                            <li class="nav-item dropdown mr-2">
                                 <a class="nav-link" href="#" id="notificationsDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-bell"></i>
                                     @if (isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
-                                        <span class="badge badge-pill badge-danger notifications-badge">{{ $unreadNotificationsCount }}</span>
+                                        <span
+                                            class="badge badge-pill badge-danger notifications-badge">{{ $unreadNotificationsCount }}</span>
                                     @endif
                                 </a>
                                 {{-- Contenido del dropdown de notificaciones --}}
@@ -156,13 +169,15 @@
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content')
                         }
                     })
                     .then(response => {
                         if (!response.ok) {
                             return response.text().then(text => {
-                                throw new Error('Network response was not ok. Status: ' + response.status + ' - ' + text);
+                                throw new Error('Network response was not ok. Status: ' + response
+                                    .status + ' - ' + text);
                             });
                         }
                         return response.json();
@@ -180,7 +195,8 @@
                                 notificationItem.href = notification.link;
 
                                 let notificationHtml = `<div>${notification.message}</div>`;
-                                notificationHtml += `<small class="text-muted">${notification.time}</small>`;
+                                notificationHtml +=
+                                    `<small class="text-muted">${notification.time}</small>`;
 
                                 notificationItem.innerHTML = notificationHtml;
 
@@ -203,7 +219,8 @@
                 if (notificationId) {
                     formData.append('id', notificationId);
                 }
-                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute(
+                    'content'));
 
                 fetch('{{ route('notifications.markAsRead') }}', {
                         method: 'POST',
@@ -214,8 +231,9 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                             return response.text().then(text => {
-                                throw new Error('Network response was not ok. Status: ' + response.status + ' - ' + text);
+                            return response.text().then(text => {
+                                throw new Error('Network response was not ok. Status: ' + response
+                                    .status + ' - ' + text);
                             });
                         }
                         return response.json();
