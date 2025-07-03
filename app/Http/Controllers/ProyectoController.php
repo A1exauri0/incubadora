@@ -337,7 +337,7 @@ class ProyectoController extends Controller
             $proposalLink = route('admin.proyectos.propuestas');
             foreach ($admins as $admin) {
                 $admin->notify(new AdminActivityNotification(
-                    'Nueva propuesta de proyecto de ' . $user->name . ': "' . $request->input('nombre') . '" (Clave: ' . $request->input('clave_proyecto') . ')',
+                    'Nueva propuesta de proyecto de ' . $user->name . ': "' . $request->input('nombre'),
                     $proposalLink,
                     'proposal_submitted'
                 ));

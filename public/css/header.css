@@ -150,3 +150,24 @@
 .navbar-nav .nav-item .nav-link.dropdown-toggle {
     color: #ffffff;
 }
+
+.navbar-nav .nav-item {
+    position: relative; /* Importante para que el badge se posicione respecto a este elemento */
+}
+
+/* Estilos para el badge de notificaciones */
+.notifications-badge {
+    position: absolute;
+    top: 0px;   /* Ajusta la posición vertical según necesites */
+    right: 0px; /* Ajusta la posición horizontal según necesites */
+    padding: 2px 5px; /* Relleno del badge */
+    border-radius: 50%; /* Para que sea circular */
+    background-color: #dc3545; /* Color rojo de Bootstrap (danger) */
+    color: white;
+    font-size: 0.7em; /* Tamaño de fuente más pequeño para el número */
+    line-height: 1; /* Altura de línea para centrar el texto */
+    min-width: 18px; /* Ancho mínimo para números de un dígito */
+    text-align: center;
+    transform: translate(50%, -50%); /* Ajusta el badge para que "cuelgue" de la esquina */
+    z-index: 100; /* Asegura que esté por encima de otros elementos */
+}

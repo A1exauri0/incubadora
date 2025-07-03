@@ -101,10 +101,11 @@
                                 <a class="nav-link" href="#" id="notificationsDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-bell"></i>
-                                    @if (isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
-                                        <span
-                                            class="badge badge-pill badge-danger notifications-badge">{{ $unreadNotificationsCount }}</span>
-                                    @endif
+                                    {{-- El span siempre se renderiza, su display inicial se controla con style --}}
+                                    <span class="badge badge-pill badge-danger notifications-badge"
+                                        style="{{ (isset($unreadNotificationsCount) && $unreadNotificationsCount > 0) ? '' : 'display: none;' }}">
+                                        {{ $unreadNotificationsCount ?? 0 }}
+                                    </span>
                                 </a>
                                 {{-- Contenido del dropdown de notificaciones --}}
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown">
@@ -160,6 +161,19 @@
             const markAllReadBtn = document.getElementById('markAllRead');
             const notificationsBadge = document.querySelector('.notifications-badge');
 
+            // Función para actualizar el contador de notificaciones
+            function updateBadgeCount(count) {
+                if (notificationsBadge) {
+                    notificationsBadge.textContent = count;
+                    if (count > 0) {
+                        notificationsBadge.style.display = 'inline-block';
+                    } else {
+                        notificationsBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            // Función para cargar las notificaciones y actualizar el badge
             function loadNotifications() {
                 notificationsList.innerHTML =
                     '<a class="dropdown-item text-center text-muted" href="#">Cargando notificaciones...</a>';
@@ -183,7 +197,10 @@
                         return response.json();
                     })
                     .then(data => {
-                        notificationsList.innerHTML = '';
+                        notificationsList.innerHTML = ''; // Limpiar el mensaje de carga
+
+                        // Actualizar el contador con el número real de notificaciones sin leer
+                        updateBadgeCount(data.length);
 
                         if (data.length === 0) {
                             notificationsList.innerHTML =
@@ -201,7 +218,9 @@
                                 notificationItem.innerHTML = notificationHtml;
 
                                 notificationItem.addEventListener('click', function(e) {
+                                    // Marcar como leída y luego recargar solo el badge, no la lista completa
                                     markNotificationAsRead(notification.id);
+                                    // No es necesario loadNotifications() aquí, ya que markNotificationAsRead lo hará
                                 });
                                 notificationsList.appendChild(notificationItem);
                             });
@@ -211,9 +230,11 @@
                         console.error('Error al cargar notificaciones:', error);
                         notificationsList.innerHTML =
                             '<a class="dropdown-item text-center text-danger" href="#">Error al cargar notificaciones.</a>';
+                        updateBadgeCount(0); // Asegurarse de que el badge se oculte en caso de error
                     });
             }
 
+            // Función para marcar como leída y luego actualizar el contador
             function markNotificationAsRead(notificationId = null) {
                 const formData = new FormData();
                 if (notificationId) {
@@ -240,14 +261,9 @@
                     })
                     .then(data => {
                         if (data.success) {
-                            if (notificationsBadge) {
-                                if (data.unread_count > 0) {
-                                    notificationsBadge.textContent = data.unread_count;
-                                    notificationsBadge.style.display = 'inline-block';
-                                } else {
-                                    notificationsBadge.style.display = 'none';
-                                }
-                            }
+                            // Actualizar el contador con el nuevo conteo de notificaciones sin leer
+                            updateBadgeCount(data.unread_count);
+                            // Recargar la lista de notificaciones para que refleje el cambio (opcional, pero buena UX)
                             loadNotifications();
                         }
                     })
@@ -257,11 +273,8 @@
             }
 
             if (notificationsDropdown) {
-                // Aquí usamos el evento 'click' directo en lugar de 'show.bs.dropdown'
                 notificationsDropdown.addEventListener('click', function(e) {
-                    // Solo si el dropdown no está ya abierto, cargamos las notificaciones.
-                    // Bootstrap se encarga de abrir/cerrar el dropdown con data-toggle="dropdown".
-                    // loadNotifications() se llama cuando el usuario hace clic.
+                    // Cargar notificaciones cuando se abre el dropdown
                     loadNotifications();
                 });
             }
@@ -269,9 +282,12 @@
             if (markAllReadBtn) {
                 markAllReadBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    markNotificationAsRead();
+                    markNotificationAsRead(); // Marcar todas como leídas
                 });
             }
+
+            // Llama a loadNotifications al cargar la página para actualizar el contador inicial
+            loadNotifications();
         });
     </script>
 @endpush
