@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es"> {{-- Cambiado de 'en' a 'es' --}}
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- Importante para peticiones AJAX --}}
     <title>@yield('titulo') - ITTG</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {{-- Mantener esta versión --}}
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -41,7 +43,8 @@
                             <form action="{{ route('participantes.generarPDF') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="clave_proyecto" value="{{ $clave_proyecto }}">
-                                <button type="submit" class="btn btn-danger d-flex align-items-center" style="font-size: 14px; padding: 6px 12px;">
+                                <button type="submit" class="btn btn-danger d-flex align-items-center"
+                                    style="font-size: 14px; padding: 6px 12px;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                         fill="currentColor" class="bi bi-filetype-pdf mr-2" viewBox="0 0 16 16">
                                         <path fill-rule="evenodd"
@@ -105,7 +108,7 @@
                     <table id="tabla_datos" class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                    <th>Líder</th>
+                                <th>Líder</th>
 
                                 <th>
                                     Alumnos
@@ -161,9 +164,9 @@
     {{-- Incluir el nuevo modal de cambio de líder --}}
     @yield('modulo_cambiar_lider')
 
-@include('components.footer')
-
+    @stack('scripts')
 
 </body>
+@include('components.footer')
 
 </html>
