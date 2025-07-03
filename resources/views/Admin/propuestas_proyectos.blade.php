@@ -59,7 +59,7 @@
                                             @elseif ($propuesta->etapa == \App\Http\Controllers\ProyectoController::ID_ETAPA_RECHAZADA)
                                                 <span class="badge badge-danger">Rechazada</span>
                                             @else
-                                                <span class="badge badge-info">{{ $propuesta->nombre_etapa }}</span> {{-- Mostrar el nombre de la etapa si es otra --}}
+                                                <span class="badge badge-info">{{ $propuesta->nombre_etapa }}</span>
                                             @endif
                                         </td>
                                         <td>{{ $propuesta->motivo_rechazo ?? 'N/A' }}</td>
@@ -78,6 +78,10 @@
                                             @else
                                                 <span class="text-muted">Revisado</span>
                                             @endif
+                                            {{-- Botón para generar PDF --}}
+                                            <a href="{{ route('admin.proyectos.ficha_tecnica_pdf', $propuesta->clave_proyecto) }}" class="btn btn-info btn-sm ml-1" title="Generar Ficha Técnica PDF" target="_blank">
+                                                <i class="fas fa-file-pdf"></i> PDF
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach

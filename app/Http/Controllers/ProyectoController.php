@@ -5,36 +5,31 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\AdminActivityNotification; // Importa tu clase de notificación
-use App\Models\User; // Importa el modelo User
+use App\Notifications\AdminActivityNotification;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf; // Importa la Facade de Dompdf
 
 class ProyectoController extends Controller
 {
-    // Define los IDs de etapa para los estados de la propuesta según tu tabla 'etapas'
-    const ID_ETAPA_PENDIENTE = 1; // Corresponde a 'PENDIENTE'
-    const ID_ETAPA_APROBADA = 3;    // Corresponde a 'V.º B.º Administrador'
-    const ID_ETAPA_RECHAZADA = 4;  // ¡¡¡CAMBIA ESTE VALOR SI USAS OTRO ID PARA 'RECHAZADA'!!!
-                                   // Si no tienes una etapa 'RECHAZADA', usa 1 y el motivo_rechazo para diferenciar
+    const ID_ETAPA_PENDIENTE = 1;
+    const ID_ETAPA_APROBADA = 3;
+    const ID_ETAPA_RECHAZADA = 4;
 
     public function __construct()
     {
-        $this->middleware('auth'); // Asegura que el usuario esté autenticado para todos los métodos
+        $this->middleware('auth');
     }
 
-    /**
-     * Muestra la vista principal del CRUD de proyectos (probablemente para administradores).
-     * Filtra los proyectos que son propuestas pendientes o rechazadas.
-     */
     public function index()
     {
+        // CORRECCIÓN: Eliminar los filtros para mostrar todos los proyectos en el CRUD principal
         $proyectos = DB::table('proyecto')
-                        ->where('etapa', '!=', self::ID_ETAPA_PENDIENTE)
-                        ->where('etapa', '!=', self::ID_ETAPA_RECHAZADA)
                         ->orderBy('fecha_agregado', 'desc')
                         ->get();
+
         $columnas = ['Clave', 'Nombre', 'Nombre descriptivo', 'Categoria', 'Tipo', 'Etapa', 'Video', 'Registrado'];
         $categorias = DB::table('categoria')->get();
-        $alumnos = DB::table('alumno')->get();
+        $alumnos = DB::table('alumno')->get(); // Mantengo esta línea si se usa en la vista, si no, puedes quitarla.
         $tipos = DB::table('tipo')->get();
         $etapas = DB::table('etapas')->get();
         $total_registros = $proyectos->count();
@@ -44,19 +39,12 @@ class ProyectoController extends Controller
         return view('Admin.cruds.proyectos', compact('proyectos', 'titulo', 'columnas', 'total_registros', 'categorias', 'alumnos', 'tipos', 'etapas'));
     }
 
-    /**
-     * Verifica si un proyecto con la clave dada ya existe.
-     */
     public function registro_existe($clave_proyecto)
     {
         $existe = DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->count();
         return $existe > 0;
     }
 
-    /**
-     * Agrega un nuevo proyecto (usado en el CRUD de administración).
-     * Los proyectos agregados por el admin se consideran aprobados por defecto.
-     */
     public function agregar(Request $request)
     {
         $clave_proyecto = $request->input('clave_proyecto_agregar');
@@ -81,7 +69,7 @@ class ProyectoController extends Controller
                 'descripcion' => $descripcion,
                 'categoria' => $categoria,
                 'tipo' => $tipo,
-                'etapa' => $etapa, // Se usa la etapa proporcionada por el admin
+                'etapa' => $etapa,
                 'video' => $video,
                 'area_aplicacion' => $area_aplicacion,
                 'naturaleza_tecnica' => $naturaleza_tecnica,
@@ -89,7 +77,6 @@ class ProyectoController extends Controller
                 'fecha_agregado' => now(),
             ]);
 
-            // Notificación para administradores: Proyecto Agregado (directamente aprobado)
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
                 $admin->notify(new AdminActivityNotification('Proyecto "' . $nombre . '" agregado directamente por administrador.', '/c_proyectos', 'proyecto_agregado_admin'));
@@ -99,9 +86,6 @@ class ProyectoController extends Controller
         }
     }
 
-    /**
-     * Actualiza un proyecto desde la interfaz de administración.
-     */
     public function editar(Request $request)
     {
         $clave_proyecto = $request->input('clave_proyecto_editar');
@@ -134,20 +118,17 @@ class ProyectoController extends Controller
                 'objetivo' => $objetivo
             ]);
 
-            // Notificación para administradores: Proyecto Actualizado (Admin)
             $admins = User::role('admin')->get();
-            $notificationMessage = "Proyecto '" . $nombre . "' actualizado por un administrador.";
+            $updaterName = Auth::user()->name;
+            $adminMessage = 'Proyecto "' . $nombre . '" actualizado por un administrador.';
             foreach ($admins as $admin) {
-                $admin->notify(new AdminActivityNotification($notificationMessage, '/c_proyectos', 'proyecto_actualizado_admin'));
+                $admin->notify(new AdminActivityNotification($adminMessage, '/c_proyectos', 'proyecto_actualizado_admin'));
             }
 
             return back()->with('success', 'Proyecto actualizado exitosamente.');
         }
     }
 
-    /**
-     * Elimina un proyecto (usado en el CRUD de administración).
-     */
     public function eliminar(Request $request)
     {
         $clave_proyecto = $request->input('clave_proyecto_eliminar');
@@ -155,7 +136,6 @@ class ProyectoController extends Controller
 
         DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->delete();
 
-        // Notificación para administradores: Proyecto Eliminado
         if ($proyecto_eliminado) {
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
@@ -166,9 +146,6 @@ class ProyectoController extends Controller
         return back()->with('success', 'Proyecto eliminado exitosamente.');
     }
 
-    /**
-     * Elimina múltiples proyectos (usado en el CRUD de administración).
-     */
     public function eliminarMultiple(Request $request)
     {
         $proyectos_a_eliminar = $request->input('proyectos_seleccionados', []);
@@ -181,7 +158,6 @@ class ProyectoController extends Controller
 
         DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
 
-        // Notificación para administradores: Múltiples Proyectos Eliminados
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
             $message = 'Múltiples proyectos eliminados. Claves: ' . implode(', ', $proyectos_a_eliminar);
@@ -194,18 +170,6 @@ class ProyectoController extends Controller
         return back()->with('success', 'Proyectos seleccionados eliminados exitosamente.');
     }
 
-
-    // ========================================================================
-    // MÉTODOS PARA LA EDICIÓN DE PROYECTOS POR EL LÍDER DE EQUIPO
-    // ========================================================================
-
-    /**
-     * Muestra el formulario para editar un proyecto específico.
-     * Solo accesible por el admin o el líder del proyecto.
-     *
-     * @param string $clave_proyecto La clave del proyecto a editar.
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function edit($clave_proyecto)
     {
         $user = Auth::user();
@@ -239,14 +203,6 @@ class ProyectoController extends Controller
         return view('alumnos.editar', compact('proyecto', 'categorias', 'tipos', 'etapas'));
     }
 
-    /**
-     * Actualiza los datos de un proyecto específico.
-     * Solo accesible por el admin o el líder del proyecto.
-     *
-     * @param \Illuminate\Http\Request $request La solicitud HTTP.
-     * @param string $clave_proyecto La clave del proyecto a actualizar.
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function update(Request $request, $clave_proyecto)
     {
         $user = Auth::user();
@@ -299,9 +255,8 @@ class ProyectoController extends Controller
                     'objetivo' => $request->input('objetivo'),
                 ]);
 
-            // Notificación para administradores: Proyecto Actualizado (Líder/Admin)
             $admins = User::role('admin')->get();
-            $updaterName = $user->name;
+            $updaterName = Auth::user()->name;
             $adminMessage = 'Proyecto "' . $request->input('nombre') . '" (Clave: ' . $clave_proyecto . ') actualizado por ' . $updaterName . '.';
             foreach ($admins as $admin) {
                 $admin->notify(new AdminActivityNotification($adminMessage, '/proyectos/' . $clave_proyecto . '/editar', 'proyecto_actualizado_lider'));
@@ -314,41 +269,22 @@ class ProyectoController extends Controller
         }
     }
 
-
-    // ========================================================================
-    // MÉTODOS PARA CREAR Y REVISAR PROPUESTAS DE PROYECTO
-    // ========================================================================
-
-    /**
-     * Muestra el formulario para que cualquier alumno cree una propuesta de proyecto.
-     *
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function createProposalForm()
     {
         $user = Auth::user();
         $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
 
-        // Cualquier usuario con rol 'alumno' puede crear una propuesta
         if (!$user->hasRole('alumno') || !$alumno) {
             return redirect()->route('home')->with('error', 'No tienes permiso para crear una propuesta de proyecto.');
         }
 
         $categorias = DB::table('categoria')->get();
         $tipos = DB::table('tipo')->get();
-        // Las etapas se pasan para que el formulario sea consistente, aunque se asigna PENDIENTE por defecto
         $etapas = DB::table('etapas')->get();
 
         return view('alumnos.crear_propuesta', compact('categorias', 'tipos', 'etapas'));
     }
 
-    /**
-     * Almacena la nueva propuesta de proyecto enviada por un alumno.
-     * El alumno que la crea se asocia automáticamente como líder.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function storeProposal(Request $request)
     {
         $user = Auth::user();
@@ -358,7 +294,6 @@ class ProyectoController extends Controller
             return redirect()->route('home')->with('error', 'Acceso no autorizado para crear propuestas.');
         }
 
-        // Validar los datos de la solicitud
         $request->validate([
             'clave_proyecto' => 'required|string|max:50|unique:proyecto,clave_proyecto',
             'nombre' => 'required|string|max:255',
@@ -372,13 +307,11 @@ class ProyectoController extends Controller
             'objetivo' => 'nullable|string',
         ]);
 
-        // Transformar '' a null para el campo 'video' si está vacío
         if (empty($request->input('video'))) {
             $request->merge(['video' => null]);
         }
 
         try {
-            // Insertar el proyecto con la etapa PENDIENTE (ID 1)
             DB::table('proyecto')->insert([
                 'clave_proyecto' => $request->input('clave_proyecto'),
                 'nombre' => $request->input('nombre'),
@@ -386,25 +319,22 @@ class ProyectoController extends Controller
                 'descripcion' => $request->input('descripcion'),
                 'categoria' => $request->input('categoria'),
                 'tipo' => $request->input('tipo'),
-                'etapa' => self::ID_ETAPA_PENDIENTE, // ¡Aquí se asigna la etapa 1 (PENDIENTE)!
+                'etapa' => self::ID_ETAPA_PENDIENTE,
                 'video' => $request->input('video'),
                 'area_aplicacion' => $request->input('area_aplicacion'),
                 'naturaleza_tecnica' => $request->input('naturaleza_tecnica'),
                 'objetivo' => $request->input('objetivo'),
-                'fecha_agregado' => now(), // Registra la fecha de creación
+                'fecha_agregado' => now(),
             ]);
 
-            // Asociar al alumno que creó la propuesta como líder del proyecto
-            // Esta relación se establecerá como líder al momento de la creación de la propuesta.
             DB::table('alumno_proyecto')->insert([
                 'no_control' => $alumno->no_control,
                 'clave_proyecto' => $request->input('clave_proyecto'),
-                'lider' => 1, // Marcar como líder desde el inicio de la propuesta
+                'lider' => 1,
             ]);
 
-            // Notificación para administradores: Nueva Propuesta de Proyecto
             $admins = User::role('admin')->get();
-            $proposalLink = route('admin.proyectos.propuestas'); // Enlace a la lista de propuestas
+            $proposalLink = route('admin.proyectos.propuestas');
             foreach ($admins as $admin) {
                 $admin->notify(new AdminActivityNotification(
                     'Nueva propuesta de proyecto de ' . $user->name . ': "' . $request->input('nombre') . '" (Clave: ' . $request->input('clave_proyecto') . ')',
@@ -420,14 +350,8 @@ class ProyectoController extends Controller
         }
     }
 
-    /**
-     * Muestra la lista de propuestas de proyectos para el administrador.
-     *
-     * @return \Illuminate\View\View
-     */
     public function listProposals()
     {
-        // Obtener solo proyectos que estén en estado 'PENDIENTE' o 'RECHAZADA'
         $propuestas = DB::table('proyecto')
                         ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
                         ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
@@ -438,9 +362,9 @@ class ProyectoController extends Controller
                             'proyecto.descripcion',
                             'categoria.nombre as nombre_categoria',
                             'tipo.nombre as nombre_tipo',
-                            'etapas.nombre as nombre_etapa', // El nombre de la etapa actual
+                            'etapas.nombre as nombre_etapa',
                             'proyecto.fecha_agregado',
-                            'proyecto.etapa', // El ID de la etapa
+                            'proyecto.etapa',
                             'proyecto.motivo_rechazo'
                         )
                         ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE, self::ID_ETAPA_RECHAZADA])
@@ -452,13 +376,6 @@ class ProyectoController extends Controller
         return view('Admin.propuestas_proyectos', compact('propuestas', 'titulo'));
     }
 
-    /**
-     * Procesa la revisión de una propuesta de proyecto (aceptar/rechazar).
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param string $clave_proyecto
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function reviewProposal(Request $request, $clave_proyecto)
     {
         $request->validate([
@@ -479,19 +396,18 @@ class ProyectoController extends Controller
 
         if ($request->input('action') === 'accept') {
             $updateData = [
-                'etapa' => self::ID_ETAPA_APROBADA, // Cambia la etapa a APROBADA (3)
-                'motivo_rechazo' => null, // Limpiar motivo de rechazo si se acepta
+                'etapa' => self::ID_ETAPA_APROBADA,
+                'motivo_rechazo' => null,
             ];
             $notificationMessage = 'La propuesta de proyecto "' . $proyecto->nombre . '" ha sido APROBADA.';
             $notificationType = 'proposal_approved';
-            // No se necesita actualizar 'lider' aquí, ya que se asignó al crear la propuesta
         } elseif ($request->input('action') === 'reject') {
             if (empty($request->input('motivo_rechazo'))) {
                 return back()->with('error', 'El motivo de rechazo es obligatorio para rechazar la propuesta.');
             }
             $motivoRechazo = $request->input('motivo_rechazo');
             $updateData = [
-                'etapa' => self::ID_ETAPA_RECHAZADA, // Cambia la etapa a RECHAZADA (4)
+                'etapa' => self::ID_ETAPA_RECHAZADA,
                 'motivo_rechazo' => $motivoRechazo,
             ];
             $notificationMessage = 'La propuesta de proyecto "' . $proyecto->nombre . '" ha sido RECHAZADA. Motivo: ' . $motivoRechazo;
@@ -500,10 +416,9 @@ class ProyectoController extends Controller
 
         DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->update($updateData);
 
-        // Notificar al alumno líder sobre la decisión
         $leader = DB::table('alumno_proyecto')
                     ->where('clave_proyecto', $clave_proyecto)
-                    ->where('lider', 1) // Obtener al alumno que ya es líder de esta propuesta
+                    ->where('lider', 1)
                     ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
                     ->join('users', 'alumno.correo_institucional', '=', 'users.email')
                     ->select('users.id')
@@ -514,12 +429,81 @@ class ProyectoController extends Controller
             if ($leaderUser) {
                 $leaderUser->notify(new AdminActivityNotification(
                     $notificationMessage,
-                    route('home'), // O una ruta específica para ver sus proyectos
+                    route('home'),
                     $notificationType
                 ));
             }
         }
 
         return back()->with('success', 'Propuesta de proyecto procesada exitosamente.');
+    }
+
+    /**
+     * Genera la ficha técnica de un proyecto en formato PDF.
+     * Utiliza la vista 'layouts.pdf' y permite la visualización en el navegador.
+     *
+     * @param string $clave_proyecto La clave del proyecto.
+     * @return \Illuminate\Http\Response
+     */
+    public function generateFichaTecnicaPdf($clave_proyecto)
+    {
+        // Obtener los datos del proyecto, incluyendo el nombre de la categoría
+        $proyecto = DB::table('proyecto')
+                        ->where('clave_proyecto', $clave_proyecto)
+                        ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+                        ->select('proyecto.*', 'categoria.nombre as nombre_categoria')
+                        ->first();
+
+        if (!$proyecto) {
+            abort(404, 'Proyecto no encontrado.');
+        }
+
+        // Obtener los resultados del proyecto (asumiendo tabla 'proyecto_resultados')
+        $resultados = DB::table('proyecto_resultados')
+                            ->where('clave_proyecto', $clave_proyecto)
+                            ->get();
+
+        // Obtener los alumnos asociados al proyecto con su carrera
+        $alumno_proyecto = DB::table('alumno_proyecto')
+                                ->where('clave_proyecto', $clave_proyecto)
+                                ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
+                                // CORRECCIÓN: Unir por el nombre de la carrera, no por un ID que no existe
+                                ->leftJoin('carrera', 'alumno.carrera', '=', 'carrera.nombre')
+                                ->select('alumno.*', 'carrera.nombre as carrera_nombre_completo', 'alumno_proyecto.lider')
+                                ->get();
+
+        // Obtener los asesores asociados al proyecto
+        $asesor_proyecto = DB::table('asesor_proyecto')
+                                ->where('clave_proyecto', $clave_proyecto)
+                                ->join('asesor', 'asesor_proyecto.idAsesor', '=', 'asesor.idAsesor')
+                                ->select('asesor.*')
+                                ->get();
+
+        // Obtener los requerimientos del proyecto (asumiendo tabla 'proyecto_requerimientos')
+        $requerimientos = DB::table('proyecto_requerimientos')
+                                ->where('clave_proyecto', $clave_proyecto)
+                                ->get();
+
+        // Pasar todos los datos a la vista del PDF
+        $data = [
+            'proyecto' => $proyecto,
+            'resultados' => $resultados,
+            'alumno_proyecto' => $alumno_proyecto,
+            'asesor_proyecto' => $asesor_proyecto,
+            'requerimientos' => $requerimientos,
+            // Las siguientes colecciones se pasan porque tu layouts/pdf.blade.php las usa
+            // aunque para la categoría del proyecto principal se usará $proyecto->nombre_categoria
+            'categorias' => DB::table('categoria')->get(), // Necesario si otras partes del PDF lo usan
+            'carreras' => DB::table('carrera')->get(),   // Necesario si otras partes del PDF lo usan
+        ];
+
+        // Cargar la vista 'layouts.pdf' y generar el PDF
+        $pdf = Pdf::loadView('layouts.pdf', $data);
+
+        // Opcional: Configurar el tamaño del papel y la orientación
+        // $pdf->setPaper('A4', 'portrait');
+
+        // Visualizar el PDF en el navegador
+        return $pdf->stream('ficha_tecnica_' . $clave_proyecto . '.pdf');
     }
 }
