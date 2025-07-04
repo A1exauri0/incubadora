@@ -152,7 +152,7 @@
                 <h1>¡Bienvenido a IncubaTec ITTG!</h1>
             </div>
             <div class="content">
-                <p>Estimado(a) usuario(a) de correo <strong>{{ $correo }}</strong>,</p>
+                <p>Estimado(a) usuario(a),</p>
                 <p>Se ha generado un token de registro para usted, asignado con el rol de <strong>{{ $rolName }}</strong>.</p>
                 <p>Por favor, utilice el siguiente token para completar su registro:</p>
                 <div class="token-box">
