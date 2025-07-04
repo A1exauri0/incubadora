@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\User; // Asegúrate de que esta línea esté aquí
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,9 +38,9 @@ class AppServiceProvider extends ServiceProvider
                     $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
                     if ($alumno) {
                         $leaderEntry = DB::table('alumno_proyecto')
-                                        ->where('no_control', $alumno->no_control)
-                                        ->where('lider', 1)
-                                        ->first();
+                            ->where('no_control', $alumno->no_control)
+                            ->where('lider', 1)
+                            ->first();
                         if ($leaderEntry) {
                             $isLeader = true;
                         }
@@ -49,8 +49,6 @@ class AppServiceProvider extends ServiceProvider
 
                 // Lógica para contar notificaciones no leídas para el administrador
                 if ($user->hasRole('admin')) {
-                    // Asegúrate de que tu modelo User usa el trait Notifiable
-                    // (use Illuminate\Notifications\Notifiable; en App\Models\User)
                     $unreadNotificationsCount = $user->unreadNotifications()->count();
                 }
             }
@@ -59,11 +57,16 @@ class AppServiceProvider extends ServiceProvider
             $view->with('unreadNotificationsCount', $unreadNotificationsCount);
         });
 
+        // Personalización del correo de verificación de email
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+            // Renderiza la vista Blade personalizada como HTML
             return (new MailMessage)
-                ->subject('Confirma tu dirección de correo electrónico')
-                ->line('Por favor, haz clic en el siguiente botón para verificar tu correo.')
-                ->action('Verificar correo', $url);
+                ->subject('Verifica tu dirección de correo electrónico - IncubaTec ITTG')
+                ->view('emails.verify_email', [
+                    'actionUrl' => $url,
+                    'actionText' => 'Verificar correo', // Texto del botón
+                    'displayableActionUrl' => $url, // Para el subcopy
+                ]);
         });
     }
 }
