@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\HtmlString; // Necesario para usar HTML en el correo
 
 class NewProposalNotification extends Notification implements ShouldQueue
 {
@@ -55,14 +54,14 @@ class NewProposalNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Nueva Propuesta de Proyecto Pendiente de Revisión') // Asunto del correo
-                    ->greeting('Hola Administrador,') // Saludo
-                    ->line(new HtmlString('Se ha enviado una nueva propuesta de proyecto que requiere su revisión:')) // Contenido del correo
-                    ->line('Nombre del Proyecto: ' . $this->projectName)
-                    ->line('Clave del Proyecto: ' . $this->projectClave)
-                    ->line('Enviado por: ' . $this->submitterName)
-                    ->action('Revisar Propuestas', $this->proposalLink) // Botón con enlace a la vista de propuestas
-                    ->line('Por favor, inicie sesión en el sistema para revisar esta y otras propuestas pendientes.');
+                    ->subject('Nueva Propuesta de Proyecto Pendiente - IncubaTec ITTG') // Asunto del correo
+                    // Usar la vista HTML personalizada y pasar los datos
+                    ->view('emails.nueva_propuesta', [
+                        'projectName' => $this->projectName,
+                        'projectClave' => $this->projectClave,
+                        'submitterName' => $this->submitterName,
+                        'proposalLink' => $this->proposalLink,
+                    ]);
     }
 
     /**
@@ -74,7 +73,7 @@ class NewProposalNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'message' => 'Nueva propuesta de proyecto de ' . $this->submitterName . ': "' . $this->projectName . '"',
+            'message' => 'Nueva propuesta de proyecto de ' . $this->submitterName . ': "' . $this->projectName . '" (Clave: ' . $this->projectClave . ')',
             'link' => $this->proposalLink,
             'type' => 'proposal_submitted',
         ];
