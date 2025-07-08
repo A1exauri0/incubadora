@@ -58,23 +58,35 @@ Route::get('/email/verify', function () {
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
 
+    Auth::login($request->user()->fresh());
+    $request->session()->regenerate();
+
     // Redirigir a la página personalizada de confirmación
-    return redirect()->route('email.confirmed');
+    return redirect()->route('email.verified')->with('status', 'email-verified');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Ruta para la vista personalizada de correo verificado
+Route::get('/email/verified-successfully', function () {
+    return view('auth.email-verified');
+})->name('email.verified');
+
 Route::post('email/verification-notification', function () {
     \Illuminate\Support\Facades\Notification::send(auth()->user(), new \Illuminate\Auth\Notifications\VerifyEmail);
 })->middleware('auth')->name('verification.send');
 
 // =========================================================================
-// RUTAS COMUNES PARA USUARIOS AUTENTICADOS Y VERIFICADOS
+// RUTAS PARA COMPLETAR EL REGISTRO DE DATOS (ACCESIBLE DESPUÉS DE VERIFICACIÓN)
+// =========================================================================
+Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
+Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
+    ->middleware(['auth', 'verified']) // El POST sí puede requerir 'verified'
+    ->name('registro.datos.guardar');
+
+
+// =========================================================================
+// RUTAS COMUNES PARA USUARIOS AUTENTICADOS Y VERIFICADOS (RESTO)
 // =========================================================================
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Rutas para completar el registro de datos (accesible para todos los roles verificados)
-    Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
-    Route::post('/registro-datos', [RegistroDatosController::class, 'store'])->name('registro.datos.guardar');
-
     // Rutas de Notificaciones (para administradores)
     Route::group(['middleware' => ['role:admin']], function () {
         Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');

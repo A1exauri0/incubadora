@@ -73,7 +73,7 @@ class NewProposalNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'message' => 'Nueva propuesta de proyecto de ' . $this->submitterName . ': "' . $this->projectName . '" (Clave: ' . $this->projectClave . ')',
+            'message' => 'Nueva propuesta de proyecto de ' . $this->submitterName . ': "' . $this->projectName . '"',
             'link' => $this->proposalLink,
             'type' => 'proposal_submitted',
         ];

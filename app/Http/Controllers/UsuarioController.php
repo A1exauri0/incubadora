@@ -22,7 +22,7 @@ class UsuarioController extends Controller
 
     public function registro_existe($id)
     {
-        $existe = DB::table('usuario')->where('id', '=', $id)->count();
+        $existe = DB::table('users')->where('id', '=', $id)->count();
 
         if ($existe > 0) {
             return true;
@@ -51,27 +51,37 @@ class UsuarioController extends Controller
         $id = $request->input('id_editar');
         $name = $request->input('name_mod');
         $password = $request->input('password_mod');
+
+        $data = ['name' => $name];
+
+        if (!empty($password)) {
+            $data['password'] = bcrypt($password);
+        }
+
+        DB::table('users')->where('id', $id)->update($data);
+
+        return back()->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function eliminar(Request $request)
     {
         $id = $request->input('id_eliminar');
 
-        DB::table('usuario')->where('id', '=', $id)->delete();
+        DB::table('users')->where('id', '=', $id)->delete();
         return back();
     }
 
     public function eliminarMultiple(Request $request)
     {
         // realiza la eliiminacion de los registros seleccionados
-        $nos_control = DB::table('usuario')->select('id')->get();
+        $nos_control = DB::table('users')->select('id')->get();
 
 
         foreach ($nos_control as $nc) {
             try {
                 $existe = $request->input('id_eliminar_' . $nc->id);
                 if ($existe != null) {
-                    DB::table('usuario')->where('id', '=', $nc->id)->delete();
+                    DB::table('users')->where('id', '=', $nc->id)->delete();
                 }
             } catch (\Exception $e) {
                 $existe = null;

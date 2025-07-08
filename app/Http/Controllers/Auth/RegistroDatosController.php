@@ -13,7 +13,7 @@ class RegistroDatosController extends Controller
     public function __construct()
     {
         // Solo usuarios autenticados y verificados pueden acceder a esta página
-        $this->middleware(['auth', 'verified']);
+        $this->middleware(['auth']);
     }
 
     /**
