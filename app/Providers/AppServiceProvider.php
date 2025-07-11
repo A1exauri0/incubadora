@@ -31,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
             $unreadNotificationsCount = 0; // Inicializar contador de notificaciones
 
             if (Auth::check()) {
+                /** @var \App\Models\User */
+
                 $user = Auth::user();
 
                 // Lógica existente para determinar si es líder

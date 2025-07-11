@@ -176,6 +176,7 @@ class ProyectoController extends Controller
 
     public function edit($clave_proyecto)
     {
+        /** @var \App\Models\User */
         $user = Auth::user();
         $proyecto = DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->first();
 
@@ -209,6 +210,7 @@ class ProyectoController extends Controller
 
     public function update(Request $request, $clave_proyecto)
     {
+        /** @var \App\Models\User */
         $user = Auth::user();
 
         $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
@@ -275,6 +277,7 @@ class ProyectoController extends Controller
 
     public function createProposalForm()
     {
+        /** @var \App\Models\User */
         $user = Auth::user();
         $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
 
@@ -291,6 +294,7 @@ class ProyectoController extends Controller
 
     public function storeProposal(Request $request)
     {
+        /** @var \App\Models\User */
         $user = Auth::user();
         $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
 

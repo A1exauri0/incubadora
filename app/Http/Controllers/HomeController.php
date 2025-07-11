@@ -14,7 +14,8 @@ class HomeController extends Controller
     }
 
     public function index()
-    {
+    {/** @var \App\Models\User */
+
         $user = auth()->user();
 
         // Obtener todos los datos necesarios

@@ -22,6 +22,8 @@ class NotificationController extends Controller
      */
     public function getUnreadNotifications(Request $request)
     {
+        /** @var \App\Models\User */
+
         $user = Auth::user();
 
         // Asegúrate de que solo los administradores puedan ver estas notificaciones
@@ -56,6 +58,8 @@ class NotificationController extends Controller
      */
     public function markNotificationsAsRead(Request $request)
     {
+        /** @var \App\Models\User */
+
         $user = Auth::user();
 
         if (!$user->hasRole('admin')) {
