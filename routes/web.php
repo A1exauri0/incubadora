@@ -57,11 +57,8 @@ Route::get('/email/verify', function () {
 // Ruta para manejar la verificación del correo
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-
     Auth::login($request->user()->fresh());
     $request->session()->regenerate();
-
-    // Redirigir a la página personalizada de confirmación
     return redirect()->route('email.verified')->with('status', 'email-verified');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
@@ -78,9 +75,16 @@ Route::post('email/verification-notification', function () {
 // RUTAS PARA COMPLETAR EL REGISTRO DE DATOS (ACCESIBLE DESPUÉS DE VERIFICACIÓN)
 // =========================================================================
 Route::get('/registro-datos', [RegistroDatosController::class, 'index'])->name('registro-datos');
+
+// Ruta para guardar o actualizar los datos (usada por el modal)
 Route::post('/registro-datos', [RegistroDatosController::class, 'store'])
-    ->middleware(['auth', 'verified']) // El POST sí puede requerir 'verified'
+    ->middleware(['auth', 'verified'])
     ->name('registro.datos.guardar');
+
+// NUEVA RUTA API PARA OBTENER DATOS DEL PERFIL PARA EL MODAL
+Route::get('/api/user-profile-data', [RegistroDatosController::class, 'getUserProfileData'])
+    ->middleware('auth') // Solo usuarios autenticados pueden pedir sus datos
+    ->name('api.user.profile.data');
 
 
 // =========================================================================

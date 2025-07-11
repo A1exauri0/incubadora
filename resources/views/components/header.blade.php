@@ -126,7 +126,7 @@
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{-- Mostrar coronita si el usuario tiene el rol 'admin' --}}
+                                {{-- Mostrar icono admin si el usuario tiene el rol 'admin' --}}
                                 @if (Auth::user()->hasRole('admin'))
                                     <i class="fas fa-user-tie text-white me-2" title="Administrador"></i>
                                 @endif
@@ -134,9 +134,19 @@
                                 @if (isset($isLeader) && $isLeader)
                                     <i class="fas fa-crown text-warning me-2" title="Líder de Proyecto"></i>
                                 @endif
+                                {{-- Mostrar icono de usuario para el alumno--}}
+                                @if (Auth::user()->hasRole('alumno'))
+                                    <i class="fas fa-user-graduate text-white me-2" title="Alumno"></i>
+                                @endif
+
                                 <span class="ml-1">{{ Auth::user()->name }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                {{-- Nuevo enlace para "Editar mis datos" --}}
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editProfileModal">
+                                    Editar mis datos
+                                </a>
+                                <div class="dropdown-divider"></div> {{-- Separador opcional --}}
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     Cerrar sesión
@@ -153,7 +163,7 @@
     </nav>
 </header>
 
-{{-- Script para manejar las notificaciones --}}
+{{-- Script para manejar las notificaciones (sin cambios) --}}
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -248,6 +258,7 @@
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
                         },
                         body: formData
                     })
