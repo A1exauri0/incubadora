@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="es"> {{-- Cambiado de 'en' a 'es' --}}
+<html lang="es">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- Importante para peticiones AJAX --}}
+    {{-- Título de la página --}}
     <title>@yield('titulo') - ITTG</title>
-
+    {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_tec.png') }}">
+    {{-- Estilos de Font Awesome, Bootstrap y Google Fonts --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -170,11 +173,8 @@
     {{-- Aquí se renderizarán los scripts pusheados desde otras vistas --}}
     @stack('scripts')
 
-    {{-- Script del modal de editar perfil - AHORA DIRECTAMENTE AQUÍ --}}
+    {{-- Script del modal de editar perfil --}}
     <script>
-        // Añadimos un console.log al inicio para confirmar que el script se está ejecutando
-        console.log("Script del modal de editar perfil cargado y ejecutándose.");
-
         $(document).ready(function() {
 
             const editProfileModal = $('#editProfileModal');
@@ -184,7 +184,8 @@
             // Escuchar el evento 'show.bs.modal' para cargar los datos cuando el modal se abre
             editProfileModal.on('show.bs.modal', function(event) {
                 console.log("Evento 'show.bs.modal' disparado. Intentando cargar datos...");
-                roleSpecificFields.html('<p class="text-center text-muted">Cargando datos...</p>'); // Mensaje de carga
+                roleSpecificFields.html(
+                '<p class="text-center text-muted">Cargando datos...</p>'); // Mensaje de carga
 
                 // Realizar una petición AJAX para obtener los datos del usuario
                 $.ajax({
@@ -239,8 +240,10 @@
                                         <option value="">Selecciona una carrera</option>
                             `;
                             response.carreras.forEach(carrera => {
-                                const selected = profileData && profileData.carrera === carrera ? 'selected' : '';
-                                formHtml += `<option value="${carrera}" ${selected}>${carrera}</option>`;
+                                const selected = profileData && profileData.carrera ===
+                                    carrera ? 'selected' : '';
+                                formHtml +=
+                                    `<option value="${carrera}" ${selected}>${carrera}</option>`;
                             });
                             formHtml += `
                                     </select>
@@ -271,14 +274,18 @@
                                 </div>
                             `;
                         } else {
-                            formHtml = '<p class="text-center text-muted">No se requieren datos adicionales para tu rol.</p>';
+                            formHtml =
+                                '<p class="text-center text-muted">No se requieren datos adicionales para tu rol.</p>';
                         }
 
                         roleSpecificFields.html(formHtml);
                     },
                     error: function(xhr) {
-                        console.error('Error al cargar los datos del perfil:', xhr.responseText);
-                        roleSpecificFields.html('<p class="text-center text-danger">Error al cargar los datos. Inténtalo de nuevo.</p>');
+                        console.error('Error al cargar los datos del perfil:', xhr
+                        .responseText);
+                        roleSpecificFields.html(
+                            '<p class="text-center text-danger">Error al cargar los datos. Inténtalo de nuevo.</p>'
+                            );
                     }
                 });
             });
@@ -308,7 +315,8 @@
                             alert(response.message); // Usar alert de JS
                             location.reload(); // Recargar la página para reflejar los cambios
                         } else {
-                            alert('Error: ' + (response.message || 'Ocurrió un error desconocido.'));
+                            alert('Error: ' + (response.message ||
+                                'Ocurrió un error desconocido.'));
                         }
                     },
                     error: function(xhr) {
@@ -320,7 +328,8 @@
                                 $(`#${field}_error`).text(errors[field][0]).show();
                             }
                         } else {
-                            alert('Error al guardar los datos: ' + (xhr.responseJSON.message || xhr.statusText));
+                            alert('Error al guardar los datos: ' + (xhr.responseJSON.message ||
+                                xhr.statusText));
                         }
                     }
                 });

@@ -7,6 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- Importante para peticiones AJAX --}}
     <!-- Título de la página -->
     <title>@yield('titulo') - ITTG</title>
+    {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_tec.png') }}">
+    <!-- Estilos de Font Awesome, Bootstrap y Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -124,11 +127,8 @@
     {{-- Aquí se renderizarán los scripts pusheados desde otras vistas --}}
     @stack('scripts')
 
-    {{-- Script del modal de editar perfil - AHORA DIRECTAMENTE AQUÍ --}}
+    {{-- Script del modal de editar perfil --}}
     <script>
-        // Añadimos un console.log al inicio para confirmar que el script se está ejecutando
-        console.log("Script del modal de editar perfil cargado y ejecutándose.");
-
         $(document).ready(function() {
 
             const editProfileModal = $('#editProfileModal');
@@ -139,7 +139,7 @@
             editProfileModal.on('show.bs.modal', function(event) {
                 console.log("Evento 'show.bs.modal' disparado. Intentando cargar datos...");
                 roleSpecificFields.html(
-                '<p class="text-center text-muted">Cargando datos...</p>'); // Mensaje de carga
+                    '<p class="text-center text-muted">Cargando datos...</p>'); // Mensaje de carga
 
                 // Realizar una petición AJAX para obtener los datos del usuario
                 $.ajax({
@@ -236,10 +236,10 @@
                     },
                     error: function(xhr) {
                         console.error('Error al cargar los datos del perfil:', xhr
-                        .responseText);
+                            .responseText);
                         roleSpecificFields.html(
                             '<p class="text-center text-danger">Error al cargar los datos. Inténtalo de nuevo.</p>'
-                            );
+                        );
                     }
                 });
             });

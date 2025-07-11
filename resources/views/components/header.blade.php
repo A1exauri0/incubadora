@@ -104,7 +104,7 @@
                                     <i class="fas fa-bell"></i>
                                     {{-- El span siempre se renderiza, su display inicial se controla con style --}}
                                     <span class="badge badge-pill badge-danger notifications-badge"
-                                        style="{{ (isset($unreadNotificationsCount) && $unreadNotificationsCount > 0) ? '' : 'display: none;' }}">
+                                        style="{{ isset($unreadNotificationsCount) && $unreadNotificationsCount > 0 ? '' : 'display: none;' }}">
                                         {{ $unreadNotificationsCount ?? 0 }}
                                     </span>
                                 </a>
@@ -134,7 +134,7 @@
                                 @if (isset($isLeader) && $isLeader)
                                     <i class="fas fa-crown text-warning me-2" title="Líder de Proyecto"></i>
                                 @endif
-                                {{-- Mostrar icono de usuario para el alumno--}}
+                                {{-- Mostrar icono de usuario para el alumno --}}
                                 @if (Auth::user()->hasRole('alumno'))
                                     <i class="fas fa-user-graduate text-white me-2" title="Alumno"></i>
                                 @endif
@@ -143,7 +143,8 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 {{-- Nuevo enlace para "Editar mis datos" --}}
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editProfileModal">
+                                <a class="dropdown-item" href="#" data-toggle="modal"
+                                    data-target="#editProfileModal">
                                     Editar mis datos
                                 </a>
                                 <div class="dropdown-divider"></div> {{-- Separador opcional --}}
@@ -247,35 +248,28 @@
 
             // Función para marcar como leída y luego actualizar el contador
             function markNotificationAsRead(notificationId = null) {
-                const formData = new FormData();
-                if (notificationId) {
-                    formData.append('id', notificationId);
-                }
-                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute(
-                    'content'));
-
                 fetch('{{ route('notifications.markAsRead') }}', {
                         method: 'POST',
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
                             'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
-                        body: formData
+                        body: JSON.stringify({
+                            id: notificationId
+                        })
                     })
                     .then(response => {
                         if (!response.ok) {
                             return response.text().then(text => {
-                                throw new Error('Network response was not ok. Status: ' + response
-                                    .status + ' - ' + text);
+                                throw new Error('Error: ' + response.status + ' - ' + text);
                             });
                         }
                         return response.json();
                     })
                     .then(data => {
                         if (data.success) {
-                            // Actualizar el contador con el nuevo conteo de notificaciones sin leer
                             updateBadgeCount(data.unread_count);
-                            // Recargar la lista de notificaciones para que refleje el cambio (opcional, pero buena UX)
                             loadNotifications();
                         }
                     })

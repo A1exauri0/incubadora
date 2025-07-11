@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Título de la página -->
     <title>@yield('titulo') - ITTG</title>
+    {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_tec.png') }}">
+    {{-- CSRF Token --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Estilos de Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Bootstrap 4.5.0 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
@@ -61,10 +65,8 @@
     {{-- Aquí se renderizarán los scripts pusheados desde otras vistas --}}
     @stack('scripts')
 
-    {{-- Script del modal de editar perfil - AHORA DIRECTAMENTE AQUÍ --}}
+    {{-- Script del modal de editar perfil --}}
     <script>
-        // Añadimos un console.log al inicio para confirmar que el script se está ejecutando
-        console.log("Script del modal de editar perfil cargado y ejecutándose.");
 
         $(document).ready(function() {
 
@@ -140,7 +142,7 @@
                                 <div class="form-group">
                                     <label for="telefono">Teléfono:</label>
                                     <input type="text" class="form-control" id="telefono" name="telefono" value="${profileData ? profileData.telefono : ''}" required>
-                                    <div class="invalid-feedback" id="telefono_error"></div>
+                                    <div class="invalid-feedback" id="telefono_error"></div>    
                                 </div>
                                 <div class="form-group">
                                     <label for="semestre">Semestre:</label>
