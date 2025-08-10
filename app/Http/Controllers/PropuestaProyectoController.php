@@ -175,7 +175,7 @@ class PropuestaProyectoController extends Controller
      */
     public function listProposals()
     {
-        // Obtiene las propuestas de proyecto que están en etapa Pendiente o Rechazada
+        // Obtiene las propuestas de proyecto que están en etapa Pendiente o Rechazada, con paginación
         $propuestas = DB::table('proyecto')
             ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
             ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
@@ -193,7 +193,7 @@ class PropuestaProyectoController extends Controller
             )
             ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE, self::ID_ETAPA_RECHAZADA])
             ->orderBy('fecha_agregado', 'desc')
-            ->get();
+            ->paginate(5); // <-- Paginar por 5 elementos
 
         $titulo = "Revisión de Propuestas de Proyectos";
 
