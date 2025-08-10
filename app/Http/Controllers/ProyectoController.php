@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\AdminActivityNotification; // Mantener si aún la usas en otros lugares
-use App\Notifications\NewProposalNotification; // Importar la nueva clase de notificación
+use App\Notifications\AdminActivityNotification;
+use App\Notifications\NewProposalNotification;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf; // Importa la Facade de Dompdf
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProyectoController extends Controller
 {
@@ -23,14 +23,13 @@ class ProyectoController extends Controller
 
     public function index()
     {
-        // CORRECCIÓN: Eliminar los filtros para mostrar todos los proyectos en el CRUD principal
         $proyectos = DB::table('proyecto')
-                        ->orderBy('fecha_agregado', 'desc')
-                        ->get();
+            ->orderBy('fecha_agregado', 'desc')
+            ->get();
 
         $columnas = ['Clave', 'Nombre', 'Nombre descriptivo', 'Categoria', 'Tipo', 'Etapa', 'Video', 'Registrado'];
         $categorias = DB::table('categoria')->get();
-        $alumnos = DB::table('alumno')->get(); // Mantengo esta línea si se usa en la vista, si no, puedes quitarla.
+        $alumnos = DB::table('alumno')->get();
         $tipos = DB::table('tipo')->get();
         $etapas = DB::table('etapas')->get();
         $total_registros = $proyectos->count();
@@ -80,9 +79,6 @@ class ProyectoController extends Controller
 
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
-                // Aquí puedes decidir si quieres seguir usando AdminActivityNotification o cambiar a NewProposalNotification
-                // Si quieres que los admins reciban un correo por "proyecto agregado directamente", podrías usar NewProposalNotification aquí también.
-                // Por ahora, mantendremos AdminActivityNotification para este caso, ya que la solicitud era para 'storeProposal'.
                 $admin->notify(new AdminActivityNotification('Proyecto "' . $nombre . '" agregado directamente por administrador.', '/c_proyectos', 'proyecto_agregado_admin'));
             }
 
@@ -138,6 +134,10 @@ class ProyectoController extends Controller
         $clave_proyecto = $request->input('clave_proyecto_eliminar');
         $proyecto_eliminado = DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->first();
 
+        // Eliminar requerimientos y resultados asociados primero
+        DB::table('proyecto_requerimientos')->where('clave_proyecto', $clave_proyecto)->delete();
+        DB::table('proyecto_resultados')->where('clave_proyecto', $clave_proyecto)->delete();
+        // Luego eliminar el proyecto
         DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->delete();
 
         if ($proyecto_eliminado) {
@@ -160,6 +160,10 @@ class ProyectoController extends Controller
 
         $nombres_proyectos = DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->pluck('nombre')->implode(', ');
 
+        // Eliminar requerimientos y resultados para múltiples proyectos
+        DB::table('proyecto_requerimientos')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+        DB::table('proyecto_resultados')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+        // Luego eliminar los proyectos
         DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
 
         $admins = User::role('admin')->get();
@@ -188,10 +192,10 @@ class ProyectoController extends Controller
         $esLider = false;
         if ($alumno) {
             $liderCheck = DB::table('alumno_proyecto')
-                            ->where('clave_proyecto', $clave_proyecto)
-                            ->where('no_control', $alumno->no_control)
-                            ->where('lider', 1)
-                            ->first();
+                ->where('clave_proyecto', $clave_proyecto)
+                ->where('no_control', $alumno->no_control)
+                ->where('lider', 1)
+                ->first();
             if ($liderCheck) {
                 $esLider = true;
             }
@@ -205,7 +209,12 @@ class ProyectoController extends Controller
         $tipos = DB::table('tipo')->get();
         $etapas = DB::table('etapas')->get();
 
-        return view('alumnos.editar', compact('proyecto', 'categorias', 'tipos', 'etapas'));
+        // Obtener requerimientos y resultados existentes para pasarlos a la vista de edición
+        $requerimientos = DB::table('proyecto_requerimientos')->where('clave_proyecto', $clave_proyecto)->get();
+        $resultados = DB::table('proyecto_resultados')->where('clave_proyecto', $clave_proyecto)->get();
+
+
+        return view('alumnos.editar', compact('proyecto', 'categorias', 'tipos', 'etapas', 'requerimientos', 'resultados'));
     }
 
     public function update(Request $request, $clave_proyecto)
@@ -217,10 +226,10 @@ class ProyectoController extends Controller
         $esLider = false;
         if ($alumno) {
             $liderCheck = DB::table('alumno_proyecto')
-                            ->where('clave_proyecto', $clave_proyecto)
-                            ->where('no_control', $alumno->no_control)
-                            ->where('lider', 1)
-                            ->first();
+                ->where('clave_proyecto', $clave_proyecto)
+                ->where('no_control', $alumno->no_control)
+                ->where('lider', 1)
+                ->first();
             if ($liderCheck) {
                 $esLider = true;
             }
@@ -244,6 +253,13 @@ class ProyectoController extends Controller
             'area_aplicacion' => 'nullable|string|max:255',
             'naturaleza_tecnica' => 'nullable|string|max:255',
             'objetivo' => 'nullable|string',
+            // Validaciones para requerimientos
+            'requerimientos' => 'nullable|array',
+            'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100', // max 100 caracteres como en la tabla
+            'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50', // max 50 caracteres como en la tabla
+            // Validaciones para resultados
+            'resultados' => 'nullable|array',
+            'resultados.*.descripcion' => 'required|string|max:100', // max 100 caracteres como en la tabla
         ]);
 
         try {
@@ -260,6 +276,39 @@ class ProyectoController extends Controller
                     'naturaleza_tecnica' => $request->input('naturaleza_tecnica'),
                     'objetivo' => $request->input('objetivo'),
                 ]);
+
+            // Sincronizar requerimientos
+            // Primero, elimina los requerimientos existentes para este proyecto
+            DB::table('proyecto_requerimientos')->where('clave_proyecto', $clave_proyecto)->delete();
+            // Luego, inserta los nuevos requerimientos si existen
+            if ($request->has('requerimientos') && is_array($request->input('requerimientos'))) {
+                foreach ($request->input('requerimientos') as $req) {
+                    if (!empty($req['descripcion']) && !empty($req['cantidad'])) {
+                        DB::table('proyecto_requerimientos')->insert([
+                            'clave_proyecto' => $clave_proyecto,
+                            'descripcion' => $req['descripcion'],
+                            'cantidad' => $req['cantidad'],
+                        ]);
+                    }
+                }
+            }
+
+            // Sincronizar resultados
+            // Primero, elimina los resultados existentes para este proyecto
+            DB::table('proyecto_resultados')->where('clave_proyecto', $clave_proyecto)->delete();
+            // Luego, inserta los nuevos resultados si existen
+            if ($request->has('resultados') && is_array($request->input('resultados'))) {
+                foreach ($request->input('resultados') as $res) {
+                    if (!empty($res['descripcion'])) {
+                        DB::table('proyecto_resultados')->insert([
+                            'clave_proyecto' => $clave_proyecto,
+                            'descripcion' => $res['descripcion'],
+                            'fecha_agregado' => now(), // Añadir la fecha de agregado
+                        ]);
+                    }
+                }
+            }
+
 
             $admins = User::role('admin')->get();
             $updaterName = Auth::user()->name;
@@ -313,6 +362,12 @@ class ProyectoController extends Controller
             'area_aplicacion' => 'nullable|string|max:255',
             'naturaleza_tecnica' => 'nullable|string|max:255',
             'objetivo' => 'nullable|string',
+            // Nuevas validaciones para requerimientos y resultados
+            'requerimientos' => 'nullable|array',
+            'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100',
+            'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50',
+            'resultados' => 'nullable|array',
+            'resultados.*.descripcion' => 'required|string|max:100',
         ]);
 
         if (empty($request->input('video'))) {
@@ -335,9 +390,38 @@ class ProyectoController extends Controller
                 'fecha_agregado' => now(),
             ]);
 
+            // Obtener la clave del proyecto recién insertado
+            $clave_proyecto_insertado = $request->input('clave_proyecto');
+
+            // Insertar requerimientos
+            if ($request->has('requerimientos') && is_array($request->input('requerimientos'))) {
+                foreach ($request->input('requerimientos') as $req) {
+                    if (!empty($req['descripcion']) && !empty($req['cantidad'])) {
+                        DB::table('proyecto_requerimientos')->insert([
+                            'clave_proyecto' => $clave_proyecto_insertado,
+                            'descripcion' => $req['descripcion'],
+                            'cantidad' => $req['cantidad'],
+                        ]);
+                    }
+                }
+            }
+
+            // Insertar resultados
+            if ($request->has('resultados') && is_array($request->input('resultados'))) {
+                foreach ($request->input('resultados') as $res) {
+                    if (!empty($res['descripcion'])) {
+                        DB::table('proyecto_resultados')->insert([
+                            'clave_proyecto' => $clave_proyecto_insertado,
+                            'descripcion' => $res['descripcion'],
+                            'fecha_agregado' => now(),
+                        ]);
+                    }
+                }
+            }
+
             DB::table('alumno_proyecto')->insert([
                 'no_control' => $alumno->no_control,
-                'clave_proyecto' => $request->input('clave_proyecto'),
+                'clave_proyecto' => $clave_proyecto_insertado,
                 'lider' => 1,
             ]);
 
@@ -366,23 +450,23 @@ class ProyectoController extends Controller
     public function listProposals()
     {
         $propuestas = DB::table('proyecto')
-                        ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
-                        ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
-                        ->leftJoin('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
-                        ->select(
-                            'proyecto.clave_proyecto',
-                            'proyecto.nombre',
-                            'proyecto.descripcion',
-                            'categoria.nombre as nombre_categoria',
-                            'tipo.nombre as nombre_tipo',
-                            'etapas.nombre as nombre_etapa',
-                            'proyecto.fecha_agregado',
-                            'proyecto.etapa',
-                            'proyecto.motivo_rechazo'
-                        )
-                        ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE, self::ID_ETAPA_RECHAZADA])
-                        ->orderBy('fecha_agregado', 'desc')
-                        ->get();
+            ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+            ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
+            ->leftJoin('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
+            ->select(
+                'proyecto.clave_proyecto',
+                'proyecto.nombre',
+                'proyecto.descripcion',
+                'categoria.nombre as nombre_categoria',
+                'tipo.nombre as nombre_tipo',
+                'etapas.nombre as nombre_etapa',
+                'proyecto.fecha_agregado',
+                'proyecto.etapa',
+                'proyecto.motivo_rechazo'
+            )
+            ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE, self::ID_ETAPA_RECHAZADA])
+            ->orderBy('fecha_agregado', 'desc')
+            ->get();
 
         $titulo = "Revisión de Propuestas de Proyectos";
 
@@ -430,12 +514,12 @@ class ProyectoController extends Controller
         DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->update($updateData);
 
         $leader = DB::table('alumno_proyecto')
-                    ->where('clave_proyecto', $clave_proyecto)
-                    ->where('lider', 1)
-                    ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
-                    ->join('users', 'alumno.correo_institucional', '=', 'users.email')
-                    ->select('users.id')
-                    ->first();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->where('lider', 1)
+            ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
+            ->join('users', 'alumno.correo_institucional', '=', 'users.email')
+            ->select('users.id')
+            ->first();
 
         if ($leader) {
             $leaderUser = User::find($leader->id);
@@ -462,10 +546,10 @@ class ProyectoController extends Controller
     {
         // Obtener los datos del proyecto, incluyendo el nombre de la categoría
         $proyecto = DB::table('proyecto')
-                        ->where('clave_proyecto', $clave_proyecto)
-                        ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
-                        ->select('proyecto.*', 'categoria.nombre as nombre_categoria')
-                        ->first();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
+            ->select('proyecto.*', 'categoria.nombre as nombre_categoria')
+            ->first();
 
         if (!$proyecto) {
             abort(404, 'Proyecto no encontrado.');
@@ -473,29 +557,29 @@ class ProyectoController extends Controller
 
         // Obtener los resultados del proyecto (asumiendo tabla 'proyecto_resultados')
         $resultados = DB::table('proyecto_resultados')
-                            ->where('clave_proyecto', $clave_proyecto)
-                            ->get();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->get();
 
         // Obtener los alumnos asociados al proyecto con su carrera
         $alumno_proyecto = DB::table('alumno_proyecto')
-                                ->where('clave_proyecto', $clave_proyecto)
-                                ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
-                                // CORRECCIÓN: Unir por el nombre de la carrera, no por un ID que no existe
-                                ->leftJoin('carrera', 'alumno.carrera', '=', 'carrera.nombre')
-                                ->select('alumno.*', 'carrera.nombre as carrera_nombre_completo', 'alumno_proyecto.lider')
-                                ->get();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
+            // CORRECCIÓN: Unir por el nombre de la carrera, no por un ID que no existe
+            ->leftJoin('carrera', 'alumno.carrera', '=', 'carrera.nombre')
+            ->select('alumno.*', 'carrera.nombre as carrera_nombre_completo', 'alumno_proyecto.lider')
+            ->get();
 
         // Obtener los asesores asociados al proyecto
         $asesor_proyecto = DB::table('asesor_proyecto')
-                                ->where('clave_proyecto', $clave_proyecto)
-                                ->join('asesor', 'asesor_proyecto.idAsesor', '=', 'asesor.idAsesor')
-                                ->select('asesor.*')
-                                ->get();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->join('asesor', 'asesor_proyecto.idAsesor', '=', 'asesor.idAsesor')
+            ->select('asesor.*')
+            ->get();
 
         // Obtener los requerimientos del proyecto (asumiendo tabla 'proyecto_requerimientos')
         $requerimientos = DB::table('proyecto_requerimientos')
-                                ->where('clave_proyecto', $clave_proyecto)
-                                ->get();
+            ->where('clave_proyecto', $clave_proyecto)
+            ->get();
 
         // Pasar todos los datos a la vista del PDF
         $data = [
@@ -507,7 +591,7 @@ class ProyectoController extends Controller
             // Las siguientes colecciones se pasan porque tu layouts/pdf.blade.php las usa
             // aunque para la categoría del proyecto principal se usará $proyecto->nombre_categoria
             'categorias' => DB::table('categoria')->get(), // Necesario si otras partes del PDF lo usan
-            'carreras' => DB::table('carrera')->get(),   // Necesario si otras partes del PDF lo usan
+            'carreras' => DB::table('carrera')->get(),    // Necesario si otras partes del PDF lo usan
         ];
 
         // Cargar la vista 'layouts.pdf' y generar el PDF
