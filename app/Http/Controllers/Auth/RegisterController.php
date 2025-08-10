@@ -72,33 +72,34 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        // Lógica para asignar rol basada en el token
+        // Lógica para asignar rol
+        // Si el token está presente y no está vacío, asigna el rol del token.
         if (isset($data['token']) && !empty($data['token'])) {
             $tokenRecord = DB::table('token_rol')->where('token', $data['token'])->first();
 
             if ($tokenRecord) {
                 // Verificar que el correo del token coincida con el correo de registro
                 if ($tokenRecord->correo !== $data['email']) {
-                    // Si no coinciden, puedes decidir qué hacer:
-                    // 1. No asignar el rol y tal vez mostrar un error o revertir el registro.
-                    //    Por simplicidad, en este ejemplo, no asignaremos el rol y el usuario se registrará sin él
-                    //    o se redirigirá con un error (depende de tu flujo).
-                    //    Si quieres que el registro falle si el correo no coincide, debes poner esto en el validador.
-                    //    Para este flujo, asumimos que la validación ya pasó y el token es válido y no usado.
-                    //    Si el email no coincide, simplemente no le asignamos el rol del token.
-                    return $user; // El usuario se registra, pero sin el rol del token si el correo no coincide.
+                    // Si no coinciden, el usuario se registra pero sin el rol del token.
+                    return $user;
                 }
 
-                // Asignar el rol al usuario
+                // Asignar el rol al usuario usando el ID del token
                 $rolName = DB::table('roles')->where('id', $tokenRecord->rol)->first()->name;
+                
                 // Asume que tu modelo User tiene el trait HasRoles (ej. de Spatie/Laravel-Permission)
-                // Si no usas un paquete de roles, deberás implementar tu propia lógica de asignación
                 if (method_exists($user, 'assignRole')) {
                     $user->assignRole($rolName);
                 }
                 
                 // Opcional: Eliminar el token después de usarlo
                 DB::table('token_rol')->where('idToken', $tokenRecord->idToken)->delete();
+            }
+        } else {
+            // Si NO hay token, asignar el rol 'alumno' por defecto
+            // Asegúrate de que 'alumno' sea un rol válido en tu tabla 'roles'
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole('alumno'); // <-- Asignación de rol por defecto
             }
         }
         
