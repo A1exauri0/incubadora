@@ -130,10 +130,6 @@
                                 @if (Auth::user()->hasRole('admin'))
                                     <i class="fas fa-user-tie text-white me-2" title="Administrador"></i>
                                 @endif
-                                {{-- Mostrar coronita si el usuario es líder (variable del View Composer) --}}
-                                @if (isset($isLeader) && $isLeader)
-                                    <i class="fas fa-crown text-warning me-2" title="Líder de Proyecto"></i>
-                                @endif
                                 {{-- Mostrar icono de usuario para el alumno --}}
                                 @if (Auth::user()->hasRole('alumno'))
                                     <i class="fas fa-user-graduate text-white me-2" title="Alumno"></i>
