@@ -92,17 +92,20 @@ Route::get('/api/user-profile-data', [RegistroDatosController::class, 'getUserPr
 // RUTAS COMUNES PARA USUARIOS AUTENTICADOS Y VERIFICADOS (RESTO)
 // =========================================================================
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Rutas de Notificaciones (para administradores)
-    Route::group(['middleware' => ['role:admin']], function () {
+    // Rutas de Notificaciones (para administradores y asesores)
+    Route::group(['middleware' => ['role:admin|asesor']], function () {
         Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');
         Route::post('/notifications/mark-as-read', [NotificationController::class, 'markNotificationsAsRead'])->name('notifications.markAsRead');
-        
-        // Rutas para la REVISIÓN de propuestas de proyectos por el administrador
-        Route::get('/admin/proyectos/propuestas', [PropuestaProyectoController::class, 'listProposals'])->name('admin.proyectos.propuestas');
-        Route::post('/admin/proyectos/propuestas/{clave_proyecto}/review', [PropuestaProyectoController::class, 'reviewProposal'])->name('admin.proyectos.propuestas.review');
-
         // Ruta para GENERAR PDF (se mantiene en ProyectoController ya que es para cualquier proyecto)
         Route::get('/admin/proyectos/{clave_proyecto}/ficha-tecnica-pdf', [ProyectoController::class, 'generateFichaTecnicaPdf'])->name('admin.proyectos.ficha_tecnica_pdf');
+    });
+
+
+    // Rutas para administradores
+    Route::group(['middleware' => ['role:admin']], function () {
+        // El administrador ahora solo ve las propuestas que tienen Visto Bueno del asesor o están rechazadas (final)
+        Route::get('/admin/proyectos/propuestas', [PropuestaProyectoController::class, 'listProposals'])->name('admin.proyectos.propuestas');
+        Route::post('/admin/proyectos/propuestas/{clave_proyecto}/review', [PropuestaProyectoController::class, 'reviewProposal'])->name('admin.proyectos.propuestas.review');
     });
 
     // Rutas específicas para el rol de alumno
@@ -111,11 +114,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/proyectos/{clave_proyecto}/editar', [ProyectoController::class, 'edit'])->name('proyectos.edit');
         Route::put('/proyectos/{clave_proyecto}', [ProyectoController::class, 'update'])->name('proyectos.update');
 
-        // Rutas para que el alumno CREE una propuesta de proyecto
+        // Rutas para que el alumno CREE una propuesta de proyecto (ahora notifica al asesor)
         Route::get('/c_proyectos_alumno/crear', [PropuestaProyectoController::class, 'createProposalForm'])->name('proyectos.crear_propuesta');
         Route::post('/c_proyectos_alumno/store-proposal', [PropuestaProyectoController::class, 'storeProposal'])->name('proyectos.store_proposal');
     });
 
+    // Rutas específicas para el rol de asesor (¡NUEVAS!)
+    Route::group(['middleware' => ['role:asesor']], function () {
+        // El asesor ve las propuestas PENDIENTES de su revisión
+        Route::get('/asesor/propuestas', [PropuestaProyectoController::class, 'listAdvisorProposals'])->name('asesor.proyectos.propuestas');
+        Route::post('/asesor/propuestas/{clave_proyecto}/review', [PropuestaProyectoController::class, 'reviewAdvisorProposal'])->name('asesor.proyectos.propuestas.review');
+    });
+
+    // ... (otras rutas protegidas generales si las tienes)
 });
 
 // =========================================================================

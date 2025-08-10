@@ -2,10 +2,13 @@
 
 @section('titulo', $titulo)
 
-@section('administrar', 'Propuestas de Proyectos')
+@section('administrar', 'Propuestas de Proyectos para Revisión')
 @section('administrar_s', 'Propuesta de Proyecto')
 
 @section('total_registros', $propuestas->total())
+
+@section('modulo_agregar')@endsection
+@section('modulo_eliminar_multiple')@endsection
 
 @section('columnas')
     <th>Clave</th>
@@ -14,7 +17,6 @@
     <th>Tipo</th>
     <th>Etapa Actual</th>
     <th>Fecha Envío</th>
-    <th>Estado Propuesta</th>
     <th>Motivo Rechazo</th>
     <th>Acciones</th>
 @endsection
@@ -34,7 +36,7 @@
 
     @if ($propuestas->isEmpty())
         <tr>
-            <td colspan="9" class="text-center">No hay propuestas de proyectos para revisar.</td>
+            <td colspan="8" class="text-center">No hay propuestas de proyectos pendientes para tu revisión.</td>
         </tr>
     @else
         @foreach ($propuestas as $propuesta)
@@ -45,28 +47,14 @@
                 <td>{{ $propuesta->nombre_tipo }}</td>
                 <td>{{ $propuesta->nombre_etapa }}</td>
                 <td>{{ \Carbon\Carbon::parse($propuesta->fecha_agregado)->format('d/m/Y') }}</td>
-                <td>
-                    {{-- Usar directamente los IDs de las etapas --}}
-                    @if ($propuesta->etapa == 1) {{-- PENDIENTE --}}
-                        <span class="badge badge-warning">Pendiente (Asesor)</span>
-                    @elseif ($propuesta->etapa == 2) {{-- V.º B. Asesor --}}
-                        <span class="badge badge-primary">V.º B. Asesor</span>
-                    @elseif ($propuesta->etapa == 3) {{-- V.º B. Administrador (Aprobada) --}}
-                        <span class="badge badge-success">Aprobada</span>
-                    @elseif ($propuesta->etapa == 4) {{-- Rechazado --}}
-                        <span class="badge badge-danger">Rechazada</span>
-                    @else
-                        <span class="badge badge-info">{{ $propuesta->nombre_etapa }}</span>
-                    @endif
-                </td>
                 <td>{{ $propuesta->motivo_rechazo ?? 'N/A' }}</td>
                 <td>
-                    {{-- Acciones del Administrador: solo si la etapa es V.º B. Asesor (2) --}}
-                    @if ($propuesta->etapa == 2) {{-- Solo si tiene Visto Bueno del Asesor --}}
-                        <form action="{{ route('admin.proyectos.propuestas.review', $propuesta->clave_proyecto) }}" method="POST" class="d-inline">
+                    {{-- Acciones del asesor: Aceptar (Visto Bueno) o Rechazar --}}
+                    @if ($propuesta->etapa == 1) {{-- PENDIENTE (pendiente para el asesor) --}}
+                        <form action="{{ route('asesor.proyectos.propuestas.review', $propuesta->clave_proyecto) }}" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="action" value="accept">
-                            <button type="submit" class="btn btn-success btn-sm" title="Aceptar Propuesta">
+                            <button type="submit" class="btn btn-success btn-sm" title="Dar Visto Bueno">
                                 <i class="fas fa-check"></i>
                             </button>
                         </form>
@@ -74,12 +62,12 @@
                             <i class="fas fa-times"></i>
                         </button>
                     @else
-                        {{-- Si la propuesta ya fue revisada por el admin o está pendiente del asesor, solo se muestra el estado --}}
-                        <span class="text-muted">Estado Actual: {{ $propuesta->nombre_etapa }}</span>
+                        {{-- Si la propuesta ya fue revisada por el asesor (aprobada/rechazada), solo muestra "Revisado" --}}
+                        <span class="text-muted">Ya revisado</span>
                     @endif
-                    {{-- Botón para generar PDF --}}
+                    {{-- Enlace para generar la ficha técnica en PDF --}}
                     <a href="{{ route('admin.proyectos.ficha_tecnica_pdf', $propuesta->clave_proyecto) }}" class="btn btn-info btn-sm ml-1" title="Generar Ficha Técnica PDF" target="_blank">
-                        <i class="fas fa-file-pdf"></i>
+                        <i class="fas fa-file-pdf"></i> 
                     </a>
                 </td>
             </tr>
@@ -143,7 +131,8 @@
             var claveProyecto = button.data('clave');
             var modal = $(this);
             modal.find('#rejectClaveProyecto').val(claveProyecto);
-            modal.find('#rejectForm').attr('action', '{{ url("/admin/proyectos/propuestas") }}/' + claveProyecto + '/review');
+            // La acción del formulario para el asesor
+            modal.find('#rejectForm').attr('action', '{{ url("/asesor/propuestas") }}/' + claveProyecto + '/review');
             modal.find('#motivo_rechazo').val('');
         });
     });

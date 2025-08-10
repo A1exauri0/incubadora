@@ -15,7 +15,7 @@ class NotificationController extends Controller
 
     /**
      * Obtiene las notificaciones no leídas para el usuario autenticado.
-     * Solo accesible por el administrador.
+     * Accesible por administradores y asesores.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -23,16 +23,14 @@ class NotificationController extends Controller
     public function getUnreadNotifications(Request $request)
     {
         /** @var \App\Models\User */
-
         $user = Auth::user();
 
-        // Asegúrate de que solo los administradores puedan ver estas notificaciones
-        if (!$user->hasRole('admin')) {
+        // Asegúrate de que solo los administradores Y ASESORES puedan ver estas notificaciones
+        if (!$user->hasAnyRole(['admin', 'asesor'])) { // <-- CAMBIO AQUÍ
             return response()->json(['message' => 'Acceso no autorizado.'], 403);
         }
 
         // Obtener las notificaciones no leídas
-        // El método 'unreadNotifications' es proporcionado por el trait Notifiable
         $notifications = $user->unreadNotifications()->limit(10)->get(); // Limita a las 10 más recientes
 
         // Formatear las notificaciones para la vista
@@ -51,7 +49,7 @@ class NotificationController extends Controller
 
     /**
      * Marca una notificación específica o todas las notificaciones no leídas como leídas.
-     * Solo accesible por el administrador.
+     * Accesible por administradores y asesores.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -59,10 +57,9 @@ class NotificationController extends Controller
     public function markNotificationsAsRead(Request $request)
     {
         /** @var \App\Models\User */
-
         $user = Auth::user();
 
-        if (!$user->hasRole('admin')) {
+        if (!$user->hasAnyRole(['admin', 'asesor'])) { // <-- CAMBIO AQUÍ
             return response()->json(['message' => 'Acceso no autorizado.'], 403);
         }
 

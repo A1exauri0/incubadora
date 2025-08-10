@@ -36,7 +36,7 @@
                             </div>
                         </li>
 
-                        <!-- Dropdown Proyectos -->
+                        <!-- Dropdown Proyectos (ADMIN) -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="proyectosDropdown"
                                 role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -48,6 +48,7 @@
                                 <a class="dropdown-item" href="/c_tipos">Tipos</a>
                                 <a class="dropdown-item" href="/c_etapas">Etapas</a>
                                 <div class="dropdown-divider"></div>
+                                {{-- Esta ruta ahora mostrará las propuestas después del Visto Bueno del Asesor --}}
                                 <a class="dropdown-item" href="{{ route('admin.proyectos.propuestas') }}">Revisar
                                     Propuestas</a>
                             </div>
@@ -91,13 +92,20 @@
                             </div>
                         </li>
                     @endcan
+                    @can('mostrar asesor') {{-- Nuevo menú para Asesores --}}
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('asesor.proyectos.propuestas') }}">
+                                Revisión Propuestas
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
 
                 <!-- Logout y Notificaciones -->
                 <ul class="navbar-nav ml-auto">
                     @auth
-                        {{-- Notificaciones para el Admin --}}
-                        @if (Auth::user()->hasRole('admin'))
+                        {{-- Notificaciones para Admin y Asesor --}}
+                        @if (Auth::user()->hasAnyRole(['admin', 'asesor'])) {{-- Ahora ambos roles ven las notificaciones --}}
                             <li class="nav-item dropdown mr-2">
                                 <a class="nav-link" href="#" id="notificationsDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -134,6 +142,10 @@
                                 @if (Auth::user()->hasRole('alumno'))
                                     <i class="fas fa-user-graduate text-white me-2" title="Alumno"></i>
                                 @endif
+                                {{-- Mostrar icono de usuario para el asesor --}}
+                                @if (Auth::user()->hasRole('asesor'))
+                                    <i class="fas fa-chalkboard-teacher text-white me-2" title="Asesor"></i>
+                                @endif
 
                                 <span class="ml-1">{{ Auth::user()->name }}</span>
                             </a>
@@ -160,7 +172,7 @@
     </nav>
 </header>
 
-{{-- Script para manejar las notificaciones (sin cambios) --}}
+{{-- Script para manejar las notificaciones (sin cambios significativos, ya es genérico) --}}
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
