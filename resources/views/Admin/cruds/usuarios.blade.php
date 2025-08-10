@@ -8,7 +8,7 @@
 @section('administrar', 'Usuarios')
 
 <!-- ¿Qué se va a administrar en singular? -->
-@section('administrar_s', 'Usuarios')
+@section('administrar_s', 'Usuario') {{-- Cambiado a singular para mensajes --}}
 
 @section('total_registros', $total_registros)
 
@@ -16,7 +16,7 @@
 @section('script_checkboxes')
     <script>
         $(document).ready(function() {
-            // Arreglo para almacenar los números de control seleccionados
+            // Arreglo para almacenar los IDs seleccionados
             var idsSeleccionadas = [];
 
             // Función para actualizar el arreglo cuando se selecciona o deselecciona un checkbox
@@ -35,7 +35,6 @@
                         document.getElementById('formulario_eliminar_multiple').appendChild(input);
                         // console.log('Se agregó el input: ' + input.name);
                     }
-
                 });
 
                 // en caso de que se deseleccione, se elimina el input oculto
@@ -44,8 +43,7 @@
                         document.getElementById('id_eliminar_' + $(this).val()).remove();
                         // console.log('Se eliminó el input: ' + 'id_eliminar_' + $(this).val());
                     }
-
-                    // console.log('Numeros de control seleccionados: ' + idsSeleccionadas);
+                    // console.log('IDs seleccionadas: ' + idsSeleccionadas);
                 });
 
                 boton_eliminar = document.getElementById('btnEliminar');
@@ -95,7 +93,7 @@
         document.querySelectorAll('.id').forEach(function(element) {
             element.addEventListener('input', function() {
                 var valor = this.value;
-                var valorLimpio = valor.replace(/[^A-Z0-9-]+/g, '');
+                var valorLimpio = valor.replace(/[^A-Z0-9\-]+/g, '');
                 valorLimpio = valorLimpio.substring(0, 13);
                 this.value = valorLimpio;
             });
@@ -115,13 +113,11 @@
 
 <!-- Se recibe la lista de columnas a mostrar (names) -->
 @section('columnas')
-
     @if (!$usuarios->isEmpty())
         @foreach ($columnas as $columna)
             <th> {{ $columna }} </th>
         @endforeach
 
-        <th>Acciones</th>
     @else
         @php
             echo "<script>
@@ -135,7 +131,6 @@
             document.getElementById('btnAgregar').remove();
         </script>";
     @endphp
-
 @endsection
 
 
@@ -158,34 +153,37 @@
         <p style="text-align: center;">No hay registros</p>
     @else
         @php
-            $usuarios = $usuarios->toArray(); // Convertir $usuarios a un array
+            // Asegúrate de que $usuarios sea un array para array_slice
+            $usuarios_array = $usuarios->toArray();
             $segmento = 20; // Número de registros por página
             $pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 1; // Página actual
             $inicio = ($pagina - 1) * $segmento; // Registro inicial de la página actual
-            $usuarios_pagina = array_slice($usuarios, $inicio, $segmento); // Obtener las usuarios de la página actual
+            $usuarios_pagina = array_slice($usuarios_array, $inicio, $segmento); // Obtener los usuarios de la página actual
         @endphp
 
         @foreach ($usuarios_pagina as $usuario)
             <tr>
                 <td>
                     <span class="custom-checkbox">
-                        <input type="checkbox" class="checkbox" name="options[]" value="{{ $usuario->id }}">
+                        <input type="checkbox" class="checkbox" name="options[]" value="{{ $usuario['id'] }}">
                         <label></label>
                     </span>
                 </td>
-                <td class="id">{{ $usuario->id }}</td>
-                <td class="name">{{ $usuario->name }}</td>
-                <td class="email">{{ $usuario->email }}</td>
-                <td class="email_verified_at">{{ $usuario->email_verified_at }}</td>
-                {{-- <td class="rol">{{ $usuario->rol }}</td> --}}
-                <td class="created_at">{{ $usuario->created_at }}</td>
-                <td class="updated_at">{{ $usuario->updated_at }}</td>
+                <td class="id">{{ $usuario['id'] }}</td>
+                <td class="name">{{ $usuario['name'] }}</td>
+                <td class="email">{{ $usuario['email'] }}</td>
+                <td class="email_verified_at">{{ $usuario['email_verified_at'] }}</td>
+                <td class="rol">{{ $usuario['role_name'] }}</td> {{-- Muestra el nombre del rol --}}
+                <td class="created_at">{{ $usuario['created_at'] }}</td>
+                <td class="updated_at">{{ $usuario['updated_at'] }}</td>
                 <td>
                     <a href="#editEmployeeModal" class="edit" data-toggle="modal"
-                        data-id="{{ $usuario->id }}" data-name="{{ $usuario->name }}">
+                        data-id="{{ $usuario['id'] }}"
+                        data-name="{{ $usuario['name'] }}"
+                        data-role="{{ $usuario['role_name'] }}"> {{-- Pasar el rol actual al modal --}}
                         <i class="material-icons" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                        data-id="{{ $usuario->id }}"><i class="material-icons" data-toggle="tooltip"
+                        data-id="{{ $usuario['id'] }}"><i class="material-icons" data-toggle="tooltip"
                             title="Eliminar">&#xE872;</i></a>
                 </td>
             </tr>
@@ -230,11 +228,8 @@
             {{-- Muy importante la directiva siguiente. --}}
             @csrf
 
-            {{-- Aquí se debe guardar el numero de control a enviar al método del controlador para eliminar. --}}
+            {{-- Aquí se debe guardar el ID del usuario a enviar al método del controlador para editar. --}}
             <input type="hidden" name="id_editar" id="id_editar">
-
-            <input type="hidden" name="id_mod" id="id_mod">
-            <input type="hidden" name="name_mod" id="name_mod">
 
             <div class="modal-header">
                 <h4 class="modal-title">Editar @yield('administrar_s')</h4>
@@ -243,12 +238,29 @@
 
             <div class="modal-body">
                 <div class="form-group">
-                    <label>id</label>
-                    <input id="id_campo" type="text" class="form-control id ceditar" value="" pattern="[A-Z0-9\-]{1,13}" required>
+                    <label>ID</label>
+                    {{-- El ID normalmente no se edita, por seguridad --}}
+                    <input id="id_campo" type="text" class="form-control id ceditar" name="id" readonly required>
                 </div>
                 <div class="form-group">
-                    <label>name</label>
-                    <input id="name_campo" type="text" class="form-control name ceditar" maxlength="75" value="" required >
+                    <label>Nombre</label>
+                    <input id="name_campo" type="text" class="form-control name ceditar" maxlength="75" name="name_mod" required >
+                </div>
+                {{-- Nuevo campo para el Rol --}}
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="role_campo" name="role_mod" class="form-control" required>
+                        <option value="">Selecciona un rol</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role }}">{{ $role }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                {{-- Campo opcional para cambiar la contraseña --}}
+                <div class="form-group">
+                    <label>Nueva Contraseña (opcional)</label>
+                    <input type="password" class="form-control" name="password_mod">
+                    <small class="form-text text-muted">Deja este campo vacío para no cambiar la contraseña.</small>
                 </div>
             </div>
 
@@ -258,53 +270,42 @@
             </div>
         </form>
 
-        {{-- Escucha que identifica según el atributo data-id el no. control que se va a editar. --}}
+        {{-- Escucha que identifica según el atributo data-id el ID que se va a editar y llena el modal. --}}
         <script>
-            // Se ejecuta cuando el documento esté listo
             $(document).ready(function() {
                 $('a.edit').click(function() {
-                    // Se obtienen los datos del registro a editar
+                    // Se obtienen los datos del registro a editar desde los atributos data-
                     var idEditar = $(this).data('id');
                     var name = $(this).data('name');
-
-                    $('#id_eliminar').val(idEditar);
+                    var role = $(this).data('role'); // Obtiene el rol del usuario
 
                     // Se llenan los campos del formulario con los datos del registro a editar
-                    $('.id').val(idEditar);
-                    $('.name').val(name);
+                    $('#id_editar').val(idEditar); // Campo oculto para el ID en el submit
+                    $('#id_campo').val(idEditar); // Campo de texto visible del ID
+                    $('#name_campo').val(name); // Campo de texto del nombre
+                    $('#role_campo').val(role); // Selecciona el rol en el dropdown
 
-                    // Se llenan los campos ocultos con los datos del registro a editar
-                    $('#id_editar').val(idEditar);
-                    $('#id_mod').val(idEditar);
-                    $('#name_mod').val(name);
-
-                    //Listeners para cuando cambien los campos
-                    document.getElementById('id_campo').addEventListener('change', function() {
-                        $('#id_mod').val(this.value);
-                    });
-
-                    document.getElementById('name_campo').addEventListener('change', function() {
-                        $('#name_mod').val(this.value);
-                    });
-
-                    //console.log("No control:", id);
+                    // Los listeners para 'change' en los campos ya no son estrictamente necesarios
+                    // para 'id_mod' y 'name_mod' si usas directamente los IDs de los campos de formulario
+                    // en el submit del modal. Pero si los usas para algo más, se pueden mantener.
+                    // Para simplificar, he dejado solo los campos que se pasan en el formulario.
                 });
 
-            });
+                // Vaciar los campos al dar clic en "Cancelar"
+                $('input[type="button"][value="Cancelar"]').click(function() {
+                    $('#id_campo').val('');
+                    $('#name_campo').val('');
+                    $('#role_campo').val(''); // Vaciar selección de rol
+                });
 
-            // Vaciar los campos al dar clic en "Cancelar"
-            $('input[type="button"]').click(function() {
-                $('.id').val('');
-                $('.name').val('');
-            });
-
-            // Vaciar los campos al hacer submit del formulario
-            $('form').submit(function() {
-                $('.id.ceditar').val('');
-                $('.name.ceditar').val('');
+                // Vaciar los campos al hacer submit del formulario (se limpian los campos visibles, no los ocultos)
+                $('form').submit(function() {
+                    // Puedes decidir si quieres limpiar los campos visibles después de un submit exitoso
+                    // o si la recarga de la página se encarga de ello.
+                });
             });
         </script>
-
+        {{-- Aquí se incluye el script de validación de campos del layoutCrud --}}
         @yield('script_validacion_campos')
 
     @endif
@@ -362,7 +363,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         </div>
         <div class="modal-body">
-            <p>¿Seguro que quieres eliminar estos registros?</p>
+            <p>¿Seguro que quiere eliminar estos registros?</p>
             <p class="text-warning"><small>Esta acción no se podrá deshacer.</small></p>
         </div>
         <div class="modal-footer">
