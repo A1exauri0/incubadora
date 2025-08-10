@@ -152,31 +152,39 @@ class ProyectoController extends Controller
 
     public function eliminarMultiple(Request $request)
     {
-        $proyectos_a_eliminar = $request->input('proyectos_seleccionados', []);
+        // Obtener todas las claves de proyecto seleccionadas
+        $proyectos_a_eliminar = [];
 
-        if (empty($proyectos_a_eliminar)) {
-            return back()->with('error', 'No se seleccionaron proyectos para eliminar.');
+    // Buscar todos los inputs que empiecen con 'clave_proyecto_eliminar_'
+    foreach ($request->all() as $key => $value) {
+        if (strpos($key, 'clave_proyecto_eliminar_') === 0 && !empty($value)) {
+            $proyectos_a_eliminar[] = $value;
         }
-
-        $nombres_proyectos = DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->pluck('nombre')->implode(', ');
-
-        // Eliminar requerimientos y resultados para múltiples proyectos
-        DB::table('proyecto_requerimientos')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
-        DB::table('proyecto_resultados')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
-        // Luego eliminar los proyectos
-        DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
-
-        $admins = User::role('admin')->get();
-        foreach ($admins as $admin) {
-            $message = 'Múltiples proyectos eliminados. Claves: ' . implode(', ', $proyectos_a_eliminar);
-            if (!empty($nombres_proyectos)) {
-                $message = 'Múltiples proyectos eliminados: ' . $nombres_proyectos;
-            }
-            $admin->notify(new AdminActivityNotification($message, '/c_proyectos', 'proyectos_eliminados_admin'));
-        }
-
-        return back()->with('success', 'Proyectos seleccionados eliminados exitosamente.');
     }
+
+    if (empty($proyectos_a_eliminar)) {
+        return back()->with('error', 'No se seleccionaron proyectos para eliminar.');
+    }
+
+    $nombres_proyectos = DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->pluck('nombre')->implode(', ');
+
+    // Eliminar requerimientos y resultados para múltiples proyectos
+    DB::table('proyecto_requerimientos')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+    DB::table('proyecto_resultados')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+    // Luego eliminar los proyectos
+    DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+
+    $admins = User::role('admin')->get();
+    foreach ($admins as $admin) {
+        $message = 'Múltiples proyectos eliminados. Claves: ' . implode(', ', $proyectos_a_eliminar);
+        if (!empty($nombres_proyectos)) {
+            $message = 'Múltiples proyectos eliminados: ' . $nombres_proyectos;
+        }
+        $admin->notify(new AdminActivityNotification($message, '/c_proyectos', 'proyectos_eliminados_admin'));
+    }
+
+    return back()->with('success', 'Proyectos seleccionados eliminados exitosamente.');
+}
 
     public function edit($clave_proyecto)
     {
