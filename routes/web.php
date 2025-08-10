@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     TipoController,
     CategoriaController,
     ProyectoController,
+    PropuestaProyectoController,
     AsesorController,
     EtapaController,
     HabilidadController,
@@ -95,24 +96,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::group(['middleware' => ['role:admin']], function () {
         Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');
         Route::post('/notifications/mark-as-read', [NotificationController::class, 'markNotificationsAsRead'])->name('notifications.markAsRead');
-        // Rutas para la revisión de propuestas de proyectos por el administrador
-        Route::get('/admin/proyectos/propuestas', [ProyectoController::class, 'listProposals'])->name('admin.proyectos.propuestas');
-        Route::post('/admin/proyectos/propuestas/{clave_proyecto}/review', [ProyectoController::class, 'reviewProposal'])->name('admin.proyectos.propuestas.review');
-        // NUEVA RUTA PARA GENERAR PDF
+        
+        // Rutas para la REVISIÓN de propuestas de proyectos por el administrador
+        Route::get('/admin/proyectos/propuestas', [PropuestaProyectoController::class, 'listProposals'])->name('admin.proyectos.propuestas');
+        Route::post('/admin/proyectos/propuestas/{clave_proyecto}/review', [PropuestaProyectoController::class, 'reviewProposal'])->name('admin.proyectos.propuestas.review');
+
+        // Ruta para GENERAR PDF (se mantiene en ProyectoController ya que es para cualquier proyecto)
         Route::get('/admin/proyectos/{clave_proyecto}/ficha-tecnica-pdf', [ProyectoController::class, 'generateFichaTecnicaPdf'])->name('admin.proyectos.ficha_tecnica_pdf');
     });
 
     // Rutas específicas para el rol de alumno
     Route::group(['middleware' => ['role:alumno']], function () {
+        // Rutas para EDITAR proyectos (se mantienen en ProyectoController)
         Route::get('/proyectos/{clave_proyecto}/editar', [ProyectoController::class, 'edit'])->name('proyectos.edit');
         Route::put('/proyectos/{clave_proyecto}', [ProyectoController::class, 'update'])->name('proyectos.update');
 
-        // Rutas para que el alumno cree una propuesta de proyecto
-        Route::get('/c_proyectos_alumno/crear', [ProyectoController::class, 'createProposalForm'])->name('proyectos.crear_propuesta');
-        Route::post('/c_proyectos_alumno/store-proposal', [ProyectoController::class, 'storeProposal'])->name('proyectos.store_proposal');
+        // Rutas para que el alumno CREE una propuesta de proyecto
+        Route::get('/c_proyectos_alumno/crear', [PropuestaProyectoController::class, 'createProposalForm'])->name('proyectos.crear_propuesta');
+        Route::post('/c_proyectos_alumno/store-proposal', [PropuestaProyectoController::class, 'storeProposal'])->name('proyectos.store_proposal');
     });
 
-    // ... (otras rutas protegidas generales)
 });
 
 // =========================================================================

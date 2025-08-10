@@ -6,12 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\AdminActivityNotification;
-use App\Notifications\NewProposalNotification;
+// use App\Notifications\NewProposalNotification; // Eliminada, ahora en PropuestaProyectoController
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProyectoController extends Controller
 {
+    // Constantes de etapa, SOLO las necesarias para este controlador (CRUD general)
+    // Las constantes de APROBADA y RECHAZADA podrían no ser estrictamente necesarias aquí
+    // si solo se usan en PropuestaProyectoController.
+    // Mantenemos solo PENDIENTE si es que se usa para algo más que propuestas.
+    // Si no se usan en ningún método de este controlador, se pueden eliminar.
+    // Las dejamos por si acaso se usan para mostrar estados en el index.
     const ID_ETAPA_PENDIENTE = 1;
     const ID_ETAPA_APROBADA = 3;
     const ID_ETAPA_RECHAZADA = 4;
@@ -21,32 +27,55 @@ class ProyectoController extends Controller
         $this->middleware('auth');
     }
 
+    /**
+     * Muestra la lista general de proyectos en el CRUD de administración.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
+        // Obtiene todos los proyectos ordenados por fecha de agregado
         $proyectos = DB::table('proyecto')
             ->orderBy('fecha_agregado', 'desc')
             ->get();
 
+        // Define las columnas para la tabla en la vista
         $columnas = ['Clave', 'Nombre', 'Nombre descriptivo', 'Categoria', 'Tipo', 'Etapa', 'Video', 'Registrado'];
+        // Obtiene datos de tablas relacionadas para los selectores o mostrar nombres en la vista
         $categorias = DB::table('categoria')->get();
-        $alumnos = DB::table('alumno')->get();
+        $alumnos = DB::table('alumno')->get(); // Puede que no sea necesario si solo es para listar proyectos
         $tipos = DB::table('tipo')->get();
         $etapas = DB::table('etapas')->get();
         $total_registros = $proyectos->count();
 
         $titulo = "CRUD Proyectos";
 
+        // Retorna la vista con los datos del proyecto
         return view('Admin.cruds.proyectos', compact('proyectos', 'titulo', 'columnas', 'total_registros', 'categorias', 'alumnos', 'tipos', 'etapas'));
     }
 
+    /**
+     * Verifica si una clave de proyecto ya existe en la base de datos.
+     *
+     * @param  string  $clave_proyecto
+     * @return bool
+     */
     public function registro_existe($clave_proyecto)
     {
         $existe = DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->count();
         return $existe > 0;
     }
 
+    /**
+     * Agrega un nuevo proyecto directamente desde la interfaz de administración.
+     * Notifica a los administradores sobre el proyecto agregado.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function agregar(Request $request)
     {
+        // Obtiene los datos del formulario
         $clave_proyecto = $request->input('clave_proyecto_agregar');
         $nombre = $request->input('nombre_agregar');
         $nombre_descriptivo = $request->input('nombre_descriptivo_agregar');
@@ -59,9 +88,11 @@ class ProyectoController extends Controller
         $naturaleza_tecnica = $request->input('naturaleza_tecnica_agregar');
         $objetivo = $request->input('objetivo_agregar');
 
+        // Verifica si la clave del proyecto ya existe
         if ($this->registro_existe($clave_proyecto)) {
             return back()->with('error', 'La clave del proyecto que intentó agregar ya existe en otro registro.');
         } else {
+            // Inserta el nuevo proyecto en la base de datos
             DB::table('proyecto')->insert([
                 'clave_proyecto' => $clave_proyecto,
                 'nombre' => $nombre,
@@ -74,9 +105,10 @@ class ProyectoController extends Controller
                 'area_aplicacion' => $area_aplicacion,
                 'naturaleza_tecnica' => $naturaleza_tecnica,
                 'objetivo' => $objetivo,
-                'fecha_agregado' => now(),
+                'fecha_agregado' => now(), // Fecha de creación
             ]);
 
+            // Notifica a todos los administradores sobre el proyecto agregado
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
                 $admin->notify(new AdminActivityNotification('Proyecto "' . $nombre . '" agregado directamente por administrador.', '/c_proyectos', 'proyecto_agregado_admin'));
@@ -86,10 +118,17 @@ class ProyectoController extends Controller
         }
     }
 
+    /**
+     * Edita un proyecto existente desde la interfaz de administración.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editar(Request $request)
     {
-        $clave_proyecto = $request->input('clave_proyecto_editar');
-        $clave_proyecto_mod = $request->input('clave_proyecto_mod');
+        // Obtiene los datos del formulario de edición
+        $clave_proyecto = $request->input('clave_proyecto_editar'); // Clave original del proyecto
+        $clave_proyecto_mod = $request->input('clave_proyecto_mod'); // Nueva clave (si se modificó)
         $nombre = $request->input('nombre_mod');
         $nombre_descriptivo = $request->input('nombre_descriptivo_mod');
         $descripcion = $request->input('descripcion_mod');
@@ -101,9 +140,11 @@ class ProyectoController extends Controller
         $naturaleza_tecnica = $request->input('naturaleza_tecnica_mod');
         $objetivo = $request->input('objetivo_mod');
 
+        // Verifica si la nueva clave de proyecto ya existe y es diferente de la original
         if ($clave_proyecto != $clave_proyecto_mod && $this->registro_existe($clave_proyecto_mod)) {
             return back()->with('error', 'La clave del proyecto que intentó modificar ya existe en otro registro.');
         } else {
+            // Actualiza el proyecto en la base de datos
             DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->update([
                 'clave_proyecto' => $clave_proyecto_mod,
                 'nombre' => $nombre,
@@ -118,8 +159,9 @@ class ProyectoController extends Controller
                 'objetivo' => $objetivo
             ]);
 
+            // Notifica a los administradores sobre la actualización del proyecto
             $admins = User::role('admin')->get();
-            $updaterName = Auth::user()->name;
+            $updaterName = Auth::user()->name; // Nombre del usuario que realizó la actualización
             $adminMessage = 'Proyecto "' . $nombre . '" actualizado por un administrador.';
             foreach ($admins as $admin) {
                 $admin->notify(new AdminActivityNotification($adminMessage, '/c_proyectos', 'proyecto_actualizado_admin'));
@@ -129,6 +171,13 @@ class ProyectoController extends Controller
         }
     }
 
+    /**
+     * Elimina un proyecto específico de la base de datos.
+     * También elimina los requerimientos y resultados asociados.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function eliminar(Request $request)
     {
         $clave_proyecto = $request->input('clave_proyecto_eliminar');
@@ -140,6 +189,7 @@ class ProyectoController extends Controller
         // Luego eliminar el proyecto
         DB::table('proyecto')->where('clave_proyecto', '=', $clave_proyecto)->delete();
 
+        // Notifica a los administradores sobre el proyecto eliminado
         if ($proyecto_eliminado) {
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
@@ -150,54 +200,72 @@ class ProyectoController extends Controller
         return back()->with('success', 'Proyecto eliminado exitosamente.');
     }
 
+    /**
+     * Elimina múltiples proyectos seleccionados de la base de datos.
+     * También elimina los requerimientos y resultados asociados.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function eliminarMultiple(Request $request)
     {
-        // Obtener todas las claves de proyecto seleccionadas
         $proyectos_a_eliminar = [];
 
-    // Buscar todos los inputs que empiecen con 'clave_proyecto_eliminar_'
-    foreach ($request->all() as $key => $value) {
-        if (strpos($key, 'clave_proyecto_eliminar_') === 0 && !empty($value)) {
-            $proyectos_a_eliminar[] = $value;
+        // Recorre todos los inputs de la solicitud para encontrar las claves de proyecto a eliminar
+        foreach ($request->all() as $key => $value) {
+            if (strpos($key, 'clave_proyecto_eliminar_') === 0 && !empty($value)) {
+                $proyectos_a_eliminar[] = $value;
+            }
         }
-    }
 
-    if (empty($proyectos_a_eliminar)) {
-        return back()->with('error', 'No se seleccionaron proyectos para eliminar.');
-    }
-
-    $nombres_proyectos = DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->pluck('nombre')->implode(', ');
-
-    // Eliminar requerimientos y resultados para múltiples proyectos
-    DB::table('proyecto_requerimientos')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
-    DB::table('proyecto_resultados')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
-    // Luego eliminar los proyectos
-    DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
-
-    $admins = User::role('admin')->get();
-    foreach ($admins as $admin) {
-        $message = 'Múltiples proyectos eliminados. Claves: ' . implode(', ', $proyectos_a_eliminar);
-        if (!empty($nombres_proyectos)) {
-            $message = 'Múltiples proyectos eliminados: ' . $nombres_proyectos;
+        // Si no se seleccionaron proyectos, redirige con un error
+        if (empty($proyectos_a_eliminar)) {
+            return back()->with('error', 'No se seleccionaron proyectos para eliminar.');
         }
-        $admin->notify(new AdminActivityNotification($message, '/c_proyectos', 'proyectos_eliminados_admin'));
+
+        // Obtiene los nombres de los proyectos a eliminar para el mensaje de notificación
+        $nombres_proyectos = DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->pluck('nombre')->implode(', ');
+
+        // Eliminar requerimientos y resultados para múltiples proyectos
+        DB::table('proyecto_requerimientos')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+        DB::table('proyecto_resultados')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+        // Luego eliminar los proyectos
+        DB::table('proyecto')->whereIn('clave_proyecto', $proyectos_a_eliminar)->delete();
+
+        // Notifica a los administradores sobre la eliminación múltiple de proyectos
+        $admins = User::role('admin')->get();
+        foreach ($admins as $admin) {
+            $message = 'Múltiples proyectos eliminados. Claves: ' . implode(', ', $proyectos_a_eliminar);
+            if (!empty($nombres_proyectos)) {
+                $message = 'Múltiples proyectos eliminados: ' . $nombres_proyectos;
+            }
+            $admin->notify(new AdminActivityNotification($message, '/c_proyectos', 'proyectos_eliminados_admin'));
+        }
+
+        return back()->with('success', 'Proyectos seleccionados eliminados exitosamente.');
     }
 
-    return back()->with('success', 'Proyectos seleccionados eliminados exitosamente.');
-}
-
+    /**
+     * Muestra el formulario para editar un proyecto existente.
+     * Verifica permisos de administrador o líder de proyecto.
+     *
+     * @param  string  $clave_proyecto La clave del proyecto a editar.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
     public function edit($clave_proyecto)
     {
         /** @var \App\Models\User */
-        $user = Auth::user();
+        $user = Auth::user(); // Obtiene el usuario autenticado
         $proyecto = DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->first();
 
+        // Si el proyecto no se encuentra, redirige con un error
         if (!$proyecto) {
             return redirect()->route('home')->with('error', 'Proyecto no encontrado.');
         }
 
         $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
         $esLider = false;
+        // Verifica si el usuario actual es el líder del proyecto
         if ($alumno) {
             $liderCheck = DB::table('alumno_proyecto')
                 ->where('clave_proyecto', $clave_proyecto)
@@ -209,29 +277,40 @@ class ProyectoController extends Controller
             }
         }
 
+        // Si el usuario no es admin y no es el líder del proyecto, niega el permiso
         if (!$user->hasRole('admin') && !$esLider) {
             return redirect()->route('home')->with('error', 'No tienes permiso para editar este proyecto.');
         }
 
+        // Obtiene datos de tablas relacionadas para los selectores del formulario de edición
         $categorias = DB::table('categoria')->get();
         $tipos = DB::table('tipo')->get();
         $etapas = DB::table('etapas')->get();
 
-        // Obtener requerimientos y resultados existentes para pasarlos a la vista de edición
+        // Obtiene requerimientos y resultados existentes del proyecto para mostrarlos en el formulario
         $requerimientos = DB::table('proyecto_requerimientos')->where('clave_proyecto', $clave_proyecto)->get();
         $resultados = DB::table('proyecto_resultados')->where('clave_proyecto', $clave_proyecto)->get();
 
-
+        // Retorna la vista de edición con los datos del proyecto
         return view('alumnos.editar', compact('proyecto', 'categorias', 'tipos', 'etapas', 'requerimientos', 'resultados'));
     }
 
+    /**
+     * Actualiza un proyecto existente.
+     * Verifica permisos y sincroniza requerimientos y resultados.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $clave_proyecto La clave del proyecto a actualizar.
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, $clave_proyecto)
     {
         /** @var \App\Models\User */
-        $user = Auth::user();
+        $user = Auth::user(); // Obtiene el usuario autenticado
 
         $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
         $esLider = false;
+        // Verifica si el usuario actual es el líder del proyecto
         if ($alumno) {
             $liderCheck = DB::table('alumno_proyecto')
                 ->where('clave_proyecto', $clave_proyecto)
@@ -243,14 +322,17 @@ class ProyectoController extends Controller
             }
         }
 
+        // Si el usuario no es admin y no es el líder del proyecto, niega el permiso
         if (!$user->hasRole('admin') && !$esLider) {
             return redirect()->route('home')->with('error', 'No tienes permiso para editar este proyecto.');
         }
 
+        // Si el campo de video está vacío, lo establece como null para evitar errores de validación de URL
         if (empty($request->input('video'))) {
             $request->merge(['video' => null]);
         }
 
+        // Define las reglas de validación para los datos del proyecto
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
@@ -263,14 +345,15 @@ class ProyectoController extends Controller
             'objetivo' => 'nullable|string',
             // Validaciones para requerimientos
             'requerimientos' => 'nullable|array',
-            'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100', // max 100 caracteres como en la tabla
-            'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50', // max 50 caracteres como en la tabla
+            'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100',
+            'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50',
             // Validaciones para resultados
             'resultados' => 'nullable|array',
-            'resultados.*.descripcion' => 'required|string|max:100', // max 100 caracteres como en la tabla
+            'resultados.*.descripcion' => 'required|string|max:100',
         ]);
 
         try {
+            // Actualiza los datos principales del proyecto
             DB::table('proyecto')
                 ->where('clave_proyecto', $clave_proyecto)
                 ->update([
@@ -285,10 +368,8 @@ class ProyectoController extends Controller
                     'objetivo' => $request->input('objetivo'),
                 ]);
 
-            // Sincronizar requerimientos
-            // Primero, elimina los requerimientos existentes para este proyecto
+            // Sincroniza requerimientos: elimina los existentes y luego inserta los nuevos
             DB::table('proyecto_requerimientos')->where('clave_proyecto', $clave_proyecto)->delete();
-            // Luego, inserta los nuevos requerimientos si existen
             if ($request->has('requerimientos') && is_array($request->input('requerimientos'))) {
                 foreach ($request->input('requerimientos') as $req) {
                     if (!empty($req['descripcion']) && !empty($req['cantidad'])) {
@@ -301,10 +382,8 @@ class ProyectoController extends Controller
                 }
             }
 
-            // Sincronizar resultados
-            // Primero, elimina los resultados existentes para este proyecto
+            // Sincroniza resultados: elimina los existentes y luego inserta los nuevos
             DB::table('proyecto_resultados')->where('clave_proyecto', $clave_proyecto)->delete();
-            // Luego, inserta los nuevos resultados si existen
             if ($request->has('resultados') && is_array($request->input('resultados'))) {
                 foreach ($request->input('resultados') as $res) {
                     if (!empty($res['descripcion'])) {
@@ -317,7 +396,7 @@ class ProyectoController extends Controller
                 }
             }
 
-
+            // Notifica a los administradores sobre la actualización del proyecto por un líder
             $admins = User::role('admin')->get();
             $updaterName = Auth::user()->name;
             $adminMessage = 'Proyecto "' . $request->input('nombre') . '" (Clave: ' . $clave_proyecto . ') actualizado por ' . $updaterName . '.';
@@ -328,224 +407,13 @@ class ProyectoController extends Controller
             return redirect()->route('home')->with('success', 'Proyecto actualizado exitosamente.');
 
         } catch (\Exception $e) {
+            // Maneja cualquier error durante la actualización
             return redirect()->back()->withInput()->with('error', 'Error al actualizar el proyecto: ' . $e->getMessage());
         }
     }
 
-    public function createProposalForm()
-    {
-        /** @var \App\Models\User */
-        $user = Auth::user();
-        $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
-
-        if (!$user->hasRole('alumno') || !$alumno) {
-            return redirect()->route('home')->with('error', 'No tienes permiso para crear una propuesta de proyecto.');
-        }
-
-        $categorias = DB::table('categoria')->get();
-        $tipos = DB::table('tipo')->get();
-        $etapas = DB::table('etapas')->get();
-
-        return view('alumnos.crear_propuesta', compact('categorias', 'tipos', 'etapas'));
-    }
-
-    public function storeProposal(Request $request)
-    {
-        /** @var \App\Models\User */
-        $user = Auth::user();
-        $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
-
-        if (!$user->hasRole('alumno') || !$alumno) {
-            return redirect()->route('home')->with('error', 'Acceso no autorizado para crear propuestas.');
-        }
-
-        $request->validate([
-            'clave_proyecto' => 'required|string|max:50|unique:proyecto,clave_proyecto',
-            'nombre' => 'required|string|max:255',
-            'nombre_descriptivo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'categoria' => 'required|integer|exists:categoria,idCategoria',
-            'tipo' => 'required|integer|exists:tipo,idTipo',
-            'video' => 'nullable|url:http,https',
-            'area_aplicacion' => 'nullable|string|max:255',
-            'naturaleza_tecnica' => 'nullable|string|max:255',
-            'objetivo' => 'nullable|string',
-            // Nuevas validaciones para requerimientos y resultados
-            'requerimientos' => 'nullable|array',
-            'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100',
-            'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50',
-            'resultados' => 'nullable|array',
-            'resultados.*.descripcion' => 'required|string|max:100',
-        ]);
-
-        if (empty($request->input('video'))) {
-            $request->merge(['video' => null]);
-        }
-
-        try {
-            DB::table('proyecto')->insert([
-                'clave_proyecto' => $request->input('clave_proyecto'),
-                'nombre' => $request->input('nombre'),
-                'nombre_descriptivo' => $request->input('nombre_descriptivo'),
-                'descripcion' => $request->input('descripcion'),
-                'categoria' => $request->input('categoria'),
-                'tipo' => $request->input('tipo'),
-                'etapa' => self::ID_ETAPA_PENDIENTE,
-                'video' => $request->input('video'),
-                'area_aplicacion' => $request->input('area_aplicacion'),
-                'naturaleza_tecnica' => $request->input('naturaleza_tecnica'),
-                'objetivo' => $request->input('objetivo'),
-                'fecha_agregado' => now(),
-            ]);
-
-            // Obtener la clave del proyecto recién insertado
-            $clave_proyecto_insertado = $request->input('clave_proyecto');
-
-            // Insertar requerimientos
-            if ($request->has('requerimientos') && is_array($request->input('requerimientos'))) {
-                foreach ($request->input('requerimientos') as $req) {
-                    if (!empty($req['descripcion']) && !empty($req['cantidad'])) {
-                        DB::table('proyecto_requerimientos')->insert([
-                            'clave_proyecto' => $clave_proyecto_insertado,
-                            'descripcion' => $req['descripcion'],
-                            'cantidad' => $req['cantidad'],
-                        ]);
-                    }
-                }
-            }
-
-            // Insertar resultados
-            if ($request->has('resultados') && is_array($request->input('resultados'))) {
-                foreach ($request->input('resultados') as $res) {
-                    if (!empty($res['descripcion'])) {
-                        DB::table('proyecto_resultados')->insert([
-                            'clave_proyecto' => $clave_proyecto_insertado,
-                            'descripcion' => $res['descripcion'],
-                            'fecha_agregado' => now(),
-                        ]);
-                    }
-                }
-            }
-
-            DB::table('alumno_proyecto')->insert([
-                'no_control' => $alumno->no_control,
-                'clave_proyecto' => $clave_proyecto_insertado,
-                'lider' => 1,
-            ]);
-
-            // Obtener todos los usuarios con el rol 'admin'
-            $admins = User::role('admin')->get();
-            // Definir el enlace a la vista de propuestas
-            $proposalLink = route('admin.proyectos.propuestas');
-
-            // Enviar la nueva notificación (que incluye correo y base de datos) a cada administrador
-            foreach ($admins as $admin) {
-                $admin->notify(new NewProposalNotification(
-                    $request->input('nombre'), // Nombre del proyecto
-                    $request->input('clave_proyecto'), // Clave del proyecto
-                    $user->name, // Nombre del usuario que envía la propuesta
-                    $proposalLink // Enlace a la vista de propuestas
-                ));
-            }
-
-            return redirect()->route('home')->with('success', 'Propuesta de proyecto creada exitosamente y pendiente de revisión.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', 'Error al crear la propuesta: ' . $e->getMessage());
-        }
-    }
-
-    public function listProposals()
-    {
-        $propuestas = DB::table('proyecto')
-            ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
-            ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
-            ->leftJoin('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
-            ->select(
-                'proyecto.clave_proyecto',
-                'proyecto.nombre',
-                'proyecto.descripcion',
-                'categoria.nombre as nombre_categoria',
-                'tipo.nombre as nombre_tipo',
-                'etapas.nombre as nombre_etapa',
-                'proyecto.fecha_agregado',
-                'proyecto.etapa',
-                'proyecto.motivo_rechazo'
-            )
-            ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE, self::ID_ETAPA_RECHAZADA])
-            ->orderBy('fecha_agregado', 'desc')
-            ->get();
-
-        $titulo = "Revisión de Propuestas de Proyectos";
-
-        return view('Admin.propuestas_proyectos', compact('propuestas', 'titulo'));
-    }
-
-    public function reviewProposal(Request $request, $clave_proyecto)
-    {
-        $request->validate([
-            'action' => 'required|in:accept,reject',
-            'motivo_rechazo' => 'nullable|string|max:500',
-        ]);
-
-        $proyecto = DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->first();
-
-        if (!$proyecto) {
-            return back()->with('error', 'Propuesta de proyecto no encontrada.');
-        }
-
-        $updateData = [];
-        $notificationMessage = '';
-        $notificationType = '';
-        $motivoRechazo = null;
-
-        if ($request->input('action') === 'accept') {
-            $updateData = [
-                'etapa' => self::ID_ETAPA_APROBADA,
-                'motivo_rechazo' => null,
-            ];
-            $notificationMessage = 'La propuesta de proyecto "' . $proyecto->nombre . '" ha sido APROBADA.';
-            $notificationType = 'proposal_approved';
-        } elseif ($request->input('action') === 'reject') {
-            if (empty($request->input('motivo_rechazo'))) {
-                return back()->with('error', 'El motivo de rechazo es obligatorio para rechazar la propuesta.');
-            }
-            $motivoRechazo = $request->input('motivo_rechazo');
-            $updateData = [
-                'etapa' => self::ID_ETAPA_RECHAZADA,
-                'motivo_rechazo' => $motivoRechazo,
-            ];
-            $notificationMessage = 'La propuesta de proyecto "' . $proyecto->nombre . '" ha sido RECHAZADA. Motivo: ' . $motivoRechazo;
-            $notificationType = 'proposal_rejected';
-        }
-
-        DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->update($updateData);
-
-        $leader = DB::table('alumno_proyecto')
-            ->where('clave_proyecto', $clave_proyecto)
-            ->where('lider', 1)
-            ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
-            ->join('users', 'alumno.correo_institucional', '=', 'users.email')
-            ->select('users.id')
-            ->first();
-
-        if ($leader) {
-            $leaderUser = User::find($leader->id);
-            if ($leaderUser) {
-                $leaderUser->notify(new AdminActivityNotification(
-                    $notificationMessage,
-                    route('home'),
-                    $notificationType
-                ));
-            }
-        }
-
-        return back()->with('success', 'Propuesta de proyecto procesada exitosamente.');
-    }
-
     /**
      * Genera la ficha técnica de un proyecto en formato PDF.
-     * Utiliza la vista 'layouts.pdf' y permite la visualización en el navegador.
      *
      * @param string $clave_proyecto La clave del proyecto.
      * @return \Illuminate\Http\Response
@@ -563,7 +431,7 @@ class ProyectoController extends Controller
             abort(404, 'Proyecto no encontrado.');
         }
 
-        // Obtener los resultados del proyecto (asumiendo tabla 'proyecto_resultados')
+        // Obtener los resultados del proyecto
         $resultados = DB::table('proyecto_resultados')
             ->where('clave_proyecto', $clave_proyecto)
             ->get();
@@ -572,8 +440,7 @@ class ProyectoController extends Controller
         $alumno_proyecto = DB::table('alumno_proyecto')
             ->where('clave_proyecto', $clave_proyecto)
             ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
-            // CORRECCIÓN: Unir por el nombre de la carrera, no por un ID que no existe
-            ->leftJoin('carrera', 'alumno.carrera', '=', 'carrera.nombre')
+            ->leftJoin('carrera', 'alumno.carrera', '=', 'carrera.nombre') // Unir por el nombre de la carrera
             ->select('alumno.*', 'carrera.nombre as carrera_nombre_completo', 'alumno_proyecto.lider')
             ->get();
 
@@ -584,29 +451,24 @@ class ProyectoController extends Controller
             ->select('asesor.*')
             ->get();
 
-        // Obtener los requerimientos del proyecto (asumiendo tabla 'proyecto_requerimientos')
+        // Obtener los requerimientos del proyecto
         $requerimientos = DB::table('proyecto_requerimientos')
             ->where('clave_proyecto', $clave_proyecto)
             ->get();
 
-        // Pasar todos los datos a la vista del PDF
+        // Preparar los datos para la vista del PDF
         $data = [
             'proyecto' => $proyecto,
             'resultados' => $resultados,
             'alumno_proyecto' => $alumno_proyecto,
             'asesor_proyecto' => $asesor_proyecto,
             'requerimientos' => $requerimientos,
-            // Las siguientes colecciones se pasan porque tu layouts/pdf.blade.php las usa
-            // aunque para la categoría del proyecto principal se usará $proyecto->nombre_categoria
-            'categorias' => DB::table('categoria')->get(), // Necesario si otras partes del PDF lo usan
-            'carreras' => DB::table('carrera')->get(),    // Necesario si otras partes del PDF lo usan
+            'categorias' => DB::table('categoria')->get(),
+            'carreras' => DB::table('carrera')->get(),
         ];
 
-        // Cargar la vista 'layouts.pdf' y generar el PDF
+        // Cargar la vista para generar el PDF
         $pdf = Pdf::loadView('layouts.pdf', $data);
-
-        // Opcional: Configurar el tamaño del papel y la orientación
-        // $pdf->setPaper('A4', 'portrait');
 
         // Visualizar el PDF en el navegador
         return $pdf->stream('ficha_tecnica_' . $clave_proyecto . '.pdf');
