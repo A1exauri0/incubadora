@@ -17,6 +17,7 @@ class AlumnoSeeder extends Seeder
         DB::table('alumno')->delete();
 
         $alumnos = [
+            // Usuario de prueba, eliminar al terminar de probar el sistema
             [
                 'no_control' => '21270650',
                 'nombre' => 'Jose Estrada',
@@ -26,6 +27,7 @@ class AlumnoSeeder extends Seeder
                 'semestre' => 3,
                 'fecha_agregado' => '2024-08-28 10:10:40',
             ],
+            // --------------------------------------------------------------
             [
                 'no_control' => '00000001',
                 'nombre' => 'Francisco Alberto Pérez Hernández',

@@ -165,7 +165,7 @@ class PropuestaProyectoController extends Controller
     /**
      * Muestra una lista de propuestas de proyectos pendientes para revisión del asesor.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function listAdvisorProposals()
     {
@@ -180,6 +180,7 @@ class PropuestaProyectoController extends Controller
             ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
             ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
             ->leftJoin('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
+            ->leftJoin('color', 'etapas.color', '=', 'color.nombre') // <-- AÑADIR ESTA LÍNEA
             ->select(
                 'proyecto.clave_proyecto',
                 'proyecto.nombre',
@@ -187,11 +188,13 @@ class PropuestaProyectoController extends Controller
                 'categoria.nombre as nombre_categoria',
                 'tipo.nombre as nombre_tipo',
                 'etapas.nombre as nombre_etapa',
+                'etapas.color as nombre_color_etapa', // Opcional: para referencia visual del nombre del color
+                'color.clase as etapa_color_class',   // <-- AÑADIR ESTA LÍNEA (la clase CSS del color)
                 'proyecto.fecha_agregado',
                 'proyecto.etapa',
                 'proyecto.motivo_rechazo'
             )
-            ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE_ASESOR]) // Solo propuestas pendientes para el asesor
+            ->whereIn('proyecto.etapa', [self::ID_ETAPA_PENDIENTE_ASESOR])
             ->orderBy('fecha_agregado', 'desc')
             ->paginate(5);
 
@@ -294,7 +297,7 @@ class PropuestaProyectoController extends Controller
      * Muestra una lista de propuestas de proyectos pendientes o rechazadas para revisión del administrador.
      * Ahora solo muestra las que tienen Visto Bueno del asesor o fueron rechazadas (final).
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function listProposals()
     {
@@ -310,6 +313,7 @@ class PropuestaProyectoController extends Controller
             ->leftJoin('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
             ->leftJoin('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
             ->leftJoin('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa')
+            ->leftJoin('color', 'etapas.color', '=', 'color.nombre') // <-- AÑADIR ESTA LÍNEA
             ->select(
                 'proyecto.clave_proyecto',
                 'proyecto.nombre',
@@ -317,11 +321,13 @@ class PropuestaProyectoController extends Controller
                 'categoria.nombre as nombre_categoria',
                 'tipo.nombre as nombre_tipo',
                 'etapas.nombre as nombre_etapa',
+                'etapas.color as nombre_color_etapa', // Opcional: para referencia visual del nombre del color
+                'color.clase as etapa_color_class',   // <-- AÑADIR ESTA LÍNEA (la clase CSS del color)
                 'proyecto.fecha_agregado',
                 'proyecto.etapa',
                 'proyecto.motivo_rechazo'
             )
-            ->whereIn('proyecto.etapa', [self::ID_ETAPA_VISTO_BUENO_ASESOR, self::ID_ETAPA_RECHAZADA]) // <-- CAMBIO
+            ->whereIn('proyecto.etapa', [self::ID_ETAPA_VISTO_BUENO_ASESOR, self::ID_ETAPA_RECHAZADA])
             ->orderBy('fecha_agregado', 'desc')
             ->paginate(5);
 

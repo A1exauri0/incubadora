@@ -16,7 +16,7 @@ class EtapasSeeder extends Seeder
         DB::table('etapas')->insert([
             [
                 'idEtapa' => 1,
-                'nombre' => 'PENDIENTE',
+                'nombre' => 'Pendiente',
                 'descripcion' => 'Proyecto pendiente de revisión o acción.',
                 'color' => 'Gris'
             ],

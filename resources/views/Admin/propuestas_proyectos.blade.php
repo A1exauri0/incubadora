@@ -46,31 +46,26 @@
                 <td>{{ $propuesta->nombre_etapa }}</td>
                 <td>{{ \Carbon\Carbon::parse($propuesta->fecha_agregado)->format('d/m/Y') }}</td>
                 <td>
-                    {{-- Usar directamente los IDs de las etapas --}}
-                    @if ($propuesta->etapa == 1) {{-- PENDIENTE --}}
-                        <span class="badge badge-warning">Pendiente (Asesor)</span>
-                    @elseif ($propuesta->etapa == 2) {{-- V.º B. Asesor --}}
-                        <span class="badge badge-primary">V.º B. Asesor</span>
-                    @elseif ($propuesta->etapa == 3) {{-- V.º B. Administrador (Aprobada) --}}
-                        <span class="badge badge-success">Aprobada</span>
-                    @elseif ($propuesta->etapa == 4) {{-- Rechazado --}}
-                        <span class="badge badge-danger">Rechazada</span>
-                    @else
-                        <span class="badge badge-info">{{ $propuesta->nombre_etapa }}</span>
-                    @endif
+                    {{-- Usar la clase de color obtenida de la base de datos --}}
+                    <span class="badge badge-{{ $propuesta->etapa_color_class ?? 'info' }}">
+                        {{ $propuesta->nombre_etapa }}
+                    </span>
                 </td>
                 <td>{{ $propuesta->motivo_rechazo ?? 'N/A' }}</td>
                 <td>
                     {{-- Acciones del Administrador: solo si la etapa es V.º B. Asesor (2) --}}
-                    @if ($propuesta->etapa == 2) {{-- Solo si tiene Visto Bueno del Asesor --}}
-                        <form action="{{ route('admin.proyectos.propuestas.review', $propuesta->clave_proyecto) }}" method="POST" class="d-inline">
+                    @if ($propuesta->etapa == 2)
+                        {{-- Solo si tiene Visto Bueno del Asesor --}}
+                        <form action="{{ route('admin.proyectos.propuestas.review', $propuesta->clave_proyecto) }}"
+                            method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="action" value="accept">
                             <button type="submit" class="btn btn-success btn-sm" title="Aceptar Propuesta">
                                 <i class="fas fa-check"></i>
                             </button>
                         </form>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal" data-clave="{{ $propuesta->clave_proyecto }}" title="Rechazar Propuesta">
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal"
+                            data-clave="{{ $propuesta->clave_proyecto }}" title="Rechazar Propuesta">
                             <i class="fas fa-times"></i>
                         </button>
                     @else
@@ -78,8 +73,9 @@
                         <span class="text-muted">Estado Actual: {{ $propuesta->nombre_etapa }}</span>
                     @endif
                     {{-- Botón para generar PDF --}}
-                    <a href="{{ route('admin.proyectos.ficha_tecnica_pdf', $propuesta->clave_proyecto) }}" class="btn btn-info btn-sm ml-1" title="Generar Ficha Técnica PDF" target="_blank">
-                        <i class="fas fa-file-pdf"></i>
+                    <a href="{{ route('admin.proyectos.ficha_tecnica_pdf', $propuesta->clave_proyecto) }}"
+                        class="btn btn-info btn-sm ml-1" title="Generar Ficha Técnica PDF" target="_blank">
+                        <i class="fas fa-file-pdf text-white"></i>
                     </a>
                 </td>
             </tr>
@@ -89,15 +85,16 @@
 
 @section('paginacion')
     <div class="hint-text">
-        Mostrando <b>{{ $propuestas->firstItem() }}</b> a <b>{{ $propuestas->lastItem() }}</b> de <b>{{ $propuestas->total() }}</b> registros.
+        Mostrando <b>{{ $propuestas->firstItem() }}</b> a <b>{{ $propuestas->lastItem() }}</b> de
+        <b>{{ $propuestas->total() }}</b> registros.
     </div>
     <ul class="pagination">
         <li class="page-item {{ $propuestas->onFirstPage() ? 'disabled' : '' }}">
             <a href="{{ $propuestas->previousPageUrl() }}" class="page-link">Anterior</a>
         </li>
         @for ($i = 1; $i <= $propuestas->lastPage(); $i++)
-            <li class="page-item {{ $i == $propuestas->currentPage() ? 'active' : '' }}"><a href="{{ $propuestas->url($i) }}"
-                    class="page-link">{{ $i }}</a></li>
+            <li class="page-item {{ $i == $propuestas->currentPage() ? 'active' : '' }}"><a
+                    href="{{ $propuestas->url($i) }}" class="page-link">{{ $i }}</a></li>
         @endfor
         <li class="page-item {{ $propuestas->onLastPage() ? 'disabled' : '' }}">
             <a href="{{ $propuestas->nextPageUrl() }}" class="page-link">Siguiente</a>
@@ -105,7 +102,8 @@
     </ul>
 @endsection
 
-<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="rejectForm" method="POST">
@@ -134,18 +132,19 @@
 </div>
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        $('[data-toggle="tooltip"]').tooltip();
+    <script>
+        $(document).ready(function() {
+            $('[data-toggle="tooltip"]').tooltip();
 
-        $('#rejectModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var claveProyecto = button.data('clave');
-            var modal = $(this);
-            modal.find('#rejectClaveProyecto').val(claveProyecto);
-            modal.find('#rejectForm').attr('action', '{{ url("/admin/proyectos/propuestas") }}/' + claveProyecto + '/review');
-            modal.find('#motivo_rechazo').val('');
+            $('#rejectModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var claveProyecto = button.data('clave');
+                var modal = $(this);
+                modal.find('#rejectClaveProyecto').val(claveProyecto);
+                modal.find('#rejectForm').attr('action', '{{ url('/admin/proyectos/propuestas') }}/' +
+                    claveProyecto + '/review');
+                modal.find('#motivo_rechazo').val('');
+            });
         });
-    });
-</script>
+    </script>
 @endpush

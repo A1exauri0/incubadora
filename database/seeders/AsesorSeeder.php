@@ -384,6 +384,14 @@ class AsesorSeeder extends Seeder
                 'correo_electronico' => 'ejemplos@gmail.com',
                 'fecha_agregado' => '2024-09-01 22:52:58',
             ],
+            // Usuario de prueba, eliminar al terminar de probar el sistema
+            [
+                'idAsesor' => 59,
+                'nombre' => 'Asesor',
+                'telefono' => '9619876543',
+                'correo_electronico' => 'servicios030630@gmail.com',
+                'fecha_agregado' => '2024-09-01 22:52:58',
+            ]
         ]);
     }
 }

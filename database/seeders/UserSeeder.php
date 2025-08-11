@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
+            /* Usuarios de prueba, eliminar al terminar de probar el sistema */
             [
                 'id' => 23,
                 'name' => 'Adrián Alejandro',
@@ -35,6 +36,16 @@ class UserSeeder extends Seeder
                 'created_at' => Carbon::parse('2025-02-24 00:22:47'),
                 'updated_at' => Carbon::parse('2025-02-24 00:22:55'),
             ],
+                        [
+                'id' => 31,
+                'name' => 'Asesor',
+                'email' => 'servicios030630@gmail.com',
+                'email_verified_at' => Carbon::parse('2025-02-24 00:22:55'),
+                'password' => Hash::make('11111111'),
+                'remember_token' => null,
+                'created_at' => Carbon::parse('2025-02-24 00:22:47'),
+                'updated_at' => Carbon::parse('2025-02-24 00:22:55'),
+            ]
         ]);
     }
 }

@@ -95,7 +95,7 @@
                     @can('mostrar asesor') {{-- Nuevo menú para Asesores --}}
                         <li class="nav-item">
                             <a class="nav-link active" href="{{ route('asesor.proyectos.propuestas') }}">
-                                Revisión Propuestas
+                                Revisar Propuestas
                             </a>
                         </li>
                     @endcan
