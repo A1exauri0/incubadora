@@ -41,6 +41,10 @@
                             <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="proyectosDropdown"
                                 role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Proyectos
+                                {{-- Ícono de exclamación en el botón principal si hay revisiones --}}
+                                @if (isset($revisionesAdminCount) && $revisionesAdminCount > 0)
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                @endif
                             </a>
                             <div class="dropdown-menu" aria-labelledby="proyectosDropdown">
                                 <a class="dropdown-item" href="/c_proyectos">Todos</a>
@@ -48,9 +52,14 @@
                                 <a class="dropdown-item" href="/c_tipos">Tipos</a>
                                 <a class="dropdown-item" href="/c_etapas">Etapas</a>
                                 <div class="dropdown-divider"></div>
-                                {{-- Esta ruta ahora mostrará las propuestas después del Visto Bueno del Asesor --}}
-                                <a class="dropdown-item" href="{{ route('admin.proyectos.propuestas') }}">Revisar
-                                    Propuestas</a>
+                                <a class="dropdown-item" href="{{ route('admin.proyectos.propuestas') }}">
+                                    Revisar Propuestas
+                                    {{-- Contador numérico dentro del dropdown --}}
+                                    @if (isset($revisionesAdminCount) && $revisionesAdminCount > 0)
+                                        <span
+                                            class="badge rounded-pill bg-danger text-white ml-2">{{ $revisionesAdminCount }}</span>
+                                    @endif
+                                </a>
                             </div>
                         </li>
 
@@ -92,11 +101,27 @@
                             </div>
                         </li>
                     @endcan
-                    @can('mostrar asesor') {{-- Nuevo menú para Asesores --}}
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('asesor.proyectos.propuestas') }}">
+                    @can('mostrar asesor')
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle font-weight-bold" href="#"
+                                id="asesorProyectosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
                                 Revisar Propuestas
+                                {{-- Ícono de exclamación si hay propuestas por revisar --}}
+                                @if (isset($revisionesAsesorCount) && $revisionesAsesorCount > 0)
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                @endif
                             </a>
+                            <div class="dropdown-menu" aria-labelledby="asesorProyectosDropdown">
+                                <a class="dropdown-item" href="{{ route('asesor.proyectos.propuestas') }}">
+                                    Todas las propuestas
+                                    @if (isset($revisionesAsesorCount) && $revisionesAsesorCount > 0)
+                                        <span class="badge rounded-pill bg-danger text-white ml-2">
+                                            {{ $revisionesAsesorCount }}
+                                        </span>
+                                    @endif
+                                </a>
+                            </div>
                         </li>
                     @endcan
                 </ul>
