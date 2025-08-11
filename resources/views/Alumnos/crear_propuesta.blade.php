@@ -6,9 +6,7 @@
     <div class="row justify-content-center mt-4 mb-4">
         <div class="col-12 col-md-12 col-lg-10">
             <div class="card shadow-lg rounded-lg">
-                {{-- Asegúrate de que el card-header tenga las clases correctas --}}
                 <div class="card-header bg-gradient-primary text-white text-center py-3 rounded-top">
-                    {{-- Asegura que el texto sea blanco --}}
                     <h2 class="mb-0 text-white">Crear Nueva Propuesta de Proyecto</h2>
                 </div>
                 <div class="card-body p-4">
@@ -79,9 +77,9 @@
                             @enderror
                         </div>
 
-                        {{-- Categoría y Tipo --}}
+                        {{-- Categoría, Tipo y Asesor --}}
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <div class="form-group">
                                     <label for="categoria" class="font-weight-bold">Categoría:</label>
                                     <select class="form-control @error('categoria') is-invalid @enderror" id="categoria"
@@ -99,7 +97,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <div class="form-group">
                                     <label for="tipo" class="font-weight-bold">Tipo:</label>
                                     <select class="form-control @error('tipo') is-invalid @enderror" id="tipo"
@@ -113,6 +111,24 @@
                                         @endforeach
                                     </select>
                                     @error('tipo')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="asesor_id" class="font-weight-bold">Asesor de Proyecto:</label>
+                                    <select class="form-control @error('asesor_id') is-invalid @enderror" id="asesor_id"
+                                        name="asesor_id" required>
+                                        <option value="">Selecciona un asesor</option>
+                                        @foreach ($asesores as $asesor)
+                                            <option value="{{ $asesor->id }}"
+                                                {{ old('asesor_id') == $asesor->id ? 'selected' : '' }}>
+                                                {{ $asesor->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('asesor_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -269,9 +285,7 @@
     </div>
 @endsection
 
-{{-- Mover los estilos al final del body con push('scripts') para mayor especificidad --}}
 @push('scripts')
-    <!-- Font Awesome para íconos (si no se carga globalmente) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <style>
