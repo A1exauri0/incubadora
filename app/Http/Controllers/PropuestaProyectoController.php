@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\AdminActivityNotification;
 use App\Notifications\NewProposalNotification;
-use App\Notifications\ProposalToAdvisorNotification; // <-- ¡NUEVO! Notificación para el asesor
+use App\Notifications\AsesorActivityNotification; 
 use App\Models\User;
 
 class PropuestaProyectoController extends Controller
@@ -146,7 +146,7 @@ class PropuestaProyectoController extends Controller
                 // NOTA: Aquí deberías implementar una lógica más fina para notificar
                 // solo al asesor(es) relevante(s) para este proyecto o alumno.
                 // Por simplicidad, se notifica a todos los asesores para el ejemplo.
-                $asesor->notify(new ProposalToAdvisorNotification(
+                $asesor->notify(new AsesorActivityNotification(
                     $request->input('nombre'),         // Nombre del proyecto
                     $request->input('clave_proyecto'), // Clave del proyecto
                     $user->name,                       // Nombre del alumno

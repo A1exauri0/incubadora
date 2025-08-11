@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ProposalToAdvisorNotification extends Notification
+class AsesorActivityNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -42,14 +42,17 @@ class ProposalToAdvisorNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        // 1. Usa tu vista personalizada 'emails.nueva_propuesta'.
+        // 2. Pasa los datos que la vista espera (projectName, projectClave, submitterName, proposalLink).
+        //    Es importante que los nombres de las variables coincidan.
         return (new MailMessage)
-                    ->subject('Nueva Propuesta de Proyecto Pendiente de tu Revisión')
-                    ->line('Un alumno ha enviado una nueva propuesta de proyecto que requiere tu visto bueno.')
-                    ->line('Nombre del Proyecto: ' . $this->projectName)
-                    ->line('Clave del Proyecto: ' . $this->projectKey)
-                    ->line('Enviado por: ' . $this->studentName)
-                    ->action('Revisar Propuesta', url($this->reviewLink))
-                    ->line('Gracias por usar nuestra aplicación!');
+            ->subject('Nueva Propuesta de Proyecto Pendiente de tu Revisión')
+            ->view('emails.nueva_propuesta', [
+                'projectName' => $this->projectName,
+                'projectClave' => $this->projectKey, // Mapea la variable 'projectKey' a 'projectClave' para la vista.
+                'submitterName' => $this->studentName, // Mapea 'studentName' a 'submitterName'.
+                'proposalLink' => $this->reviewLink, // Mapea 'reviewLink' a 'proposalLink'.
+            ]);
     }
 
     /**

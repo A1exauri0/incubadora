@@ -158,7 +158,8 @@
     <div class="email-wrapper">
         <div class="email-container">
             <div class="header">
-                <img src="https://edu.ieee.org/mx-ittg/wp-content/uploads/sites/536/image-768x755.png" alt="Logo de IncubaTec ITTG">
+                <img src="https://edu.ieee.org/mx-ittg/wp-content/uploads/sites/536/image-768x755.png"
+                    alt="Logo de IncubaTec ITTG" width="100" height="auto" style="max-width: 100px;">
                 <h1>¡Nueva Propuesta de Proyecto Pendiente!</h1>
             </div>
             <div class="content">
