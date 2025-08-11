@@ -378,6 +378,12 @@ class AsesorProyectoSeeder extends Seeder
                 'clave_proyecto' => '0000000000040',
                 'fecha_agregado' => '2024-09-01 23:03:54',
             ],
+            /* Campos de prueba, eliminar al terminar de probar el sistema */
+            [
+                'idAsesor' => 59,
+                'clave_proyecto' => '0000000000050',
+                'fecha_agregado' => '2024-09-01 23:04:12',
+            ],
         ]);
     }
 }

@@ -26,11 +26,10 @@ return new class extends Migration {
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
-
             $table->integer('etapa')->default(4);
             $table->string('video', 255)->nullable();
-            $table->string('area_aplicacion', 50)->default('Sin asignar');
-            $table->string('naturaleza_tecnica', 50)->default('Sin asignar');
+            $table->string('area_aplicacion', 50)->default('Sin asignar')->nullable();
+            $table->string('naturaleza_tecnica', 50)->default('Sin asignar')->nullable();
             $table->string('objetivo', 600)->default('Sin asignar');
 
             $table->dateTime('fecha_agregado')->default(DB::raw('CURRENT_TIMESTAMP'));

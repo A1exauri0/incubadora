@@ -23,20 +23,13 @@ class ModelHasRolesSeeder extends Seeder
             $adminUser->assignRole($adminRole);
         }
 
-        // // Para el role_id 2 (alumno)
-        // $alumnoRole = Role::find(2);
+        // Para el role_id 2 (alumno)
+        $alumnoUser = User::find(30); 
+        $alumnoRole = Role::find(2);
 
-        // // Lista de IDs de usuarios a asignar al rol 'alumno'
-        // $alumnoUserIds = [24, 25, 26, 27, 28, 29, 30, 31];
-
-        // if ($alumnoRole) {
-        //     foreach ($alumnoUserIds as $userId) {
-        //         $user = User::find($userId);
-        //         if ($user) {
-        //             $user->assignRole($alumnoRole);
-        //         }
-        //     }
-        // }
+        if ($alumnoUser && $alumnoRole) {
+            $alumnoUser->assignRole($alumnoRole);
+        }
 
         //Para el role_id 3 (asesor)
         $asesorUser = User::find(31);

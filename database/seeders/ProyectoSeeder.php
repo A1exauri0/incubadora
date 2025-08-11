@@ -699,6 +699,7 @@ class ProyectoSeeder extends Seeder
                 'objetivo' => 'Sin asignar',
                 'fecha_agregado' => '2024-08-29 11:04:16',
             ],
+            /* Campos de prueba, eliminar al terminar de probar el sistema */
             [
                 'clave_proyecto' => '0000000000050',
                 'nombre' => 'Incubadora',
