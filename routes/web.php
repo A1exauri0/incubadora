@@ -124,6 +124,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // El asesor ve las propuestas PENDIENTES de su revisión
         Route::get('/asesor/propuestas', [PropuestaProyectoController::class, 'listAdvisorProposals'])->name('asesor.proyectos.propuestas');
         Route::post('/asesor/propuestas/{clave_proyecto}/review', [PropuestaProyectoController::class, 'reviewAdvisorProposal'])->name('asesor.proyectos.propuestas.review');
+
+        // Rutas para que el asesor vea y gestione sus habilidades
+        Route::get('/asesor/habilidades', [AsesorController::class, 'showHabilidades'])->name('asesor.habilidades.show');
+        Route::post('/asesor/habilidades/store', [AsesorController::class, 'storeHabilidades'])->name('asesor.habilidades.store');
+        Route::post('/asesor/habilidades/addCustom', [AsesorController::class, 'addCustomHabilidad'])->name('asesor.habilidades.addCustom');
+        Route::delete('/asesor/habilidades/{id}', [AsesorController::class, 'destroyHabilidad'])->name('asesor.habilidades.destroy');
+        Route::post('/asesor/habilidades/add-catalog', [AsesorController::class, 'addCatalogHabilidad'])->name('asesor.habilidades.addCatalog');
+
     });
 
     // ... (otras rutas protegidas generales si las tienes)

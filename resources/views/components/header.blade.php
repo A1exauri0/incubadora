@@ -123,6 +123,9 @@
                                 </a>
                             </div>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{route('asesor.habilidades.show')}}">Mis habilidades</a>
+                        </li>
                     @endcan
                 </ul>
 
@@ -130,7 +133,8 @@
                 <ul class="navbar-nav ml-auto">
                     @auth
                         {{-- Notificaciones para Admin y Asesor --}}
-                        @if (Auth::user()->hasAnyRole(['admin', 'asesor'])) {{-- Ahora ambos roles ven las notificaciones --}}
+                        @if (Auth::user()->hasAnyRole(['admin', 'asesor']))
+                            {{-- Ahora ambos roles ven las notificaciones --}}
                             <li class="nav-item dropdown mr-2">
                                 <a class="nav-link" href="#" id="notificationsDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
