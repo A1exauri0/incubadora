@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Models\User; 
+use App\Models\Alumno; 
+use App\Models\Asesor; 
+use App\Models\Mentor; 
 
 class RegistroDatosController extends Controller
 {
@@ -29,6 +33,8 @@ class RegistroDatosController extends Controller
         $titulo = "Completar Registro de Datos";
         $data = [];
 
+        // No es estrictamente necesario cargar estos datos aquí si solo se usan en el modal,
+        // pero se mantiene por si la vista 'auth.registro-datos' los necesita.
         if ($user->hasRole('alumno')) {
             $data['rol_type'] = 'alumno';
             $data['carreras'] = DB::table('carrera')->get();
@@ -89,7 +95,7 @@ class RegistroDatosController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error interno del servidor al cargar datos del perfil.'], 500);
+            return response()->json(['error' => 'Error interno del servidor al cargar datos del perfil: ' . $e->getMessage()], 500);
         }
     }
 
@@ -100,13 +106,14 @@ class RegistroDatosController extends Controller
     public function store(Request $request)
     {
         /** @var \App\Models\User */
-
         $user = Auth::user();
-        $rules = [];
+        $rules = [
+            'name' => ['required', 'string', 'max:255'], // Regla general para el nombre en la tabla 'users'
+        ];
         $messages = [];
-        $redirectMessage = '';
-        $tableToInsert = '';
-        $dataToInsert = [];
+        $redirectMessage = 'Datos actualizados exitosamente.';
+        $tableToUpdate = null; // Almacenará el nombre de la tabla de perfil específica del rol
+        $profileDataToUpdate = []; // Almacenará los datos para esa tabla
 
         if (!$user) {
             if ($request->ajax()) {
@@ -115,24 +122,23 @@ class RegistroDatosController extends Controller
             return redirect()->route('login')->with('error', 'Debes iniciar sesión para completar esta acción.');
         }
 
-        if ($user->hasRole('alumno')) {
-            $tableToInsert = 'alumno';
-            $rules = [
+        $userRole = $user->roles->first() ? $user->roles->first()->name : null;
+
+        // Validaciones y datos específicos de cada rol
+        if ($userRole === 'alumno') {
+            $tableToUpdate = 'alumno';
+            $rules = array_merge($rules, [
                 'no_control' => ['required', 'string', 'max:8', Rule::unique('alumno', 'no_control')->ignore($user->email, 'correo_institucional')],
-                'nombre' => ['required', 'string', 'max:50'],
                 'carrera' => ['required', 'string', Rule::exists('carrera', 'nombre')],
                 'telefono' => ['required', 'string', 'max:10'],
                 'semestre' => ['required', 'integer', 'min:1', 'max:10'],
-            ];
-            $messages = [
+            ]);
+            $messages = array_merge($messages, [
                 'no_control.unique' => 'Este número de control ya está registrado para otro alumno.',
                 'carrera.exists' => 'La carrera seleccionada no es válida.',
-            ];
-            $redirectMessage = 'Datos de alumno guardados/actualizados exitosamente.';
-
-            $dataToInsert = [
+            ]);
+            $profileDataToUpdate = [
                 'no_control' => $request->input('no_control'),
-                'nombre' => $request->input('nombre'),
                 'carrera' => $request->input('carrera'),
                 'telefono' => $request->input('telefono'),
                 'semestre' => $request->input('semestre'),
@@ -140,36 +146,31 @@ class RegistroDatosController extends Controller
                 'fecha_agregado' => now(),
             ];
 
-        } elseif ($user->hasRole('asesor')) {
-            $tableToInsert = 'asesor';
-            $rules = [
-                'nombre' => ['required', 'string', 'max:50'],
+        } elseif ($userRole === 'asesor') {
+            $tableToUpdate = 'asesor';
+            $rules = array_merge($rules, [
                 'telefono' => ['required', 'string', 'max:10'],
-            ];
-            $redirectMessage = 'Datos de asesor guardados/actualizados exitosamente.';
-
-            $dataToInsert = [
-                'nombre' => $request->input('nombre'),
+            ]);
+            $profileDataToUpdate = [
                 'telefono' => $request->input('telefono'),
                 'correo_electronico' => $user->email,
                 'fecha_agregado' => now(),
             ];
 
-        } elseif ($user->hasRole('mentor')) {
-            $tableToInsert = 'mentor';
-            $rules = [
-                'nombre' => ['required', 'string', 'max:50'],
+        } elseif ($userRole === 'mentor') {
+            $tableToUpdate = 'mentor';
+            $rules = array_merge($rules, [
                 'telefono' => ['required', 'string', 'max:10'],
-            ];
-            $redirectMessage = 'Datos de mentor guardados/actualizados exitosamente.';
-
-            $dataToInsert = [
-                'nombre' => $request->input('nombre'),
+            ]);
+            $profileDataToUpdate = [
                 'telefono' => $request->input('telefono'),
                 'correo_electronico' => $user->email,
                 'fecha_agregado' => now(),
             ];
 
+        } elseif ($userRole === 'admin') {
+            // No se requieren reglas adicionales para el administrador, ya que solo actualiza 'name' en 'users'.
+            $redirectMessage = 'Datos de administrador actualizados correctamente.';
         } else {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Tu rol no requiere completar datos adicionales o no está configurado para ello.'], 400);
@@ -178,24 +179,50 @@ class RegistroDatosController extends Controller
         }
 
         try {
-            $request->validate($rules, $messages);
+            // Ejecutar la validación con las reglas y mensajes definidos
+            $validatedData = $request->validate($rules, $messages);
 
-            DB::table($tableToInsert)->updateOrInsert(
-                [$this->getEmailColumnForRole($user->roles->first()->name) => $user->email],
-                $dataToInsert
-            );
+            // Iniciar una transacción de base de datos para asegurar la consistencia
+            DB::beginTransaction();
 
+            // 1. Actualizar el nombre en la tabla 'users'
+            $user->name = $validatedData['name'];
+            $user->save(); // Guarda los cambios en el modelo de usuario
+
+            // 2. Actualizar la tabla específica del rol si el usuario tiene un rol que requiere una tabla de perfil
+            if ($tableToUpdate) {
+                // Si el rol es alumno, asesor o mentor, su tabla de perfil tiene una columna 'nombre'
+                if (in_array($userRole, ['alumno', 'asesor', 'mentor'])) {
+                     $profileDataToUpdate['nombre'] = $validatedData['name']; // Sincroniza el nombre
+                }
+                
+                // Actualizar o insertar el registro en la tabla de perfil del rol
+                DB::table($tableToUpdate)->updateOrInsert(
+                    [$this->getEmailColumnForRole($userRole) => $user->email],
+                    $profileDataToUpdate
+                );
+            }
+
+            // Confirmar la transacción
+            DB::commit();
+
+            // Respuesta para peticiones AJAX
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => $redirectMessage]);
             }
+            // Redirección para peticiones no AJAX
             return redirect()->route('home')->with('success', $redirectMessage);
 
         } catch (ValidationException $e) {
+            // Revertir la transacción si hay errores de validación
+            DB::rollBack();
             if ($request->ajax()) {
                 return response()->json(['errors' => $e->errors()], 422);
             }
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
+            // Revertir la transacción si ocurre cualquier otra excepción
+            DB::rollBack();
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Error al guardar los datos: ' . $e->getMessage()], 500);
             }
@@ -203,6 +230,9 @@ class RegistroDatosController extends Controller
         }
     }
 
+    /**
+     * Helper para obtener el nombre de la columna de correo electrónico por rol.
+     */
     protected function getEmailColumnForRole(string $roleName): string
     {
         switch ($roleName) {
@@ -212,7 +242,7 @@ class RegistroDatosController extends Controller
             case 'mentor':
                 return 'correo_electronico';
             default:
-                return 'email';
+                return 'email'; // En caso de que se necesite para otros roles sin tabla específica.
         }
     }
 }

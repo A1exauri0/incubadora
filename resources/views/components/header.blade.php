@@ -94,7 +94,6 @@
                                 Proyectos
                             </a>
                             <div class="dropdown-menu" aria-labelledby="proyectosAlumnoDropdown">
-                                <a class="dropdown-item" href="/c_proyectos_alumno">Mis Proyectos</a>
                                 <a class="dropdown-item" href="{{ route('proyectos.crear_propuesta') }}">Crear Propuesta
                                     de
                                     Proyecto</a>

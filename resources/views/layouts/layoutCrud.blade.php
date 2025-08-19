@@ -137,7 +137,6 @@
 
             // Escuchar el evento 'show.bs.modal' para cargar los datos cuando el modal se abre
             editProfileModal.on('show.bs.modal', function(event) {
-                console.log("Evento 'show.bs.modal' disparado. Intentando cargar datos...");
                 roleSpecificFields.html(
                     '<p class="text-center text-muted">Cargando datos...</p>'); // Mensaje de carga
 
@@ -150,7 +149,6 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log("Datos de perfil cargados exitosamente:", response);
                         // Limpiar los campos y construir el formulario dinámicamente
                         roleSpecificFields.empty();
 
