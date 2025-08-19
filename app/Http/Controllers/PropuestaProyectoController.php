@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Notifications\AdminActivityNotification;
 use App\Notifications\NewProposalNotification;
 use App\Notifications\AsesorActivityNotification; 
+use App\Notifications\StudentProposalStatusNotification;
 use App\Models\User;
 
 class PropuestaProyectoController extends Controller
@@ -226,14 +227,14 @@ class PropuestaProyectoController extends Controller
      * @param  string  $clave_proyecto
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function reviewAdvisorProposal(Request $request, $clave_proyecto)
+public function reviewAdvisorProposal(Request $request, $clave_proyecto)
     {
         /** @var \App\Models\User */
         $user = Auth::user();
         if (!$user->hasRole('asesor')) {
             return back()->with('error', 'No tienes permiso para realizar esta acción.');
         }
-        
+
         // Buscar el ID del asesor en la tabla 'asesor' usando el email del usuario
         $asesor = DB::table('asesor')->where('correo_electronico', $user->email)->first();
         if (!$asesor) {
@@ -247,25 +248,24 @@ class PropuestaProyectoController extends Controller
         
         $proyecto = DB::table('proyecto')
             ->join('asesor_proyecto', 'proyecto.clave_proyecto', '=', 'asesor_proyecto.clave_proyecto')
-            ->where('asesor_proyecto.idAsesor', $asesor->idAsesor) 
+            ->where('asesor_proyecto.idAsesor', $asesor->idAsesor)
             ->where('proyecto.clave_proyecto', $clave_proyecto)
             ->first();
-            
+
         if (!$proyecto || $proyecto->etapa != self::ID_ETAPA_PENDIENTE_ASESOR) {
             return back()->with('error', 'Propuesta no encontrada o no está pendiente para tu revisión.');
         }
 
         $updateData = [];
         $notificationMessageForLeader = '';
-        $notificationTypeForLeader = '';
+        $rejectionReason = null;
 
         if ($request->input('action') === 'accept') {
             $updateData = [
                 'etapa' => self::ID_ETAPA_VISTO_BUENO_ASESOR,
                 'motivo_rechazo' => null,
             ];
-            $notificationMessageForLeader = 'Tu propuesta "' . $proyecto->nombre . '" ha recibido el Visto Bueno del asesor y ahora está PENDIENTE DE REVISIÓN del administrador.';
-            $notificationTypeForLeader = 'proposal_advisor_approved';
+            $newStatus = 'Aprobada por el Asesor';
 
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
@@ -277,18 +277,16 @@ class PropuestaProyectoController extends Controller
                     route('admin.proyectos.propuestas')
                 ));
             }
-
         } elseif ($request->input('action') === 'reject') {
             if (empty($request->input('motivo_rechazo'))) {
                 return back()->with('error', 'El motivo de rechazo es obligatorio para rechazar la propuesta.');
             }
-            $motivoRechazo = $request->input('motivo_rechazo');
+            $rejectionReason = $request->input('motivo_rechazo');
             $updateData = [
                 'etapa' => self::ID_ETAPA_RECHAZADA,
-                'motivo_rechazo' => $motivoRechazo,
+                'motivo_rechazo' => $rejectionReason,
             ];
-            $notificationMessageForLeader = 'Tu propuesta "' . $proyecto->nombre . '" ha sido RECHAZADA por el asesor. Motivo: ' . $motivoRechazo;
-            $notificationTypeForLeader = 'proposal_advisor_rejected';
+            $newStatus = 'Rechazada por el Asesor';
         }
 
         DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->update($updateData);
@@ -304,10 +302,11 @@ class PropuestaProyectoController extends Controller
         if ($leader) {
             $leaderUser = User::find($leader->id);
             if ($leaderUser) {
-                $leaderUser->notify(new AdminActivityNotification(
-                    $notificationMessageForLeader,
+                $leaderUser->notify(new StudentProposalStatusNotification(
+                    $proyecto->nombre,
+                    $newStatus,
                     route('home'),
-                    $notificationTypeForLeader
+                    $rejectionReason
                 ));
             }
         }
@@ -363,7 +362,7 @@ class PropuestaProyectoController extends Controller
      * @param  string  $clave_proyecto
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function reviewProposal(Request $request, $clave_proyecto)
+public function reviewProposal(Request $request, $clave_proyecto)
     {
         /** @var \App\Models\User */
         $user = Auth::user();
@@ -383,28 +382,24 @@ class PropuestaProyectoController extends Controller
         }
 
         $updateData = [];
-        $notificationMessage = '';
-        $notificationType = '';
-        $motivoRechazo = null;
+        $rejectionReason = null;
 
         if ($request->input('action') === 'accept') {
             $updateData = [
                 'etapa' => self::ID_ETAPA_APROBADA_ADMIN,
                 'motivo_rechazo' => null,
             ];
-            $notificationMessage = 'La propuesta de proyecto "' . $proyecto->nombre . '" ha sido APROBADA por el administrador.';
-            $notificationType = 'proposal_approved_admin';
+            $newStatus = 'Aprobada por el Administrador';
         } elseif ($request->input('action') === 'reject') {
             if (empty($request->input('motivo_rechazo'))) {
                 return back()->with('error', 'El motivo de rechazo es obligatorio para rechazar la propuesta.');
             }
-            $motivoRechazo = $request->input('motivo_rechazo');
+            $rejectionReason = $request->input('motivo_rechazo');
             $updateData = [
                 'etapa' => self::ID_ETAPA_RECHAZADA,
-                'motivo_rechazo' => $motivoRechazo,
+                'motivo_rechazo' => $rejectionReason,
             ];
-            $notificationMessage = 'La propuesta de proyecto "' . $proyecto->nombre . '" ha sido RECHAZADA por el administrador. Motivo: ' . $motivoRechazo;
-            $notificationType = 'proposal_rejected_admin';
+            $newStatus = 'Rechazada por el Administrador';
         }
 
         DB::table('proyecto')->where('clave_proyecto', $clave_proyecto)->update($updateData);
@@ -420,10 +415,11 @@ class PropuestaProyectoController extends Controller
         if ($leader) {
             $leaderUser = User::find($leader->id);
             if ($leaderUser) {
-                $leaderUser->notify(new AdminActivityNotification(
-                    $notificationMessage,
+                $leaderUser->notify(new StudentProposalStatusNotification(
+                    $proyecto->nombre,
+                    $newStatus,
                     route('home'),
-                    $notificationType
+                    $rejectionReason
                 ));
             }
         }

@@ -26,7 +26,7 @@ class NotificationController extends Controller
         $user = Auth::user();
 
         // Asegúrate de que solo los administradores Y ASESORES puedan ver estas notificaciones
-        if (!$user->hasAnyRole(['admin', 'asesor'])) { // <-- CAMBIO AQUÍ
+        if (!$user->hasAnyRole(['admin', 'asesor','alumno'])) { // <-- CAMBIO AQUÍ
             return response()->json(['message' => 'Acceso no autorizado.'], 403);
         }
 
@@ -59,7 +59,7 @@ class NotificationController extends Controller
         /** @var \App\Models\User */
         $user = Auth::user();
 
-        if (!$user->hasAnyRole(['admin', 'asesor'])) { // <-- CAMBIO AQUÍ
+        if (!$user->hasAnyRole(['admin', 'asesor','alumno'])) { // <-- CAMBIO AQUÍ
             return response()->json(['message' => 'Acceso no autorizado.'], 403);
         }
 

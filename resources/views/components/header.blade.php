@@ -124,7 +124,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{route('asesor.habilidades.show')}}">Mis habilidades</a>
+                            <a class="nav-link active" href="{{ route('asesor.habilidades.show') }}">Mis habilidades</a>
                         </li>
                     @endcan
                 </ul>
@@ -132,9 +132,8 @@
                 <!-- Logout y Notificaciones -->
                 <ul class="navbar-nav ml-auto">
                     @auth
-                        {{-- Notificaciones para Admin y Asesor --}}
-                        @if (Auth::user()->hasAnyRole(['admin', 'asesor']))
-                            {{-- Ahora ambos roles ven las notificaciones --}}
+                        {{-- Notificaciones para Admin, Asesor y Alumno --}}
+                        @if (Auth::user()->hasAnyRole(['admin', 'asesor', 'alumno']))
                             <li class="nav-item dropdown mr-2">
                                 <a class="nav-link" href="#" id="notificationsDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

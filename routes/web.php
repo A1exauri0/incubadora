@@ -93,7 +93,7 @@ Route::get('/api/user-profile-data', [RegistroDatosController::class, 'getUserPr
 // =========================================================================
 Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas de Notificaciones (para administradores y asesores)
-    Route::group(['middleware' => ['role:admin|asesor']], function () {
+    Route::group(['middleware' => ['role:admin|asesor|alumno']], function () {
         Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');
         Route::post('/notifications/mark-as-read', [NotificationController::class, 'markNotificationsAsRead'])->name('notifications.markAsRead');
         // Ruta para GENERAR PDF (se mantiene en ProyectoController ya que es para cualquier proyecto)
