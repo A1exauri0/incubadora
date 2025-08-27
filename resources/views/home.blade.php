@@ -37,7 +37,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="row">
                 {{-- Panel de Proyectos --}}
                 <div class="col-md-4">
@@ -57,16 +57,13 @@
                         <div class="p-0" style="height: 500px; overflow-y: auto;">
                             <div class="list-group list-group-flush" id="proyectos-list">
                                 @forelse ($proyectos as $proyecto)
-                                    <a href="#" 
+                                    <a href="#"
                                         class="list-group-item list-group-item-action list-group-item-{{ $proyecto->clase }}"
-                                        data-clave="{{ $proyecto->clave_proyecto }}"
-                                        data-nombre="{{ $proyecto->nombre }}"
+                                        data-clave="{{ $proyecto->clave_proyecto }}" data-nombre="{{ $proyecto->nombre }}"
                                         data-descripcion="{{ $proyecto->descripcion }}"
                                         data-categoria="{{ $proyecto->nombre_categoria }}"
-                                        data-tipo="{{ $proyecto->nombre_tipo }}"
-                                        data-etapa="{{ $proyecto->nombre_etapa }}"
-                                        data-fecha="{{ $proyecto->fecha_agregado }}"
-                                        data-video="{{ $proyecto->video }}"
+                                        data-tipo="{{ $proyecto->nombre_tipo }}" data-etapa="{{ $proyecto->nombre_etapa }}"
+                                        data-fecha="{{ $proyecto->fecha_agregado }}" data-video="{{ $proyecto->video }}"
                                         data-lider="{{ $proyecto->es_lider ?? 0 }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1 text-truncate">{{ $proyecto->nombre }}</h5>
@@ -78,7 +75,7 @@
                                     <div class="p-4 text-center" id="no-projects-message">
                                         <p class="mb-2">No participa en ningún proyecto.</p>
                                         @role('alumno')
-                                            <a href="{{ route('proyectos.create') }}" class="btn btn-success btn-sm">
+                                            <a href="" class="btn btn-success btn-sm">
                                                 Crear mi primer proyecto
                                             </a>
                                         @endrole
@@ -102,9 +99,9 @@
                                     <span class="badge badge-pill badge-primary" id="detallesEtapaBadge"></span>
                                 </div>
                             </div>
-                            
+
                             <hr>
-                            
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <p class="card-text"><strong>Clave:</strong> <span id="detallesClave"></span></p>
@@ -112,7 +109,8 @@
                                     <p class="card-text"><strong>Tipo:</strong> <span id="detallesTipo"></span></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="card-text"><strong>Fecha de Registro:</strong> <span id="detallesFecha"></span></p>
+                                    <p class="card-text"><strong>Fecha de Registro:</strong> <span id="detallesFecha"></span>
+                                    </p>
                                 </div>
                             </div>
 
@@ -121,7 +119,10 @@
                             <div id="detallesVideo" class="mt-4"></div>
 
                             {{-- Botones de acción --}}
-                            <div class="mt-4 text-right">
+                            <div class="mt-4 d-flex justify-content-between">
+                                <a href="#" id="botonParticipantes" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-users"></i> Ver Participantes
+                                </a>
                                 <a href="#" id="botonEditarProyecto" class="btn btn-info btn-sm d-none">
                                     <i class="fas fa-edit"></i> Editar Proyecto
                                 </a>
@@ -130,17 +131,17 @@
                     </div>
 
                     {{-- Mensaje si no hay proyectos seleccionados --}}
-                    @empty ($proyectos)
-                    @else
-                        <div id="no-proyecto-seleccionado" class="text-center p-5">
-                            <i class="fas fa-arrow-circle-left fa-3x text-muted"></i>
-                            <h4 class="mt-3 text-muted">Selecciona un proyecto de la lista para ver los detalles.</h4>
-                        </div>
-                    @endempty
-                </div>
+                @empty($proyectos)
+                @else
+                    <div id="no-proyecto-seleccionado" class="text-center p-5">
+                        <i class="fas fa-arrow-circle-left fa-3x text-muted"></i>
+                        <h4 class="mt-3 text-muted">Selecciona un proyecto de la lista para ver los detalles.</h4>
+                    </div>
+                @endempty
             </div>
         </div>
-    @endhasanyrole
+    </div>
+@endhasanyrole
 @endsection
 
 @push('scripts')
@@ -148,7 +149,7 @@
     function mostrarDetalles(proyecto) {
         $('#detallesProyecto').show();
         $('#no-proyecto-seleccionado').hide();
-        
+
         // Asignar los valores a los elementos del panel de detalles
         $('#detallesNombre').text(proyecto.nombre);
         $('#detallesClave').text(proyecto.clave);
@@ -165,7 +166,9 @@
         if (proyecto.video) {
             const videoId = obtenerIdVideo(proyecto.video);
             if (videoId) {
-                videoContainer.html(`<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`);
+                videoContainer.html(
+                    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+                );
             } else {
                 videoContainer.html('<p class="text-center text-muted">URL de video no válida.</p>');
             }
@@ -174,12 +177,17 @@
         }
 
         const botonEditar = $('#botonEditarProyecto');
+        const botonParticipantes = $('#botonParticipantes'); // Selecciona el nuevo botón
+
         if (proyecto.esLider == 1) {
             botonEditar.removeClass('d-none');
             botonEditar.attr('href', `/proyectos/${proyecto.clave}/editar`);
         } else {
             botonEditar.addClass('d-none');
         }
+
+        // Configura el enlace del botón de participantes
+        botonParticipantes.attr('href', `/proyectos/${proyecto.clave}/participantes`);
     }
 
     function obtenerIdVideo(url) {
@@ -193,7 +201,7 @@
         const searchInput = $('#searchInput');
         const noResultsMessage = $('#no-results-message');
         const noProjectsMessage = $('#no-projects-message');
-        
+
         // Función para filtrar los proyectos
         function filtrarProyectos() {
             const searchTerm = searchInput.val().toLowerCase();
@@ -231,11 +239,11 @@
                 $('#no-proyecto-seleccionado').hide();
             }
         });
-        
+
         // Evento para el clic en los proyectos
         projectItems.on('click', function(event) {
             event.preventDefault();
-            
+
             projectItems.removeClass('active');
             $(this).addClass('active');
 
@@ -246,7 +254,8 @@
                 categoria: $(this).data('categoria'),
                 tipo: $(this).data('tipo'),
                 etapa: $(this).data('etapa'),
-                clase: $(this).attr('class').split(' ').find(cls => cls.startsWith('list-group-item-')).replace('list-group-item-', ''),
+                clase: $(this).attr('class').split(' ').find(cls => cls.startsWith(
+                    'list-group-item-')).replace('list-group-item-', ''),
                 fecha: $(this).data('fecha'),
                 video: $(this).data('video'),
                 esLider: $(this).data('lider')

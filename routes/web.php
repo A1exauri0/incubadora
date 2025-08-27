@@ -38,8 +38,9 @@ use App\Http\Controllers\{
 |
 */
 
+//  Redirige la ruta raíz a la ruta de login
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Rutas de autenticación y verificación de correo electrónico
@@ -98,6 +99,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/notifications/mark-as-read', [NotificationController::class, 'markNotificationsAsRead'])->name('notifications.markAsRead');
         // Ruta para GENERAR PDF (se mantiene en ProyectoController ya que es para cualquier proyecto)
         Route::get('/admin/proyectos/{clave_proyecto}/ficha-tecnica-pdf', [ProyectoController::class, 'generateFichaTecnicaPdf'])->name('admin.proyectos.ficha_tecnica_pdf');
+        
+        // --- RUTAS DE PARTICIPANTES PARA CUALQUIER ROL CON ACCESO ---
+        Route::get('/proyectos/{clave_proyecto}/participantes', [ParticipanteController::class, 'mostrarProyecto'])->name('proyectos.participantes');
+
+        // RUTAS AJAX PARA BÚSQUEDA EN MODALES (deben estar accesibles para roles con permiso a la vista de participantes)
+        Route::get('/api/alumnos/search', [ParticipanteController::class, 'searchAlumnos'])->name('api.alumnos.search');
+        Route::get('/api/asesores/search', [ParticipanteController::class, 'searchAsesores'])->name('api.asesores.search');
+
+        // RUTA PARA AGREGAR ALUMNO AL PROYECTO
+        Route::post('/participantes/agregar-alumno', [ParticipanteController::class, 'agregarAlumno'])->name('participantes.alumno.agregar');
+        // RUTA PARA ELIMINAR ALUMNO DEL PROYECTO
+        Route::delete('/participantes/eliminar-alumno', [ParticipanteController::class, 'eliminarAlumno'])->name('participantes.alumno.eliminar');
+
+        // RUTA PARA AGREGAR ASESOR AL PROYECTO
+        Route::post('/participantes/agregar-asesor', [ParticipanteController::class, 'agregarAsesor'])->name('participantes.asesor.agregar');
+        // RUTA PARA ELIMINAR ASESOR DEL PROYECTO
+        Route::delete('/participantes/eliminar-asesor', [ParticipanteController::class, 'eliminarAsesor'])->name('participantes.asesor.eliminar');
+
+        // RUTA PARA ACTUALIZAR LÍDER DE PROYECTO (Se mantiene por si hay otra interfaz que la use)
+        Route::post('/participantes/actualizarLider', [ParticipanteController::class, 'actualizarLider'])->name('participantes.actualizarLider');
+
     });
 
 
@@ -119,7 +141,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/c_proyectos_alumno/store-proposal', [PropuestaProyectoController::class, 'storeProposal'])->name('proyectos.store_proposal');
     });
 
-    // Rutas específicas para el rol de asesor (¡NUEVAS!)
+    // Rutas específicas para el rol de asesor
     Route::group(['middleware' => ['role:asesor']], function () {
         // El asesor ve las propuestas PENDIENTES de su revisión
         Route::get('/asesor/propuestas', [PropuestaProyectoController::class, 'listAdvisorProposals'])->name('asesor.proyectos.propuestas');

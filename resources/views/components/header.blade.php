@@ -89,112 +89,104 @@
                     @can('mostrar alumno')
                         <!-- Dropdown Proyectos Alumno -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="proyectosAlumnoDropdown"
-                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Proyectos
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="proyectosAlumnoDropdown">
-                                <a class="dropdown-item" href="{{ route('proyectos.crear_propuesta') }}">Crear Propuesta
-                                    de
-                                    Proyecto</a>
-                            </div>
-                        </li>
-                    @endcan
-                    @can('mostrar asesor')
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle font-weight-bold" href="#"
-                                id="asesorProyectosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                Revisar Propuestas
-                                {{-- Ícono de exclamación si hay propuestas por revisar --}}
-                                @if (isset($revisionesAsesorCount) && $revisionesAsesorCount > 0)
-                                    <i class="fas fa-exclamation-circle text-danger"></i>
-                                @endif
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="asesorProyectosDropdown">
-                                <a class="dropdown-item" href="{{ route('asesor.proyectos.propuestas') }}">
-                                    Todas las propuestas
-                                    @if (isset($revisionesAsesorCount) && $revisionesAsesorCount > 0)
-                                        <span class="badge rounded-pill bg-danger text-white ml-2">
-                                            {{ $revisionesAsesorCount }}
-                                        </span>
-                                    @endif
-                                </a>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('asesor.habilidades.show') }}">Mis habilidades</a>
-                        </li>
-                    @endcan
-                </ul>
-
-                <!-- Logout y Notificaciones -->
-                <ul class="navbar-nav ml-auto">
-                    @auth
-                        {{-- Notificaciones para Admin, Asesor y Alumno --}}
-                        @if (Auth::user()->hasAnyRole(['admin', 'asesor', 'alumno']))
-                            <li class="nav-item dropdown mr-2">
-                                <a class="nav-link" href="#" id="notificationsDropdown" role="button"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-bell"></i>
-                                    {{-- El span siempre se renderiza, su display inicial se controla con style --}}
-                                    <span class="badge badge-pill badge-danger notifications-badge"
-                                        style="{{ isset($unreadNotificationsCount) && $unreadNotificationsCount > 0 ? '' : 'display: none;' }}">
-                                        {{ $unreadNotificationsCount ?? 0 }}
-                                    </span>
-                                </a>
-                                {{-- Contenido del dropdown de notificaciones --}}
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown">
-                                    <h6 class="dropdown-header">Notificaciones</h6>
-                                    <div id="notifications-list">
-                                        {{-- Las notificaciones se cargarán aquí con JavaScript --}}
-                                        <a class="dropdown-item text-center text-muted" href="#">Cargando
-                                            notificaciones...</a>
-                                    </div>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item text-center" href="#" id="markAllRead">Marcar todas
-                                        como leídas</a>
-                                </div>
-                            </li>
+                            <a class="nav-link active" href="{{ route('proyectos.crear_propuesta') }}">Crear Propuesta de
+                                Proyecto</a>
+                </div>
+                </li>
+            @endcan
+            @can('mostrar asesor')
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="asesorProyectosDropdown"
+                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Proyectos
+                        {{-- Ícono de exclamación si hay propuestas por revisar --}}
+                        @if (isset($revisionesAsesorCount) && $revisionesAsesorCount > 0)
+                            <i class="fas fa-exclamation-circle text-danger"></i>
                         @endif
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="asesorProyectosDropdown">
+                        <a class="dropdown-item" href="{{ route('asesor.proyectos.propuestas') }}">
+                            Revisar propuestas
+                            @if (isset($revisionesAsesorCount) && $revisionesAsesorCount > 0)
+                                <span class="badge rounded-pill bg-danger text-white ml-2">
+                                    {{ $revisionesAsesorCount }}
+                                </span>
+                            @endif
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ route('asesor.habilidades.show') }}">Mis habilidades</a>
+                </li>
+            @endcan
+            </ul>
 
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+            <!-- Logout y Notificaciones -->
+            <ul class="navbar-nav ml-auto">
+                @auth
+                    {{-- Notificaciones para Admin, Asesor y Alumno --}}
+                    @if (Auth::user()->hasAnyRole(['admin', 'asesor', 'alumno']))
+                        <li class="nav-item dropdown mr-2">
+                            <a class="nav-link" href="#" id="notificationsDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{-- Mostrar icono admin si el usuario tiene el rol 'admin' --}}
-                                @if (Auth::user()->hasRole('admin'))
-                                    <i class="fas fa-user-tie text-white me-2" title="Administrador"></i>
-                                @endif
-                                {{-- Mostrar icono de usuario para el alumno --}}
-                                @if (Auth::user()->hasRole('alumno'))
-                                    <i class="fas fa-user-graduate text-white me-2" title="Alumno"></i>
-                                @endif
-                                {{-- Mostrar icono de usuario para el asesor --}}
-                                @if (Auth::user()->hasRole('asesor'))
-                                    <i class="fas fa-chalkboard-teacher text-white me-2" title="Asesor"></i>
-                                @endif
-
-                                <span class="ml-1">{{ Auth::user()->name }}</span>
+                                <i class="fas fa-bell"></i>
+                                {{-- El span siempre se renderiza, su display inicial se controla con style --}}
+                                <span class="badge badge-pill badge-danger notifications-badge"
+                                    style="{{ isset($unreadNotificationsCount) && $unreadNotificationsCount > 0 ? '' : 'display: none;' }}">
+                                    {{ $unreadNotificationsCount ?? 0 }}
+                                </span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                {{-- Nuevo enlace para "Editar mis datos" --}}
-                                <a class="dropdown-item" href="#" data-toggle="modal"
-                                    data-target="#editProfileModal">
-                                    Editar mis datos
-                                </a>
-                                <div class="dropdown-divider"></div> {{-- Separador opcional --}}
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    Cerrar sesión
-                                </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
+                            {{-- Contenido del dropdown de notificaciones --}}
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown">
+                                <h6 class="dropdown-header">Notificaciones</h6>
+                                <div id="notifications-list">
+                                    {{-- Las notificaciones se cargarán aquí con JavaScript --}}
+                                    <a class="dropdown-item text-center text-muted" href="#">Cargando
+                                        notificaciones...</a>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center" href="#" id="markAllRead">Marcar todas
+                                    como leídas</a>
                             </div>
                         </li>
-                    @endauth
-                </ul>
-            </div>
+                    @endif
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{-- Mostrar icono admin si el usuario tiene el rol 'admin' --}}
+                            @if (Auth::user()->hasRole('admin'))
+                                <i class="fas fa-user-tie text-white me-2" title="Administrador"></i>
+                            @endif
+                            {{-- Mostrar icono de usuario para el alumno --}}
+                            @if (Auth::user()->hasRole('alumno'))
+                                <i class="fas fa-user-graduate text-white me-2" title="Alumno"></i>
+                            @endif
+                            {{-- Mostrar icono de usuario para el asesor --}}
+                            @if (Auth::user()->hasRole('asesor'))
+                                <i class="fas fa-chalkboard-teacher text-white me-2" title="Asesor"></i>
+                            @endif
+
+                            <span class="ml-1">{{ Auth::user()->name }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            {{-- Nuevo enlace para "Editar mis datos" --}}
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editProfileModal">
+                                Editar mis datos
+                            </a>
+                            <div class="dropdown-divider"></div> {{-- Separador opcional --}}
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Cerrar sesión
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
+                @endauth
+            </ul>
+        </div>
         </div>
     </nav>
 </header>
