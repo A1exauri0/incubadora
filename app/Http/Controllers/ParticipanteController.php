@@ -72,6 +72,7 @@ class ParticipanteController extends Controller
 
         // Determinar si el usuario actual es el líder del proyecto
         $esLider = false;
+        $esAlumnoParticipante = false;
         if ($user->hasRole('alumno')) {
             $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
             if ($alumno) {
@@ -82,6 +83,14 @@ class ParticipanteController extends Controller
                                 ->first();
                 if ($liderCheck) {
                     $esLider = true;
+                }
+                // Nuevo: verificar si el alumno participa en el proyecto
+                $participaCheck = DB::table('alumno_proyecto')
+                                ->where('clave_proyecto', $clave_proyecto)
+                                ->where('no_control', $alumno->no_control)
+                                ->exists();
+                if ($participaCheck) {
+                    $esAlumnoParticipante = true;
                 }
             }
         }
@@ -99,8 +108,8 @@ class ParticipanteController extends Controller
         }
 
 
-        // Solo permitir acceso si es admin, el líder del proyecto o un asesor asignado al proyecto
-        if (!$user->hasRole('admin') && !$esLider && !$esAsesorDelProyecto) {
+        // Solo permitir acceso si es admin, el líder del proyecto, un asesor asignado o un alumno participante
+        if (!$user->hasRole('admin') && !$esLider && !$esAsesorDelProyecto && !$esAlumnoParticipante) {
             return redirect()->route('home')->with('error', 'No tienes permiso para ver los participantes de este proyecto.');
         }
 

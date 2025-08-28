@@ -41,7 +41,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Alumnos</h4>
-                    {{-- Botón para agregar alumnos --}}
+                    {{-- Botón para agregar alumnos: solo admin o líder --}}
                     @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
                         <a href="#" class="btn btn-sm btn-light" data-toggle="modal" data-target="#addAlumnoModal">
                             <i class="fas fa-plus"></i> Agregar
@@ -58,7 +58,9 @@
                                     <th>Carrera</th>
                                     <th>Correo Institucional</th>
                                     <th>Líder</th>
-                                    <th style="width: 120px;">Acciones</th>
+                                    @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
+                                        <th style="width: 120px;">Acciones</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,33 +70,27 @@
                                     <td>{{ $alumno->nombre }}</td>
                                     <td>{{ $alumno->carrera }}</td>
                                     <td>{{ $alumno->correo_institucional }}</td>
-                                    <td>
-                                        @if ($alumno->lider)
-                                            <span class="badge badge-success">Sí</span>
-                                        @else
-                                            <span class="badge badge-danger">No</span>
-                                        @endif
-                                    </td>
                                     <td class="text-center">
-                                        {{-- Botón para eliminar alumno (solo si el usuario actual es líder del proyecto o admin) --}}
-                                        @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
-                                            <button class="btn btn-danger btn-sm" data-toggle="modal"
-                                                data-target="#deleteModal"
-                                                data-id="{{ $alumno->no_control }}"
-                                                data-tipo="alumno"
-                                                data-proyecto="{{ $proyecto->clave_proyecto }}">
-                                                <i class="fas fa-trash-alt"></i> Eliminar
-                                            </button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm" disabled data-toggle="tooltip" title="No tienes permisos">
-                                                <i class="fas fa-trash-alt"></i> Eliminar
-                                            </button>
+                                        @if($alumno->lider)
+                                            <i class="fas fa-crown text-warning" title="Líder"></i>
                                         @endif
                                     </td>
+                                    @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
+                                    <td class="text-center">
+                                        {{-- Botón para eliminar alumno --}}
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="{{ $alumno->no_control }}"
+                                            data-tipo="alumno"
+                                            data-proyecto="{{ $proyecto->clave_proyecto }}">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </button>
+                                    </td>
+                                    @endif
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">No hay alumnos asignados a este proyecto.</td>
+                                    <td colspan="@if (Auth::user()->hasRole('admin') || ($esLider ?? false)) 6 @else 5 @endif" class="text-center">No hay alumnos asignados a este proyecto.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -109,15 +105,11 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Asesores</h4>
-                    {{-- Botón para agregar asesores (solo si el usuario actual es líder del proyecto o admin) --}}
+                    {{-- Botón para agregar asesores: solo admin o líder --}}
                     @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
                         <a href="#" class="btn btn-sm btn-light" data-toggle="modal" data-target="#addAsesorModal">
                             <i class="fas fa-plus"></i> Agregar
                         </a>
-                    @else
-                        <button class="btn btn-sm btn-light" disabled data-toggle="tooltip" title="No tienes permisos">
-                            <i class="fas fa-plus"></i> Agregar
-                        </button>
                     @endif
                 </div>
                 <div class="card-body">
@@ -127,7 +119,9 @@
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Correo Electrónico</th>
-                                    <th style="width: 120px;">Acciones</th>
+                                    @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
+                                        <th style="width: 120px;">Acciones</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -135,26 +129,22 @@
                                 <tr>
                                     <td>{{ $asesor->nombre }}</td>
                                     <td>{{ $asesor->correo_electronico }}</td>
+                                    @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
                                     <td class="text-center">
-                                        {{-- Botón para eliminar asesor (solo si el usuario actual es líder del proyecto o admin) --}}
-                                        @if (Auth::user()->hasRole('admin') || ($esLider ?? false))
-                                            <button class="btn btn-danger btn-sm" data-toggle="modal"
-                                                data-target="#deleteModal"
-                                                data-id="{{ $asesor->idAsesor }}"
-                                                data-tipo="asesor"
-                                                data-proyecto="{{ $proyecto->clave_proyecto }}">
-                                                <i class="fas fa-trash-alt"></i> Eliminar
-                                            </button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm" disabled data-toggle="tooltip" title="No tienes permisos">
-                                                <i class="fas fa-trash-alt"></i> Eliminar
-                                            </button>
-                                        @endif
+                                        {{-- Botón para eliminar asesor --}}
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="{{ $asesor->idAsesor }}"
+                                            data-tipo="asesor"
+                                            data-proyecto="{{ $proyecto->clave_proyecto }}">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </button>
                                     </td>
+                                    @endif
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="3" class="text-center">No hay asesores asignados a este proyecto.</td>
+                                    <td colspan="@if (Auth::user()->hasRole('admin') || ($esLider ?? false)) 3 @else 2 @endif" class="text-center">No hay asesores asignados a este proyecto.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
