@@ -41,13 +41,24 @@ class PropuestaProyectoController extends Controller
 
         $categorias = DB::table('categoria')->get();
         $tipos = DB::table('tipo')->get();
-        // Las etapas no se usan directamente en el formulario de creación, pero se mantienen si la vista las espera.
-        $etapas = DB::table('etapas')->get(); 
+        $etapas = DB::table('etapas')->get(); // Se mantiene si la vista espera esta variable.
         
         // Obtenemos los asesores desde la tabla 'users' para el formulario
         $asesores = User::role('asesor')->get();
 
-        return view('alumnos.crear_propuesta', compact('categorias', 'tipos', 'etapas', 'asesores'));
+        // --- NUEVA LÓGICA: Verificar el número de proyectos del alumno ---
+        $proyectosDelAlumno = DB::table('alumno_proyecto')
+                                ->where('no_control', $alumno->no_control)
+                                ->count();
+
+        $showLimitModal = false;
+        if ($proyectosDelAlumno >= 2) {
+            $showLimitModal = true;
+            // No redirigimos aquí, solo establecemos la bandera para que la vista muestre el modal
+        }
+        // --- FIN DE LA NUEVA LÓGICA ---
+
+        return view('alumnos.crear_propuesta', compact('categorias', 'tipos', 'etapas', 'asesores', 'showLimitModal'));
     }
 
     /**
@@ -66,6 +77,16 @@ class PropuestaProyectoController extends Controller
             return redirect()->route('home')->with('error', 'Acceso no autorizado para crear propuestas.');
         }
 
+        // --- Mantenemos esta verificación de proyectos para seguridad en el backend ---
+        $proyectosDelAlumno = DB::table('alumno_proyecto')
+                                ->where('no_control', $alumno->no_control)
+                                ->count();
+
+        if ($proyectosDelAlumno >= 2) {
+            return redirect()->route('home')->with('error', 'Ya estás registrado en el número máximo de 2 proyectos. No puedes crear nuevas propuestas.');
+        }
+        // --- FIN DE LA VERIFICACIÓN DE SEGURIDAD ---
+
         // Si el campo de video está vacío, lo normalizamos a null
         if (empty($request->input('video'))) {
             $request->merge(['video' => null]);
@@ -82,8 +103,8 @@ class PropuestaProyectoController extends Controller
             'video' => 'nullable|url:http,https',
             'area_aplicacion' => 'nullable|string|max:255',
             'naturaleza_tecnica' => 'nullable|string|max:255',
-            'objetivo' => 'nullable|string',
-            'requerimientos' => 'required|array',
+            'objetivo' => 'required|string', // Objetivo es requerido
+            'requerimientos' => 'nullable|array',
             'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100',
             'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50',
             'resultados' => 'nullable|array',
@@ -103,7 +124,7 @@ class PropuestaProyectoController extends Controller
                 $lastNumericPart = (int) $lastProyecto->clave_proyecto;
                 $nextNumericId = $lastNumericPart + 1;
             } else {
-                // Si no hay proyectos, empezamos desde 49 + 1 = 50 para seguir la secuencia '0000000000049'
+                // Si no hay proyectos, empezamos desde 50 para seguir la secuencia '0000000000049'
                 $nextNumericId = 50; 
             }
             
@@ -180,7 +201,7 @@ class PropuestaProyectoController extends Controller
                     // Notificar al asesor seleccionado
                     $asesorUser->notify(new AsesorActivityNotification(
                         $request->input('nombre'),         
-                        $request->input('clave_proyecto'), // Usar la clave generada aquí para la notificación
+                        $generatedClaveProyecto, // Usar la clave generada aquí para la notificación
                         $user->name,                       
                         route('asesor.proyectos.propuestas') 
                     ));

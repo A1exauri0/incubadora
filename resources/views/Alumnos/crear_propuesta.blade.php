@@ -3,277 +3,302 @@
 @section('titulo', 'Crear Propuesta de Proyecto')
 
 @section('content')
-    <div class="row justify-content-center mt-4 mb-4">
-        <div class="col-12 col-md-12 col-lg-10">
-            <div class="card shadow-lg rounded-lg">
-                <div class="card-header bg-gradient-primary text-white text-center py-3 rounded-top">
-                    <h2 class="mb-0 text-white">Crear Nueva Propuesta de Proyecto</h2>
-                </div>
-                <div class="card-body p-4">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
+    {{-- Contenedor principal de la vista, que solo se muestra si NO se excede el límite --}}
+    @if (!$showLimitModal)
+        <div class="row justify-content-center mt-4 mb-4">
+            <div class="col-12 col-md-12 col-lg-10">
+                <div class="card shadow-lg rounded-lg">
+                    <div class="card-header bg-gradient-primary text-white text-center py-3 rounded-top">
+                        <h2 class="mb-0 text-white">Crear Nueva Propuesta de Proyecto</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
 
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
 
-                    <form action="{{ route('proyectos.store_proposal') }}" method="POST">
-                        @csrf
+                        <form action="{{ route('proyectos.store_proposal') }}" method="POST">
+                            @csrf
 
-
-                        {{-- Nombre y Nombre Descriptivo --}}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="form-group">
-                                    <label for="nombre" class="font-weight-bold">Nombre del Proyecto:</label>
-                                    <input type="text" class="form-control @error('nombre') is-invalid @enderror"
-                                        id="nombre" name="nombre" value="{{ old('nombre') }}" required maxlength="50">
-                                    @error('nombre')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                            {{-- Nombre y Nombre Descriptivo --}}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        <label for="nombre" class="font-weight-bold">Nombre del Proyecto:</label>
+                                        <input type="text" class="form-control @error('nombre') is-invalid @enderror"
+                                            id="nombre" name="nombre" value="{{ old('nombre') }}" required maxlength="50">
+                                        @error('nombre')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        <label for="nombre_descriptivo" class="font-weight-bold">Nombre Descriptivo:</label>
+                                        <input type="text"
+                                            class="form-control @error('nombre_descriptivo') is-invalid @enderror"
+                                            id="nombre_descriptivo" name="nombre_descriptivo"
+                                            value="{{ old('nombre_descriptivo') }}" required maxlength="100">
+                                        @error('nombre_descriptivo')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="form-group">
-                                    <label for="nombre_descriptivo" class="font-weight-bold">Nombre Descriptivo:</label>
-                                    <input type="text"
-                                        class="form-control @error('nombre_descriptivo') is-invalid @enderror"
-                                        id="nombre_descriptivo" name="nombre_descriptivo"
-                                        value="{{ old('nombre_descriptivo') }}" required maxlength="100">
-                                    @error('nombre_descriptivo')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+
+                            {{-- Descripción --}}
+                            <div class="form-group mb-3">
+                                <label for="descripcion" class="font-weight-bold">Descripción:</label>
+                                <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion"
+                                    rows="5" required maxlength="800">{{ old('descripcion') }}</textarea>
+                                @error('descripcion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Categoría, Tipo y Asesor --}}
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="categoria" class="font-weight-bold">Categoría:</label>
+                                        <select class="form-control @error('categoria') is-invalid @enderror" id="categoria"
+                                            name="categoria" required>
+                                            <option value="">Selecciona una categoría</option>
+                                            @foreach ($categorias as $cat)
+                                                <option value="{{ $cat->idCategoria }}"
+                                                    {{ old('categoria') == $cat->idCategoria ? 'selected' : '' }}>
+                                                    {{ $cat->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('categoria')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="tipo" class="font-weight-bold">Tipo:</label>
+                                        <select class="form-control @error('tipo') is-invalid @enderror" id="tipo"
+                                            name="tipo" required>
+                                            <option value="">Selecciona un tipo</option>
+                                            @foreach ($tipos as $t)
+                                                <option value="{{ $t->idTipo }}"
+                                                    {{ old('tipo') == $t->idTipo ? 'selected' : '' }}>
+                                                    {{ $t->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('tipo')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="asesor_id" class="font-weight-bold">Asesor de Proyecto:</label>
+                                        <select class="form-control @error('asesor_id') is-invalid @enderror" id="asesor_id"
+                                            name="asesor_id" required>
+                                            <option value="">Selecciona un asesor</option>
+                                            @foreach ($asesores as $asesor)
+                                                <option value="{{ $asesor->id }}"
+                                                    {{ old('asesor_id') == $asesor->id ? 'selected' : '' }}>
+                                                    {{ $asesor->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('asesor_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {{-- Descripción --}}
-                        <div class="form-group mb-3">
-                            <label for="descripcion" class="font-weight-bold">Descripción:</label>
-                            <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion"
-                                rows="5" required maxlength="800">{{ old('descripcion') }}</textarea>
-                            @error('descripcion')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Categoría, Tipo y Asesor --}}
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="form-group">
-                                    <label for="categoria" class="font-weight-bold">Categoría:</label>
-                                    <select class="form-control @error('categoria') is-invalid @enderror" id="categoria"
-                                        name="categoria" required>
-                                        <option value="">Selecciona una categoría</option>
-                                        @foreach ($categorias as $cat)
-                                            <option value="{{ $cat->idCategoria }}"
-                                                {{ old('categoria') == $cat->idCategoria ? 'selected' : '' }}>
-                                                {{ $cat->nombre }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('categoria')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                            {{-- Área de Aplicación --}}
+                            <div class="form-group mb-3">
+                                <label for="area_aplicacion" class="font-weight-bold">Área de Aplicación (Opcional):</label>
+                                <input type="text" class="form-control @error('area_aplicacion') is-invalid @enderror"
+                                    id="area_aplicacion" name="area_aplicacion" value="{{ old('area_aplicacion') }}"
+                                    maxlength="50">
+                                @error('area_aplicacion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="form-group">
-                                    <label for="tipo" class="font-weight-bold">Tipo:</label>
-                                    <select class="form-control @error('tipo') is-invalid @enderror" id="tipo"
-                                        name="tipo" required>
-                                        <option value="">Selecciona un tipo</option>
-                                        @foreach ($tipos as $t)
-                                            <option value="{{ $t->idTipo }}"
-                                                {{ old('tipo') == $t->idTipo ? 'selected' : '' }}>
-                                                {{ $t->nombre }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('tipo')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+
+                            {{-- Naturaleza Técnica --}}
+                            <div class="form-group mb-3">
+                                <label for="naturaleza_tecnica" class="font-weight-bold">Naturaleza Técnica (Opcional):</label>
+                                <input type="text" class="form-control @error('naturaleza_tecnica') is-invalid @enderror"
+                                    id="naturaleza_tecnica" name="naturaleza_tecnica" value="{{ old('naturaleza_tecnica') }}"
+                                    maxlength="50">
+                                @error('naturaleza_tecnica')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="form-group">
-                                    <label for="asesor_id" class="font-weight-bold">Asesor de Proyecto:</label>
-                                    <select class="form-control @error('asesor_id') is-invalid @enderror" id="asesor_id"
-                                        name="asesor_id" required>
-                                        <option value="">Selecciona un asesor</option>
-                                        @foreach ($asesores as $asesor)
-                                            <option value="{{ $asesor->id }}"
-                                                {{ old('asesor_id') == $asesor->id ? 'selected' : '' }}>
-                                                {{ $asesor->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('asesor_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+
+                            {{-- Objetivo --}}
+                            <div class="form-group mb-3">
+                                <label for="objetivo" class="font-weight-bold">Objetivo:</label>
+                                <textarea class="form-control @error('objetivo') is-invalid @enderror" id="objetivo" name="objetivo" rows="3"
+                                    maxlength="600" required>{{ old('objetivo') }}</textarea>
+                                @error('objetivo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                        </div>
 
-                        {{-- Área de Aplicación --}}
-                        <div class="form-group mb-3">
-                            <label for="area_aplicacion" class="font-weight-bold">Área de Aplicación (Opcional):</label>
-                            <input type="text" class="form-control @error('area_aplicacion') is-invalid @enderror"
-                                id="area_aplicacion" name="area_aplicacion" value="{{ old('area_aplicacion') }}"
-                                maxlength="50">
-                            @error('area_aplicacion')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                            {{-- URL del Video --}}
+                            <div class="form-group mb-3">
+                                <label for="video" class="font-weight-bold">URL del Video (Opcional):</label>
+                                <input type="url" class="form-control @error('video') is-invalid @enderror"
+                                    id="video" name="video" value="{{ old('video') }}"
+                                    placeholder="Ej: https://www.youtube.com/watch?v=VIDEO_ID">
+                                <small class="form-text text-muted">Deja vacío si no hay video. Debe comenzar con 'http://' o
+                                    'https://'.</small>
+                                @error('video')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        {{-- Naturaleza Técnica --}}
-                        <div class="form-group mb-3">
-                            <label for="naturaleza_tecnica" class="font-weight-bold">Naturaleza Técnica (Opcional):</label>
-                            <input type="text" class="form-control @error('naturaleza_tecnica') is-invalid @enderror"
-                                id="naturaleza_tecnica" name="naturaleza_tecnica" value="{{ old('naturaleza_tecnica') }}"
-                                maxlength="50">
-                            @error('naturaleza_tecnica')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Objetivo --}}
-                        <div class="form-group mb-3">
-                            <label for="objetivo" class="font-weight-bold">Objetivo:</label>
-                            <textarea class="form-control @error('objetivo') is-invalid @enderror" id="objetivo" name="objetivo" rows="3"
-                                maxlength="600" required>{{ old('objetivo') }}</textarea>
-                            @error('objetivo')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- URL del Video --}}
-                        <div class="form-group mb-3">
-                            <label for="video" class="font-weight-bold">URL del Video (Opcional):</label>
-                            <input type="url" class="form-control @error('video') is-invalid @enderror"
-                                id="video" name="video" value="{{ old('video') }}"
-                                placeholder="Ej: https://www.youtube.com/watch?v=VIDEO_ID">
-                            <small class="form-text text-muted">Deja vacío si no hay video. Debe comenzar con 'http://' o
-                                'https://'.</small>
-                            @error('video')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <hr class="my-4">
-                        <h3>Requerimientos del Proyecto</h3>
-                        <div id="requerimientos-container">
-                            {{-- Los requerimientos se añadirán aquí dinámicamente --}}
-                            @if (old('requerimientos'))
-                                @foreach (old('requerimientos') as $index => $req)
+                            <hr class="my-4">
+                            <h3>Requerimientos del Proyecto</h3>
+                            <div id="requerimientos-container">
+                                {{-- Los requerimientos se añadirán aquí dinámicamente --}}
+                                @if (old('requerimientos'))
+                                    @foreach (old('requerimientos') as $index => $req)
+                                        <div class="form-row mb-2 dynamic-field">
+                                            <div class="col-md-6">
+                                                <input type="text" name="requerimientos[{{ $index }}][descripcion]"
+                                                    class="form-control @error("requerimientos.$index.descripcion") is-invalid @enderror"
+                                                    placeholder="Descripción del requerimiento"
+                                                    value="{{ $req['descripcion'] ?? '' }}" required>
+                                                @error("requerimientos.$index.descripcion")
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" name="requerimientos[{{ $index }}][cantidad]"
+                                                    class="form-control @error("requerimientos.$index.cantidad") is-invalid @enderror"
+                                                    placeholder="Cantidad (ej: 5 unidades, 2 horas)"
+                                                    value="{{ $req['cantidad'] ?? '' }}" required>
+                                                @error("requerimientos.$index.cantidad")
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button"
+                                                    class="btn btn-danger btn-remove-field">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
                                     <div class="form-row mb-2 dynamic-field">
                                         <div class="col-md-6">
-                                            <input type="text" name="requerimientos[{{ $index }}][descripcion]"
-                                                class="form-control @error("requerimientos.$index.descripcion") is-invalid @enderror"
-                                                placeholder="Descripción del requerimiento"
-                                                value="{{ $req['descripcion'] ?? '' }}" required>
-                                            @error("requerimientos.$index.descripcion")
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                            <input type="text" name="requerimientos[0][descripcion]" class="form-control"
+                                                placeholder="Descripción del requerimiento" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="text" name="requerimientos[{{ $index }}][cantidad]"
-                                                class="form-control @error("requerimientos.$index.cantidad") is-invalid @enderror"
-                                                placeholder="Cantidad (ej: 5 unidades, 2 horas)"
-                                                value="{{ $req['cantidad'] ?? '' }}" required>
-                                            @error("requerimientos.$index.cantidad")
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                            <input type="text" name="requerimientos[0][cantidad]" class="form-control"
+                                                placeholder="Cantidad (ej: 5 unidades, 2 horas)" required>
                                         </div>
                                         <div class="col-md-2">
-                                            <button type="button"
-                                                class="btn btn-danger btn-remove-field">Eliminar</button>
+                                            <button type="button" class="btn btn-danger btn-remove-field">Eliminar</button>
                                         </div>
                                     </div>
-                                @endforeach
-                            @else
-                                <div class="form-row mb-2 dynamic-field">
-                                    <div class="col-md-6">
-                                        <input type="text" name="requerimientos[0][descripcion]" class="form-control"
-                                            placeholder="Descripción del requerimiento" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="text" name="requerimientos[0][cantidad]" class="form-control"
-                                            placeholder="Cantidad (ej: 5 unidades, 2 horas)" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button type="button" class="btn btn-danger btn-remove-field">Eliminar</button>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        <button type="button" class="btn btn-secondary mb-4" id="add-requerimiento">
-                            <i class="fas fa-plus"></i> Añadir Requerimiento
-                        </button>
+                                @endif
+                            </div>
+                            <button type="button" class="btn btn-secondary mb-4" id="add-requerimiento">
+                                <i class="fas fa-plus"></i> Añadir Requerimiento
+                            </button>
 
-                        <hr class="my-4">
-                        <h3>Resultados Esperados del Proyecto</h3>
-                        <div id="resultados-container">
-                            {{-- Los resultados se añadirán aquí dinámicamente --}}
-                            @if (old('resultados'))
-                                @foreach (old('resultados') as $index => $res)
+                            <hr class="my-4">
+                            <h3>Resultados Esperados del Proyecto</h3>
+                            <div id="resultados-container">
+                                {{-- Los resultados se añadirán aquí dinámicamente --}}
+                                @if (old('resultados'))
+                                    @foreach (old('resultados') as $index => $res)
+                                        <div class="form-row mb-2 dynamic-field">
+                                            <div class="col-md-10">
+                                                <input type="text" name="resultados[{{ $index }}][descripcion]"
+                                                    class="form-control @error("resultados.$index.descripcion") is-invalid @enderror"
+                                                    placeholder="Descripción del resultado"
+                                                    value="{{ $res['descripcion'] ?? '' }}" required>
+                                                @error("resultados.$index.descripcion")
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button"
+                                                    class="btn btn-danger btn-remove-field">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
                                     <div class="form-row mb-2 dynamic-field">
                                         <div class="col-md-10">
-                                            <input type="text" name="resultados[{{ $index }}][descripcion]"
-                                                class="form-control @error("resultados.$index.descripcion") is-invalid @enderror"
-                                                placeholder="Descripción del resultado"
-                                                value="{{ $res['descripcion'] ?? '' }}" required>
-                                            @error("resultados.$index.descripcion")
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                            <input type="text" name="resultados[0][descripcion]" class="form-control"
+                                                placeholder="Descripción del resultado" required>
                                         </div>
                                         <div class="col-md-2">
-                                            <button type="button"
-                                                class="btn btn-danger btn-remove-field">Eliminar</button>
+                                            <button type="button" class="btn btn-danger btn-remove-field">Eliminar</button>
                                         </div>
                                     </div>
-                                @endforeach
-                            @else
-                                <div class="form-row mb-2 dynamic-field">
-                                    <div class="col-md-10">
-                                        <input type="text" name="resultados[0][descripcion]" class="form-control"
-                                            placeholder="Descripción del resultado" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button type="button" class="btn btn-danger btn-remove-field">Eliminar</button>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        <button type="button" class="btn btn-secondary mb-4" id="add-resultado">
-                            <i class="fas fa-plus"></i> Añadir Resultado
-                        </button>
-
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="submit" class="btn btn-primary flex-grow-1 mr-2 py-2 rounded-pill shadow">
-                                <i class="fas fa-paper-plane mr-2"></i> Enviar Propuesta
+                                @endif
+                            </div>
+                            <button type="button" class="btn btn-secondary mb-4" id="add-resultado">
+                                <i class="fas fa-plus"></i> Añadir Resultado
                             </button>
-                            <a href="{{ route('home') }}"
-                                class="btn btn-secondary flex-grow-1 ml-2 py-2 rounded-pill shadow">
-                                <i class="fas fa-times-circle mr-2"></i> Cancelar
-                            </a>
-                        </div>
-                    </form>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="submit" class="btn btn-primary flex-grow-1 mr-2 py-2 rounded-pill shadow">
+                                    <i class="fas fa-paper-plane mr-2"></i> Enviar Propuesta
+                                </button>
+                                <a href="{{ route('home') }}"
+                                    class="btn btn-secondary flex-grow-1 ml-2 py-2 rounded-pill shadow">
+                                    <i class="fas fa-times-circle mr-2"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif {{-- Fin del if que oculta el formulario si el modal se muestra --}}
+
+    {{-- MODAL: Límite de Proyectos Excedido --}}
+    <div class="modal fade" id="limitExceededModal" tabindex="-1" role="dialog" aria-labelledby="limitExceededModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="limitExceededModalLabel"><i class="fas fa-exclamation-triangle mr-2"></i>Límite de Proyectos Alcanzado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="lead">Ya estás registrado en el número máximo permitido de proyectos.</p>
+                    <p>No puedes crear nuevas propuestas en este momento.</p>
+                    <p>Si deseas iniciar un nuevo proyecto, primero deberás salir de uno de tus proyectos actuales.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a href="{{ route('home') }}" class="btn btn-primary"><i class="fas fa-home mr-2"></i>Ir al Inicio</a>
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('scripts')
@@ -348,14 +373,35 @@
             /* Asegurar que el background se aplique con !important */
             background: linear-gradient(45deg, #007bff, #0056b3) !important;
         }
+
+        /* Estilos para el modal de límite */
+        #limitExceededModal .modal-header.bg-warning {
+            background-color: #ffc107 !important; /* Amarillo de advertencia */
+            border-top-left-radius: 0.3rem;
+            border-top-right-radius: 0.3rem;
+        }
+        #limitExceededModal .modal-title {
+            color: #343a40 !important; /* Color oscuro para el texto del título */
+        }
     </style>
 
     <script>
         $(document).ready(function() {
-            // Script para animar los alerts si lo deseas
+            // Script para animar los alerts
             setTimeout(function() {
                 $(".alert").alert('close');
             }, 5000); // Los alerts se cierran automáticamente después de 5 segundos
+
+            // --- NUEVA LÓGICA: Mostrar el modal si showLimitModal es true ---
+            if (@json($showLimitModal)) {
+                $('#limitExceededModal').modal({
+                    backdrop: 'static', // No permite cerrar el modal haciendo clic fuera
+                    keyboard: false      // No permite cerrar el modal con la tecla Esc
+                });
+                $('#limitExceededModal').modal('show');
+            }
+            // --- FIN NUEVA LÓGICA ---
+
 
             // Función para añadir campos dinámicos de requerimientos
             $('#add-requerimiento').on('click', function() {
