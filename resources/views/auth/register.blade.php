@@ -3,18 +3,13 @@
 
 <head>
     <title>Registro</title>
-    
     <meta charset="utf-8" />
-    
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="icon" href="{{ asset('images/logo_tec.png') }}" type="image/x-icon" />
 
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
@@ -103,7 +98,7 @@
 
             <div class="col-md-6 login-image-section d-none d-md-flex">
                 <img src="images/logo_tec.png" class="img-fluid" alt="Imagen de Registro">
-                </div>
+            </div>
 
             <div class="col-md-6 login-form-section">
                 <h3 class="mb-4 text-center">Registro</h3>
@@ -116,78 +111,75 @@
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                            </ul>
+                        </div>
+                    @endif
 
                     <div class="d-flex flex-row align-items-center mb-4">
                         <i class="fas fa-user fa-lg me-3 fa-fw text-secondary"></i>
-                        <input name="name" type="text" class="form-control"
-                            placeholder="Nombre" value="{{ old('name') }}" required />
-                        </div>
+                        <input name="name" type="text" class="form-control" placeholder="Nombre"
+                            value="{{ old('name') }}" required />
+                    </div>
 
                     <div class="d-flex flex-row align-items-center mb-4">
                         <i class="fas fa-envelope fa-lg me-3 fa-fw text-secondary"></i>
-                        <input name="email" type="email" class="form-control"
-                            placeholder="Correo electrónico" value="{{ old('email', request('email')) }}"
+                        <input name="email" type="email" class="form-control" placeholder="Correo electrónico"
+                            value="{{ old('email', request('email')) }}"
                             {{ request('email') && request('token') ? 'readonly' : '' }} required />
-                        </div>
+                    </div>
 
                     <div class="d-flex flex-row align-items-center mb-4">
                         <i class="fas fa-lock fa-lg me-3 fa-fw text-secondary"></i>
-                        <input name="password" type="password" class="form-control"
-                            placeholder="Contraseña" required />
-                        </div>
+                        <input name="password" type="password" class="form-control" placeholder="Contraseña" required />
+                    </div>
 
                     <div class="d-flex flex-row align-items-center mb-4">
                         <i class="fas fa-key fa-lg me-3 fa-fw text-secondary"></i>
                         <input name="password_confirmation" type="password" class="form-control"
                             placeholder="Confirmar contraseña" required />
-                        </div>
+                    </div>
 
-                    <div
-                        class="d-flex flex-row align-items-center mb-4 {{ request('token') ? '' : 'd-none' }}"
+                    <div class="d-flex flex-row align-items-center mb-4 {{ request('token') ? '' : 'd-none' }}"
                         id="token-input-group">
                         <i class="fas fa-barcode fa-lg me-3 fa-fw text-secondary"></i>
-                        <input name="token" type="text" class="form-control"
-                            placeholder="Token de Registro" value="{{ old('token', request('token')) }}"
-                            autocomplete="off" {{ request('token') ? 'readonly required' : '' }} />
-                        </div>
+                        <input name="token" type="text" class="form-control" placeholder="Token de Registro"
+                            value="{{ old('token', request('token')) }}" autocomplete="off"
+                            {{ request('token') ? 'readonly required' : '' }} />
+                    </div>
 
                     @if (!request('token'))
                         <div class="d-grid gap-2 mb-4">
-                            <button type="button" class="btn btn-outline-info btn-sm"
-                                id="toggleTokenField">
+                            <button type="button" class="btn btn-outline-info btn-sm" id="toggleTokenField">
                                 ¿Tienes un token de registro?
-                                </button>
-                            </div>
+                            </button>
+                        </div>
                     @endif
 
                     <button class="btn btn-primary btn-lg" type="submit">Registrarse</button>
 
-                    
+
                     <hr class="my-4">
 
                     <p class="text-center">
                         ¿Ya tienes una cuenta? <a href="{{ route('login') }}">Iniciar sesión</a>
-                        </p>
-                    
+                    </p>
+
                 </form>
-                </div>
-
             </div>
-        </div>
 
-    
+        </div>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"        
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
     </script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"        
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
     </script>
 
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tokenInputFieldGroup = document.getElementById('token-input-group');

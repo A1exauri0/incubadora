@@ -99,7 +99,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/notifications/mark-as-read', [NotificationController::class, 'markNotificationsAsRead'])->name('notifications.markAsRead');
         // Ruta para GENERAR PDF (se mantiene en ProyectoController ya que es para cualquier proyecto)
         Route::get('/admin/proyectos/{clave_proyecto}/ficha-tecnica-pdf', [ProyectoController::class, 'generateFichaTecnicaPdf'])->name('admin.proyectos.ficha_tecnica_pdf');
-        
+
         // --- RUTAS DE PARTICIPANTES PARA CUALQUIER ROL CON ACCESO ---
         Route::get('/proyectos/{clave_proyecto}/participantes', [ParticipanteController::class, 'mostrarProyecto'])->name('proyectos.participantes');
 
@@ -258,7 +258,7 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/c_usuarios/eliminar', [UsuarioController::class, 'eliminar'])->name('usuarios.eliminar');
     Route::post('c_usuarios/eliminarMultiple', [UsuarioController::class, 'eliminarMultiple'])->name('usuarios.eliminarMultiple');
 
-    // RUTAS PARA EL NUEVO CRUD DE ASIGNACIÓN DE HABILIDADES A ASESORES/MENTORES
+    // CRUD habilidades asesores/mentores
     Route::prefix('c_habilidadesAM_asignar')->group(function () {
         Route::get('/', [habilidadesAMController::class, 'index'])->name('habilidadesAM.index');
         Route::post('/get-usuarios-por-tipo', [habilidadesAMController::class, 'getUsuariosPorTipo'])->name('habilidadesAM.getUsuariosPorTipo');

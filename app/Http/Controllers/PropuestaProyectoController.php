@@ -41,7 +41,8 @@ class PropuestaProyectoController extends Controller
 
         $categorias = DB::table('categoria')->get();
         $tipos = DB::table('tipo')->get();
-        $etapas = DB::table('etapas')->get();
+        // Las etapas no se usan directamente en el formulario de creación, pero se mantienen si la vista las espera.
+        $etapas = DB::table('etapas')->get(); 
         
         // Obtenemos los asesores desde la tabla 'users' para el formulario
         $asesores = User::role('asesor')->get();
@@ -65,12 +66,13 @@ class PropuestaProyectoController extends Controller
             return redirect()->route('home')->with('error', 'Acceso no autorizado para crear propuestas.');
         }
 
+        // Si el campo de video está vacío, lo normalizamos a null
         if (empty($request->input('video'))) {
             $request->merge(['video' => null]);
         }
 
+        // Las reglas de validación ya NO incluyen 'clave_proyecto'
         $request->validate([
-            'clave_proyecto' => 'required|string|max:50|unique:proyecto,clave_proyecto',
             'nombre' => 'required|string|max:255',
             'nombre_descriptivo' => 'required|string|max:255',
             'descripcion' => 'required|string',
@@ -81,7 +83,7 @@ class PropuestaProyectoController extends Controller
             'area_aplicacion' => 'nullable|string|max:255',
             'naturaleza_tecnica' => 'nullable|string|max:255',
             'objetivo' => 'nullable|string',
-            'requerimientos' => 'nullable|array',
+            'requerimientos' => 'required|array',
             'requerimientos.*.descripcion' => 'required_with:requerimientos.*.cantidad|string|max:100',
             'requerimientos.*.cantidad' => 'required_with:requerimientos.*.descripcion|string|max:50',
             'resultados' => 'nullable|array',
@@ -89,8 +91,29 @@ class PropuestaProyectoController extends Controller
         ]);
 
         try {
+            // --- Lógica para GENERAR la clave del proyecto autoincremental ---
+            $lastProyecto = DB::table('proyecto')
+                                ->orderBy('clave_proyecto', 'desc')
+                                ->first();
+
+            $nextNumericId = 1;
+            if ($lastProyecto) {
+                // Extraemos la parte numérica del último clave_proyecto
+                // Asumimos que la clave siempre es un número con ceros a la izquierda
+                $lastNumericPart = (int) $lastProyecto->clave_proyecto;
+                $nextNumericId = $lastNumericPart + 1;
+            } else {
+                // Si no hay proyectos, empezamos desde 49 + 1 = 50 para seguir la secuencia '0000000000049'
+                $nextNumericId = 50; 
+            }
+            
+            // Formateamos la nueva clave del proyecto con ceros a la izquierda para 11 dígitos
+            $generatedClaveProyecto = str_pad($nextNumericId, 11, '0', STR_PAD_LEFT);
+            // --- FIN de la lógica de generación ---
+
+
             DB::table('proyecto')->insert([
-                'clave_proyecto' => $request->input('clave_proyecto'),
+                'clave_proyecto' => $generatedClaveProyecto, // Usamos la clave generada
                 'nombre' => $request->input('nombre'),
                 'nombre_descriptivo' => $request->input('nombre_descriptivo'),
                 'descripcion' => $request->input('descripcion'),
@@ -104,8 +127,9 @@ class PropuestaProyectoController extends Controller
                 'fecha_agregado' => now(),
             ]);
 
-            $clave_proyecto_insertado = $request->input('clave_proyecto');
+            $clave_proyecto_insertado = $generatedClaveProyecto; // Usamos la clave generada
 
+            // Insertar requerimientos
             if ($request->has('requerimientos') && is_array($request->input('requerimientos'))) {
                 foreach ($request->input('requerimientos') as $req) {
                     if (!empty($req['descripcion']) && !empty($req['cantidad'])) {
@@ -118,6 +142,7 @@ class PropuestaProyectoController extends Controller
                 }
             }
 
+            // Insertar resultados esperados
             if ($request->has('resultados') && is_array($request->input('resultados'))) {
                 foreach ($request->input('resultados') as $res) {
                     if (!empty($res['descripcion'])) {
@@ -130,6 +155,7 @@ class PropuestaProyectoController extends Controller
                 }
             }
 
+            // Asignar alumno como líder del proyecto
             DB::table('alumno_proyecto')->insert([
                 'no_control' => $alumno->no_control,
                 'clave_proyecto' => $clave_proyecto_insertado,
@@ -154,7 +180,7 @@ class PropuestaProyectoController extends Controller
                     // Notificar al asesor seleccionado
                     $asesorUser->notify(new AsesorActivityNotification(
                         $request->input('nombre'),         
-                        $request->input('clave_proyecto'), 
+                        $request->input('clave_proyecto'), // Usar la clave generada aquí para la notificación
                         $user->name,                       
                         route('asesor.proyectos.propuestas') 
                     ));
@@ -164,6 +190,7 @@ class PropuestaProyectoController extends Controller
             return redirect()->route('home')->with('success', 'Propuesta de proyecto creada exitosamente y pendiente de revisión por el asesor.');
 
         } catch (\Exception $e) {
+            // Manejo de errores: redirige de vuelta con los datos y el mensaje de error
             return redirect()->back()->withInput()->with('error', 'Error al crear la propuesta: ' . $e->getMessage());
         }
     }
@@ -238,7 +265,7 @@ public function reviewAdvisorProposal(Request $request, $clave_proyecto)
         // Buscar el ID del asesor en la tabla 'asesor' usando el email del usuario
         $asesor = DB::table('asesor')->where('correo_electronico', $user->email)->first();
         if (!$asesor) {
-             return back()->with('error', 'No se encontró tu información de asesor. Contacta al administrador.');
+            return back()->with('error', 'No se encontró tu información de asesor. Contacta al administrador.');
         }
 
         $request->validate([
@@ -269,7 +296,7 @@ public function reviewAdvisorProposal(Request $request, $clave_proyecto)
 
             $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
-                $notificationMessageForAdmin = 'La propuesta "' . $proyecto->nombre . '" ha recibido el Visto Bueno del asesor y está lista para tu revisión.';
+                // Notificación para el administrador cuando el asesor da el visto bueno
                 $admin->notify(new NewProposalNotification(
                     $proyecto->nombre,
                     $proyecto->clave_proyecto,
@@ -302,10 +329,11 @@ public function reviewAdvisorProposal(Request $request, $clave_proyecto)
         if ($leader) {
             $leaderUser = User::find($leader->id);
             if ($leaderUser) {
+                // Notificación para el alumno líder sobre el estado de la propuesta
                 $leaderUser->notify(new StudentProposalStatusNotification(
                     $proyecto->nombre,
                     $newStatus,
-                    route('home'),
+                    route('home'), // Se redirige al home, donde el alumno puede ver sus proyectos
                     $rejectionReason
                 ));
             }
@@ -415,10 +443,11 @@ public function reviewProposal(Request $request, $clave_proyecto)
         if ($leader) {
             $leaderUser = User::find($leader->id);
             if ($leaderUser) {
+                // Notificación para el alumno líder sobre el estado de la propuesta
                 $leaderUser->notify(new StudentProposalStatusNotification(
                     $proyecto->nombre,
                     $newStatus,
-                    route('home'),
+                    route('home'), // Se redirige al home, donde el alumno puede ver sus proyectos
                     $rejectionReason
                 ));
             }

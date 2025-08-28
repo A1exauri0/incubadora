@@ -31,15 +31,6 @@
                     <form action="{{ route('proyectos.store_proposal') }}" method="POST">
                         @csrf
 
-                        {{-- Clave del Proyecto --}}
-                        <div class="form-group mb-3">
-                            <label for="clave_proyecto" class="font-weight-bold">Clave del Proyecto:</label>
-                            <input type="text" class="form-control @error('clave_proyecto') is-invalid @enderror"
-                                id="clave_proyecto" name="clave_proyecto" value="{{ old('clave_proyecto') }}" required>
-                            @error('clave_proyecto')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
 
                         {{-- Nombre y Nombre Descriptivo --}}
                         <div class="row">
