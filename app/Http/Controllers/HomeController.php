@@ -14,18 +14,17 @@ class HomeController extends Controller
     }
 
     public function index()
-    {/** @var \App\Models\User */
-
+    {
+        /** @var \App\Models\User */
         $user = auth()->user();
 
-        // Obtener todos los datos necesarios
+        // Obtener todos los datos necesarios para la vista
         $etapas = DB::table('etapas')->get();
-        $colores = DB::table('color')->get(); 
-        $categorias = DB::table('categoria')->get(); 
-        $tipos = DB::table('tipo')->get();           
+        $colores = DB::table('color')->get();
+        $categorias = DB::table('categoria')->get();
+        $tipos = DB::table('tipo')->get();
 
-        // Asignar clase de color a cada etapa
-        // Esta lógica es crucial para que $etapas tenga la propiedad 'clase'
+        // Asignar clase de color a cada etapa para uso en la vista
         foreach ($etapas as $etapa) {
             if ($color = $colores->firstWhere('nombre', $etapa->color)) {
                 $etapa->clase = $color->clase;
@@ -43,12 +42,13 @@ class HomeController extends Controller
             'proyecto.descripcion',
             'proyecto.fecha_agregado',
             'proyecto.video',
-            'proyecto.categoria as categoria_id', 
-            'proyecto.tipo as tipo_id',           
-            'proyecto.etapa as etapa_id',         
+            'proyecto.categoria as categoria_id',
+            'proyecto.tipo as tipo_id',
+            'proyecto.etapa as etapa_id', // ID de la etapa
+            'proyecto.motivo_rechazo',    // <-- ¡Añadido aquí!
             'categoria.nombre as nombre_categoria', // Nombre de la categoría
             'tipo.nombre as nombre_tipo',           // Nombre del tipo
-            'etapas.nombre as nombre_etapa',         // Nombre de la etapa
+            'etapas.nombre as nombre_etapa',        // Nombre de la etapa
         ];
 
         // Construir la consulta base con los JOINs necesarios
@@ -57,16 +57,16 @@ class HomeController extends Controller
                         ->join('tipo', 'proyecto.tipo', '=', 'tipo.idTipo')
                         ->join('etapas', 'proyecto.etapa', '=', 'etapas.idEtapa');
 
-
-        // Verificar el rol del usuario
+        // Verificar el rol del usuario para cargar los proyectos
         if ($user->hasRole('admin')) {
-            // Admin ve todos los proyectos
+            // El administrador ve todos los proyectos
             $proyectos = $baseQuery->select(array_merge($commonSelects, [DB::raw('0 as es_lider')]))
                                    ->get();
         } elseif ($user->hasRole('alumno')) {
             $alumno = DB::table('alumno')->where('correo_institucional', $user->email)->first();
 
             if ($alumno) {
+                // Obtener los proyectos a los que el alumno actual está asociado
                 $proyectos = DB::table('alumno_proyecto')
                     ->join('proyecto', 'alumno_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
                     ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
@@ -75,11 +75,22 @@ class HomeController extends Controller
                     ->where('alumno_proyecto.no_control', $alumno->no_control)
                     ->select(array_merge($commonSelects, ['alumno_proyecto.lider as es_lider']))
                     ->get();
+
+                // Para cada proyecto, obtener todos los miembros del equipo
+                foreach ($proyectos as $proyecto) {
+                    $miembros = DB::table('alumno_proyecto')
+                        ->where('clave_proyecto', $proyecto->clave_proyecto)
+                        ->join('alumno', 'alumno_proyecto.no_control', '=', 'alumno.no_control')
+                        ->select('alumno.no_control', 'alumno.nombre', 'alumno_proyecto.lider')
+                        ->get();
+                    $proyecto->miembros_equipo = $miembros; // Añadir los miembros del equipo al objeto proyecto
+                }
             }
         } elseif ($user->hasRole('asesor')) {
             $asesor = DB::table('asesor')->where('correo_electronico', $user->email)->first();
 
             if ($asesor) {
+                // El asesor ve los proyectos que le han sido asignados
                 $proyectos = DB::table('asesor_proyecto')
                     ->join('proyecto', 'asesor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
                     ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
@@ -93,6 +104,7 @@ class HomeController extends Controller
             $mentor = DB::table('mentor')->where('correo_electronico', $user->email)->first();
 
             if ($mentor) {
+                // El mentor ve los proyectos que le han sido asignados
                 $proyectos = DB::table('mentor_proyecto')
                     ->join('proyecto', 'mentor_proyecto.clave_proyecto', '=', 'proyecto.clave_proyecto')
                     ->join('categoria', 'proyecto.categoria', '=', 'categoria.idCategoria')
@@ -105,18 +117,19 @@ class HomeController extends Controller
         }
         // Si no tiene ninguno de los roles anteriores, $proyectos seguirá siendo una colección vacía.
 
-        // Ahora que tenemos 'etapa_id' en cada proyecto y 'clase' en cada 'etapa' de la colección $etapas
+        // Asignar la clase de color de la etapa a cada proyecto
         foreach ($proyectos as $proyecto) {
             $etapaObj = $etapas->firstWhere('idEtapa', $proyecto->etapa_id);
-            $proyecto->clase = $etapaObj->clase ?? 'secondary'; 
+            $proyecto->clase = $etapaObj->clase ?? 'secondary';
         }
 
+        // Retornar la vista 'home' con los datos necesarios
         return view('home', [
             'titulo' => 'Inicio',
             'proyectos' => $proyectos,
-            'categorias' => $categorias, 
-            'tipos' => $tipos,           
-            'etapas' => $etapas,        
+            'categorias' => $categorias,
+            'tipos' => $tipos,
+            'etapas' => $etapas,
         ]);
     }
 }

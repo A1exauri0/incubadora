@@ -57,20 +57,30 @@
                         <div class="p-0" style="height: 500px; overflow-y: auto;">
                             <div class="list-group list-group-flush" id="proyectos-list">
                                 @forelse ($proyectos as $proyecto)
-                                    <a href="#"
-                                        class="list-group-item list-group-item-action list-group-item-{{ $proyecto->clase }}"
-                                        data-clave="{{ $proyecto->clave_proyecto }}" data-nombre="{{ $proyecto->nombre }}"
-                                        data-descripcion="{{ $proyecto->descripcion }}"
-                                        data-categoria="{{ $proyecto->nombre_categoria }}"
-                                        data-tipo="{{ $proyecto->nombre_tipo }}" data-etapa="{{ $proyecto->nombre_etapa }}"
-                                        data-fecha="{{ $proyecto->fecha_agregado }}" data-video="{{ $proyecto->video }}"
-                                        data-lider="{{ $proyecto->es_lider ?? 0 }}">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1 text-truncate">{{ $proyecto->nombre }}</h5>
-                                            <small class="text-muted">{{ $proyecto->fecha_agregado }}</small>
-                                        </div>
-                                        <p class="mb-1 text-truncate">{{ $proyecto->nombre_etapa }}</p>
-                                    </a>
+                                    <div class="d-flex align-items-start">
+                                        <a href="#"
+                                            class="list-group-item list-group-item-action list-group-item-{{ $proyecto->clase }}"
+                                            data-clave="{{ $proyecto->clave_proyecto }}" data-nombre="{{ $proyecto->nombre }}"
+                                            data-descripcion="{{ $proyecto->descripcion }}"
+                                            data-categoria="{{ $proyecto->nombre_categoria }}"
+                                            data-tipo="{{ $proyecto->nombre_tipo }}" data-etapa-nombre="{{ $proyecto->nombre_etapa }}"
+                                            data-etapa-id="{{ $proyecto->etapa_id }}" {{-- ¡CORREGIDO! --}}
+                                            data-clase="{{ $proyecto->clase }}"
+                                            data-fecha="{{ $proyecto->fecha_agregado }}" data-video="{{ $proyecto->video }}"
+                                            data-lider="{{ $proyecto->es_lider ?? 0 }}"
+                                            {{-- ¡AÑADIDO!: Pasar el motivo de rechazo si existe --}}
+                                            @if($proyecto->motivo_rechazo)
+                                                data-motivo-rechazo="{{ $proyecto->motivo_rechazo }}"
+                                            @endif
+                                        >
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1 text-truncate">{{ $proyecto->nombre }}</h5>
+                                                <small class="text-muted">{{ $proyecto->fecha_agregado }}</small>
+                                            </div>
+                                            <p class="mb-1 text-truncate">{{ $proyecto->nombre_etapa }}</p>
+                                        </a>
+                                        {{-- ¡ELIMINADO!: Este botón es mejor gestionarlo dinámicamente en el panel de detalles --}}
+                                    </div>
                                 @empty
                                     <div class="p-4 text-center" id="no-projects-message">
                                         <p class="mb-2">No participa en ningún proyecto.</p>
@@ -118,6 +128,11 @@
 
                             <div id="detallesVideo" class="mt-4"></div>
 
+                            {{-- Contenedor para el botón de motivo de rechazo --}}
+                            <div id="motivoRechazoContainer" class="mt-3 d-flex justify-content-end" style="display:none;">
+                                {{-- El botón se añadirá aquí vía JavaScript --}}
+                            </div>
+
                             {{-- Botones de acción --}}
                             <div class="mt-4 d-flex justify-content-between">
                                 <a href="#" id="botonParticipantes" class="btn btn-danger btn-sm">
@@ -131,18 +146,38 @@
                     </div>
 
                     {{-- Mensaje si no hay proyectos seleccionados --}}
-                @empty($proyectos)
-                @else
-                    <div id="no-proyecto-seleccionado" class="text-center p-5">
-                        <i class="fas fa-arrow-circle-left fa-3x text-muted"></i>
-                        <h4 class="mt-3 text-muted">Selecciona un proyecto de la lista para ver los detalles.</h4>
-                    </div>
-                @endempty
+                    @empty($proyectos)
+                    @else
+                        <div id="no-proyecto-seleccionado" class="text-center p-5">
+                            <i class="fas fa-arrow-circle-left fa-3x text-muted"></i>
+                            <h4 class="mt-3 text-muted">Selecciona un proyecto de la lista para ver los detalles.</h4>
+                        </div>
+                    @endempty
+                </div>
+            </div>
+        </div>
+    @endhasanyrole
+@endsection
+
+{{-- Modal para mostrar motivo de rechazo (se mantiene igual) --}}
+<div class="modal fade" id="motivoRechazoModal" tabindex="-1" role="dialog" aria-labelledby="motivoRechazoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="motivoRechazoModalLabel">Motivo de Rechazo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="motivoRechazoTexto">
+                <!-- Aquí se muestra el motivo -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
-@endhasanyrole
-@endsection
+</div>
 
 @push('scripts')
 <script>
@@ -159,7 +194,7 @@
         $('#detallesFecha').text(proyecto.fecha);
 
         const badge = $('#detallesEtapaBadge');
-        badge.text(proyecto.etapa);
+        badge.text(proyecto.etapaNombre); // Usar el nombre de la etapa
         badge.removeClass().addClass(`badge badge-pill badge-${proyecto.clase}`);
 
         const videoContainer = $('#detallesVideo');
@@ -177,7 +212,7 @@
         }
 
         const botonEditar = $('#botonEditarProyecto');
-        const botonParticipantes = $('#botonParticipantes'); // Selecciona el nuevo botón
+        const botonParticipantes = $('#botonParticipantes');
 
         if (proyecto.esLider == 1) {
             botonEditar.removeClass('d-none');
@@ -188,6 +223,22 @@
 
         // Configura el enlace del botón de participantes
         botonParticipantes.attr('href', `/proyectos/${proyecto.clave}/participantes`);
+
+        // ¡NUEVO!: Lógica para mostrar el botón de motivo de rechazo en el panel de detalles
+        const motivoRechazoContainer = $('#motivoRechazoContainer');
+        motivoRechazoContainer.empty(); // Limpiar el contenedor
+
+        // ID_ETAPA_RECHAZADA es 4
+        if (proyecto.etapaId == 4 && proyecto.motivoRechazo) {
+            const motivoBoton = `
+                <button type="button" class="btn btn-warning btn-sm ver-motivo-rechazo-detalle" data-motivo="${proyecto.motivoRechazo}">
+                    <i class="fas fa-exclamation-circle"></i> Motivo de rechazo
+                </button>
+            `;
+            motivoRechazoContainer.append(motivoBoton).show();
+        } else {
+            motivoRechazoContainer.hide();
+        }
     }
 
     function obtenerIdVideo(url) {
@@ -253,15 +304,24 @@
                 descripcion: $(this).data('descripcion'),
                 categoria: $(this).data('categoria'),
                 tipo: $(this).data('tipo'),
-                etapa: $(this).data('etapa'),
-                clase: $(this).attr('class').split(' ').find(cls => cls.startsWith(
-                    'list-group-item-')).replace('list-group-item-', ''),
+                etapaNombre: $(this).data('etapa-nombre'), // Nombre de la etapa
+                etapaId: $(this).data('etapa-id'),         // ID de la etapa
+                clase: $(this).data('clase'),              // Clase de color de la etapa
                 fecha: $(this).data('fecha'),
                 video: $(this).data('video'),
-                esLider: $(this).data('lider')
+                esLider: $(this).data('lider'),
+                motivoRechazo: $(this).data('motivo-rechazo') || null // Motivo de rechazo
             };
 
             mostrarDetalles(proyectoData);
+        });
+
+        // Mostrar modal de motivo de rechazo desde el panel de detalles (nuevo listener)
+        $(document).on('click', '.ver-motivo-rechazo-detalle', function(e) {
+            e.stopPropagation(); // Evita que se propague a otros elementos
+            var motivo = $(this).data('motivo');
+            $('#motivoRechazoTexto').text(motivo);
+            $('#motivoRechazoModal').modal('show');
         });
 
         // Carga los detalles del primer proyecto al iniciar la página
